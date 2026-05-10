@@ -208,8 +208,13 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ spinning, targetIndex, onSpinEnd,
     };
   }, [spinning]); // ONLY react to spinning prop changes
 
+  const wheelSize = 'clamp(220px, min(82vw, 58dvh), 520px)';
+
   return (
-    <div className="relative w-[30vw] h-[30vw] max-w-[520px] max-h-[520px] min-w-[220px] min-h-[220px] flex items-center justify-center select-none overflow-visible">
+    <div
+      className="relative flex items-center justify-center select-none overflow-visible"
+      style={{ width: wheelSize, height: wheelSize }}
+    >
       {/* Outer Glow Ring */}
       <div className="absolute inset-[-10px] rounded-full border-2 transition-all duration-1000 animate-pulse" 
            style={{ borderColor: themeHex, filter: `drop-shadow(0 0 30px ${themeHex}66)` }}></div>

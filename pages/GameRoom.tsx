@@ -707,7 +707,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
   };
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen w-screen lg:w-full bg-black overflow-hidden relative">
+    <div className="flex flex-col lg:flex-row h-[100dvh] w-full bg-black overflow-hidden relative">
       <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
 
       {/* Betting Modal - PRE_GAME Phase */}
@@ -724,7 +724,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
       {/* Deposit Prompt Modal - When insufficient balance */}
       {showDepositPrompt && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-sm p-4">
-          <div className="bg-gradient-to-b from-slate-900 to-black border-2 border-neon-pink rounded-sm p-8 max-w-md w-full text-center shadow-[0_0_50px_rgba(255,0,128,0.3)]">
+          <div className="bg-gradient-to-b from-slate-900 to-black border-2 border-neon-pink rounded-sm p-4 sm:p-8 max-w-md w-full text-center shadow-[0_0_50px_rgba(255,0,128,0.3)] max-h-[92dvh] overflow-y-auto">
             <div className="text-5xl mb-4">💳</div>
             <h3 className="text-2xl font-arcade text-neon-pink mb-2 uppercase tracking-wider">INSUFFICIENT BALANCE</h3>
             <p className="text-slate-300 mb-6 text-sm">
@@ -844,44 +844,44 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
 
       {/* Ranked Player Sidebar - Mobile: Collapsible Drawer, Desktop: Always Visible */}
       {!showBettingModal && !showColorAssignment && (
-        <div className={`fixed md:relative inset-0 md:inset-auto z-40 md:z-auto transition-all duration-300 ${sidebarOpen ? 'w-full md:w-72' : 'w-0 md:w-72'} md:h-full`}>
-          <div className={`absolute inset-0 bg-black/70 md:hidden transition-opacity duration-300 ${sidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setSidebarOpen(false)}></div>
-          <div className={`absolute md:relative left-0 top-0 h-full w-64 md:w-full bg-vegas-panel border-r border-white/5 flex flex-col z-20 pt-12 sm:pt-12 md:pt-0 px-2 sm:px-3 py-3 md:p-0 max-h-full overflow-y-auto custom-scrollbar transition-transform duration-300 md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        <div className={`fixed lg:relative inset-0 lg:inset-auto z-40 lg:z-auto transition-all duration-300 ${sidebarOpen ? 'w-full lg:w-72' : 'w-0 lg:w-72'} lg:h-full`}>
+          <div className={`absolute inset-0 bg-black/70 lg:hidden transition-opacity duration-300 ${sidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setSidebarOpen(false)}></div>
+          <div className={`absolute lg:relative left-0 top-0 h-full w-[82vw] max-w-72 lg:w-full bg-vegas-panel border-r border-white/5 flex flex-col z-20 pt-12 sm:pt-12 lg:pt-0 px-2 sm:px-3 py-3 lg:p-0 max-h-full overflow-y-auto custom-scrollbar transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
           <button 
             onClick={() => setSidebarOpen(false)}
-            className="md:hidden absolute top-2 right-2 text-slate-400 hover:text-white text-xl z-30"
+            className="lg:hidden absolute top-2 right-2 text-slate-400 hover:text-white text-xl z-30"
           >
             ✕
           </button>
           
-          <div className="p-2 sm:p-3 md:p-4 border-b border-white/5 bg-black/40">
+          <div className="p-2 sm:p-3 lg:p-4 border-b border-white/5 bg-black/40">
             <h2 className="font-arcade text-[8px] sm:text-[9px] md:text-[9px] text-neon-cyan tracking-widest uppercase opacity-70">SYST_ACTIVE_NODES</h2>
             <div className="mt-1 flex items-center gap-2">
               <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_lime]"></span>
               <span className="text-[9px] sm:text-[10px] md:text-[10px] font-mono text-slate-400">{players.length} CONNECTED</span>
             </div>
           </div>
-          <div className="flex-1 overflow-x-auto md:overflow-y-auto custom-scrollbar p-2 md:p-3 space-y-1 md:space-y-1.5 flex md:flex-col gap-1.5 mt-4 md:mt-0">
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-2 lg:p-3 space-y-1 lg:space-y-1.5 flex flex-col gap-1.5 mt-4 lg:mt-0">
             {players.map(p => {
               const rConfig = RANK_CONFIG[p.rank || UserRank.ROOKIE];
               return (
                 <div key={p.id} 
-                     className={`flex items-center gap-2 md:gap-3 p-1.5 md:p-2 rounded border border-transparent transition-all duration-300 flex-shrink-0 md:flex-shrink whitespace-nowrap md:whitespace-normal ${
+                     className={`flex items-center gap-2 lg:gap-3 p-1.5 lg:p-2 rounded border border-transparent transition-all duration-300 flex-shrink-0 lg:flex-shrink whitespace-nowrap lg:whitespace-normal ${
                        p.id === user.id ? 'bg-white/10 border-white/20' : 'bg-black/20 hover:bg-white/5'
                      }`}
                 >
                   <PlayerAvatar player={p} size="xs" />
-                  <div className="min-w-0 flex-1 md:block">
-                    <div className="text-[10px] md:text-[11px] font-bold text-white truncate uppercase tracking-tighter flex items-center justify-between">
+                  <div className="min-w-0 flex-1 lg:block">
+                    <div className="text-[10px] lg:text-[11px] font-bold text-white truncate uppercase flex items-center justify-between">
                       <span>{p.username}</span>
                       {p.id === user.id && <span className="text-[7px] text-neon-cyan border border-neon-cyan/50 px-1 rounded ml-1 animate-pulse">YOU</span>}
                     </div>
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <span className="text-[7px] md:text-[8px] font-arcade px-1 border-b uppercase opacity-80" style={{ color: rConfig.color, borderColor: rConfig.color + '44' }}>
+                      <span className="text-[7px] lg:text-[8px] font-arcade px-1 border-b uppercase opacity-80" style={{ color: rConfig.color, borderColor: rConfig.color + '44' }}>
                         {rConfig.label}
                       </span>
                       {p.betAmount > 0 && (
-                        <span className="text-neon-green text-[8px] md:text-[9px] font-mono font-black">
+                        <span className="text-neon-green text-[8px] lg:text-[9px] font-mono font-black">
                           ${p.betAmount}
                         </span>
                       )}
@@ -899,14 +899,14 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
       {!showBettingModal && !showColorAssignment && !isTransitioning && (
         <button
           onClick={() => setSidebarOpen(true)}
-          className="md:hidden fixed bottom-24 right-2 z-30 w-11 h-11 bg-neon-cyan text-black rounded-full font-bold text-xl hover:bg-white transition-colors flex items-center justify-center shadow-lg active:scale-95"
+          className="lg:hidden fixed bottom-24 right-2 z-30 w-11 h-11 bg-neon-cyan text-black rounded-full font-bold text-xl hover:bg-white transition-colors flex items-center justify-center shadow-lg active:scale-95"
         >
           👥
         </button>
       )}
 
       {!showBettingModal && !showColorAssignment && !isTransitioning && (
-        <div className="flex-1 flex flex-col relative pt-12 sm:pt-12 md:pt-0 w-full md:flex-1 min-h-0">
+        <div className="flex-1 flex flex-col relative pt-12 sm:pt-12 lg:pt-0 w-full min-w-0 min-h-0">
         {/* Inactivity Warning - Overlay when needed */}
         {inactivityWarning && (
           <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none p-4">
@@ -935,7 +935,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
         )}
 
         {/* Spin Wheel - Responsive */}
-        <div className="flex-1 flex flex-col items-center justify-center p-1 sm:p-2 md:p-4 min-h-[220px] sm:min-h-[320px] relative overflow-visible gap-2 sm:gap-4">
+        <div className="flex-1 flex flex-col items-center justify-center p-1 sm:p-2 lg:p-4 min-h-[0] relative overflow-visible gap-2 sm:gap-4">
           {/* Wheel Container with Pointer and Pot */}
           <div className="flex-1 flex flex-col items-center justify-center w-full relative">
             <SpinWheel 
@@ -947,7 +947,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
             />
             
             {/* Total Pot Display - Mobile Optimized */}
-            <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-black/90 border border-neon-gold rounded px-2 sm:px-4 py-1.5 sm:py-3 z-40">
+            <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-black/90 border border-neon-gold rounded px-2 sm:px-4 py-1.5 sm:py-3 z-40 max-w-[36vw]">
               <div className="text-[7px] sm:text-[10px] font-arcade text-neon-gold/70 uppercase tracking-widest">TOTAL POT</div>
               <div className="text-sm sm:text-2xl font-arcade font-black text-neon-gold drop-shadow-[0_0_10px_rgba(255,215,0,0.5)]">
                 ${players.filter(p => p.status === PlayerStatus.CONFIRMED).reduce((sum, p) => sum + p.betAmount, 0)}
@@ -959,7 +959,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
               <img 
                 src={winnerAlert ? (winnerAlert.isUserWin ? '/winner.png' : '/loser.png') : ''} 
                 alt={winnerAlert?.isUserWin ? 'Winner' : 'Loser'}
-                className={`w-40 h-40 sm:w-56 sm:h-56 md:w-64 md:h-64 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] bg-transparent ${
+                className={`w-28 h-28 sm:w-56 sm:h-56 md:w-64 md:h-64 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] bg-transparent ${
                   winnerAlert?.isUserWin ? 'animate-winner-bounce' : 'animate-loser-shake'
                 }`}
                 style={{ backgroundColor: 'transparent', display: winnerAlert ? 'block' : 'none' }}
@@ -988,7 +988,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
 
         {/* Countdown Display - Fixed Overlay (rendered outside wheel container) */}
         {gameState === GameState.BETTING && timer > 0 && (
-          <div className="fixed inset-0 flex flex-col items-center justify-center pointer-events-none z-[9999]" style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'auto', height: 'auto' }}>
+          <div className="fixed inset-0 flex flex-col items-center justify-center pointer-events-none z-[9999] px-4" style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'auto', height: 'auto' }}>
             <div className="text-center">
               <div className="text-[12px] sm:text-[14px] font-arcade text-neon-cyan uppercase tracking-wider mb-2 sm:mb-3 drop-shadow-[0_0_20px_rgba(0,255,255,1)]">⏱️ Spin starts in</div>
               <div className="text-6xl sm:text-8xl md:text-9xl font-arcade font-black text-neon-cyan drop-shadow-[0_0_40px_rgba(0,255,255,1)] animate-pulse">
@@ -1000,7 +1000,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
         )}
 
         {/* Action Console - Simple Betting */}
-        <div className="p-2 sm:p-3 md:p-4 bg-vegas-panel/90 border-t border-white/5 z-20 backdrop-blur-md max-h-[45vh] sm:max-h-[40vh] md:max-h-none overflow-y-auto md:overflow-y-visible">
+        <div className="p-2 sm:p-3 lg:p-4 bg-vegas-panel/90 border-t border-white/5 z-20 backdrop-blur-md max-h-[34dvh] sm:max-h-[36dvh] lg:max-h-none overflow-y-auto lg:overflow-y-visible">
           <div className="max-w-full sm:max-w-2xl mx-auto space-y-2 sm:space-y-3 md:space-y-5">
             {/* Your Assigned Color & Bet Status */}
             {(() => {
@@ -1028,7 +1028,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
             {/* Bet Amount Controls */}
             {gameState === GameState.BETTING && !userBetPlaced && (
               <div className="flex flex-col gap-2 sm:gap-3">
-                <div className="flex gap-2 sm:gap-3">
+                <div className="flex flex-col min-[380px]:flex-row gap-2 sm:gap-3">
                   <div className="flex-1 flex bg-black/60 border border-white/10 rounded-sm overflow-hidden shadow-inner">
                     <button 
                       onClick={() => { soundManager.play('click'); setBetAmount(a => Math.max(10, a - 50)); }} 
@@ -1116,18 +1116,18 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
       </div>
       )}
 
-      {/* Chat Panel - Mobile: Collapsible Drawer, Tablet+: Fixed Side Panel */}
+      {/* Chat Panel - Mobile/Tablet: Collapsible Drawer, Desktop: Fixed Side Panel */}
       {!showBettingModal && !showColorAssignment && (
-        <div className={`fixed sm:relative inset-0 sm:inset-auto z-40 sm:z-auto transition-all duration-300 ${chatOpen ? 'w-full sm:w-72 md:w-80' : 'w-0 sm:w-72 md:w-80'} sm:h-full`}>
-          <div className={`absolute inset-0 bg-black/70 sm:hidden transition-opacity duration-300 ${chatOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setChatOpen(false)}></div>
-          <div className={`absolute sm:relative left-0 top-0 h-full w-64 sm:w-full border-t sm:border-t-0 sm:border-l border-white/5 z-20 bg-black/95 flex flex-col overflow-y-auto custom-scrollbar transition-transform duration-300 sm:translate-x-0 ${chatOpen ? 'translate-x-0' : '-translate-x-full sm:translate-x-0'}`}>
+        <div className={`fixed lg:relative inset-0 lg:inset-auto z-40 lg:z-auto transition-all duration-300 w-full lg:w-80 lg:h-full ${chatOpen ? 'pointer-events-auto' : 'pointer-events-none lg:pointer-events-auto'}`}>
+          <div className={`absolute inset-0 bg-black/70 lg:hidden transition-opacity duration-300 ${chatOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setChatOpen(false)}></div>
+          <div className={`absolute lg:relative right-0 lg:left-0 top-0 h-full w-[82vw] max-w-80 lg:w-full border-t lg:border-t-0 lg:border-l border-white/5 z-20 bg-black/95 flex flex-col overflow-y-auto custom-scrollbar transition-transform duration-300 lg:translate-x-0 ${chatOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}`}>
             <button 
               onClick={() => setChatOpen(false)}
-              className="sm:hidden absolute top-2 right-2 text-slate-400 hover:text-white text-xl z-30"
+              className="lg:hidden absolute top-2 right-2 text-slate-400 hover:text-white text-xl z-30"
             >
               ✕
             </button>
-            <div className="mt-10 sm:mt-0">
+            <div className="mt-10 lg:mt-0 min-h-0 flex-1">
               <AiChat chatHistory={chatHistory} onSendMessage={handleSendMessage} />
             </div>
           </div>
@@ -1138,7 +1138,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
       {!showBettingModal && !showColorAssignment && (
         <button
           onClick={() => setChatOpen(true)}
-          className="sm:hidden fixed bottom-16 right-2 z-30 w-11 h-11 bg-neon-pink text-black rounded-full font-bold text-xl hover:bg-white transition-colors flex items-center justify-center shadow-lg active:scale-95"
+          className="lg:hidden fixed bottom-16 right-2 z-30 w-11 h-11 bg-neon-pink text-black rounded-full font-bold text-xl hover:bg-white transition-colors flex items-center justify-center shadow-lg active:scale-95"
         >
           💬
         </button>

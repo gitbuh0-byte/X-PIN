@@ -56,7 +56,7 @@ const Layout: React.FC<{ children: React.ReactNode; user: User; onOpenPayment?: 
   }, []);
 
   return (
-    <div className="min-h-screen bg-vegas-bg text-white flex flex-col font-ui relative overflow-hidden">
+    <div className="min-h-[100dvh] bg-vegas-bg text-white flex flex-col font-ui relative overflow-hidden">
       {!isRoom && (
         <header className="h-14 sm:h-16 md:h-20 border-b border-neon-purple/50 bg-vegas-panel/90 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between px-2 sm:px-4 md:px-8 shadow-[0_0_20px_rgba(191,0,255,0.2)]">
           <div className="flex items-center gap-2 sm:gap-6 md:gap-10 flex-1 min-w-0">
@@ -127,7 +127,7 @@ const Layout: React.FC<{ children: React.ReactNode; user: User; onOpenPayment?: 
           </div>
         </header>
       )}
-      <main className="flex-1 relative overflow-y-auto overflow-x-hidden flex flex-col">
+      <main className="flex-1 relative overflow-y-auto overflow-x-hidden flex flex-col min-w-0">
         {children}
       </main>
 

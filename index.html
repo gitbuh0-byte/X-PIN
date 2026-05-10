@@ -79,6 +79,12 @@
         --color-panel: #0a0a12;
       }
 
+      html {
+        height: 100%;
+        width: 100%;
+        overflow-x: hidden;
+      }
+
       body {
         background-color: var(--color-bg);
         color: white;
@@ -86,15 +92,43 @@
         overflow-x: hidden;
         margin: 0;
         padding: 0;
-        height: 100vh;
+        min-height: 100vh;
+        min-height: 100dvh;
         width: 100vw;
         touch-action: manipulation;
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
       }
       #root {
-        height: 100%;
+        min-height: 100%;
+        min-height: 100dvh;
         width: 100%;
         position: relative;
         z-index: 10;
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      input,
+      button,
+      textarea,
+      select {
+        font: inherit;
+      }
+
+      img,
+      svg,
+      canvas,
+      video {
+        max-width: 100%;
+      }
+
+      @media (max-width: 640px) {
+        .scanline {
+          opacity: 0.08;
+        }
       }
       .scanline {
         position: fixed;

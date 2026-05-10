@@ -107,14 +107,14 @@ const Home: React.FC<HomeProps> = ({ user, onJoinGame }) => {
   };
 
   return (
-    <div className="p-2 sm:p-3 md:p-6 max-w-7xl mx-auto flex flex-col justify-center min-h-[calc(100vh-140px)] lg:min-h-[calc(100vh-80px)] mt-8 sm:mt-12 md:mt-16">
+    <div className="p-3 sm:p-4 md:p-6 max-w-7xl mx-auto flex flex-col justify-center min-h-[calc(100dvh-116px)] lg:min-h-[calc(100dvh-80px)] mt-2 sm:mt-6 md:mt-10 w-full">
       {/* Hero */}
-      <div className="text-center mb-6 sm:mb-8 md:mb-16 relative mt-8 sm:mt-12 md:mt-16 z-20">
-        <h1 className="relative z-10 text-6xl md:text-9xl font-arcade font-black text-white mb-2 tracking-tighter">
+      <div className="text-center mb-6 sm:mb-8 md:mb-12 relative mt-4 sm:mt-8 md:mt-12 z-20">
+        <h1 className="relative z-10 text-5xl min-[380px]:text-6xl md:text-9xl font-arcade font-black text-white mb-2">
           X <span className="text-neon-pink text-glow-pink">PIN</span>
         </h1>
         <div className="h-1 w-16 md:w-24 bg-gradient-to-r from-neon-cyan via-white to-neon-pink mx-auto mb-4 md:mb-6"></div>
-        <p className="relative z-10 text-slate-400 font-mono text-[10px] md:text-lg tracking-[0.2em] md:tracking-[0.3em] uppercase opacity-80">
+        <p className="relative z-10 text-slate-400 font-mono text-[10px] md:text-lg tracking-[0.14em] sm:tracking-[0.2em] md:tracking-[0.3em] uppercase opacity-80 px-2">
           Hyper-Competitive Betting Engine
         </p>
         
