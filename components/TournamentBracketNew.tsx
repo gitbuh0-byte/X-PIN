@@ -170,16 +170,35 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
               <div className="text-[8px] sm:text-[9px] text-neon-cyan/60">4 Rooms</div>
             </div>
             <div className="text-center min-w-0">
-              <div className="text-[10px] sm:text-xs md:text-sm font-arcade text-neon-gold font-bold uppercase tracking-wider">Final</div>
-              <div className="text-[8px] sm:text-[9px] text-neon-gold/60">1 Room</div>
+              <div className="text-[10px] sm:text-xs md:text-sm font-arcade text-neon-gold font-bold uppercase tracking-wider">Round 3</div>
+              <div className="text-[8px] sm:text-[9px] text-neon-gold/60">Final • 1 Room</div>
+            </div>
+          </div>
+
+          <div className="hidden sm:grid grid-cols-[minmax(0,1.7fr)_minmax(0,0.9fr)_minmax(0,0.75fr)] gap-2 sm:gap-4 md:gap-6 w-full max-w-5xl -mt-3 mb-5 px-1 sm:px-2">
+            <div className="flex items-center justify-end gap-2 min-w-0">
+              <div className="h-px flex-1 max-w-[220px] bg-gradient-to-r from-transparent via-neon-pink to-neon-cyan shadow-[0_0_8px_rgba(0,255,255,0.8)]"></div>
+              <div className="h-0 w-0 border-y-[5px] border-y-transparent border-l-[9px] border-l-neon-cyan drop-shadow-[0_0_6px_rgba(0,255,255,0.9)]"></div>
+            </div>
+            <div className="flex items-center justify-between gap-2 min-w-0">
+              <span className="whitespace-nowrap text-[7px] font-arcade uppercase tracking-wider text-neon-cyan/80">
+                Winners Advance
+              </span>
+              <div className="h-px flex-1 bg-gradient-to-r from-neon-cyan via-neon-gold to-neon-gold shadow-[0_0_8px_rgba(255,215,0,0.75)]"></div>
+              <div className="h-0 w-0 border-y-[5px] border-y-transparent border-l-[9px] border-l-neon-gold drop-shadow-[0_0_6px_rgba(255,215,0,0.9)]"></div>
+            </div>
+            <div className="flex items-center min-w-0">
+              <span className="whitespace-nowrap text-[7px] font-arcade uppercase tracking-wider text-neon-gold/80">
+                Finalists Advance
+              </span>
             </div>
           </div>
 
           {/* Main Bracket */}
-          <div className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,0.9fr)_minmax(0,0.75fr)] gap-2 sm:gap-4 md:gap-6 w-full max-w-5xl px-1 sm:px-2 pb-2 items-center">
+          <div className="relative grid grid-cols-[minmax(0,1.7fr)_minmax(0,0.9fr)_minmax(0,0.75fr)] gap-2 sm:gap-4 md:gap-6 w-full max-w-5xl px-1 sm:px-2 pb-2 items-center">
             
             {/* ROUND 1 - 20 Rooms (G1-G20) - Mobile optimized */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 min-w-0">
+            <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-1 min-w-0">
               {round1Rooms.map((room, idx) => {
                 const isUserRoom = (idx + 1) === groupNumber;  // Fixed: direct comparison with groupNumber (1-20)
                 const isHovered = hoveredRoom === `r1-${idx}`;
@@ -211,7 +230,7 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
             </div>
 
             {/* ROUND 2 - 4 Quarter Finals - Mobile optimized */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 min-w-0">
+            <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-2 min-w-0">
               {round2Rooms.map((room, idx) => {
                 const isHovered = hoveredRoom === `r2-${idx}`;
                 const isSelected = selectedRoom === `r2-${idx}`;
@@ -240,7 +259,7 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
             </div>
 
             {/* ROUND 3 - Final - Mobile optimized */}
-            <div className="flex flex-col gap-1.5 justify-center min-w-0">
+            <div className="relative z-10 flex flex-col gap-1.5 justify-center min-w-0">
               {round3Rooms.map((room, idx) => {
                 const isHovered = hoveredRoom === `r3-${idx}`;
                 const isSelected = selectedRoom === `r3-${idx}`;
