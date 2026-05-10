@@ -820,7 +820,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
         {/* BRACKET_VIEW - Tournament Bracket with Proceed Button */}
         {phase === 'BRACKET_VIEW' && (
-          <div className="flex-1 flex items-center justify-center bg-black/95 p-2 sm:p-4 overflow-hidden">
+          <div className="flex-1 bg-black/95 overflow-hidden">
             <TournamentBracketNew 
               groupNumber={userGroup}
               playersInGroup={PLAYERS_PER_GROUP}

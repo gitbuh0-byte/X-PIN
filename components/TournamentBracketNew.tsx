@@ -139,15 +139,14 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
   };
 
   return (
-    <div className="w-full max-w-5xl max-h-[92dvh] flex flex-col bg-vegas-panel/95 border border-neon-cyan/50 rounded-lg shadow-[0_0_50px_rgba(0,255,255,0.15)] clip-corner overflow-hidden">
-      <div className="h-1 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50 flex-shrink-0"></div>
-      {/* Header - compact modal style */}
-      <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b border-white/10 flex-shrink-0">
+    <div className="w-full h-full flex flex-col bg-black overflow-hidden">
+      {/* Header - full tournament style */}
+      <div className="sticky top-0 bg-gradient-to-r from-black via-black to-black border-b-2 border-neon-cyan/60 px-2 sm:px-3 md:px-4 py-2 sm:py-3 z-20 backdrop-blur-sm flex-shrink-0">
         <div className="text-center">
-          <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-arcade text-white tracking-widest mb-1 uppercase">
+          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-arcade text-neon-gold tracking-widest mb-1 drop-shadow-[0_0_20px_rgba(255,215,0,0.6)] uppercase">
             GRAND PRIX TOURNAMENT
           </h1>
-          <p className="text-[8px] sm:text-[9px] md:text-xs text-neon-cyan font-mono opacity-80">
+          <p className="text-[8px] sm:text-[9px] md:text-xs text-neon-cyan font-mono">
             Round 1: 20 Rooms • Round 2: 4 Rooms • Final: 1 Room
           </p>
           <p className="text-[7px] sm:text-[8px] md:text-[9px] text-neon-pink font-arcade mt-1">
@@ -157,11 +156,11 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
       </div>
 
       {/* Bracket Container */}
-      <div className="flex-1 overflow-auto relative pb-4 custom-scrollbar">
+      <div className="flex-1 overflow-auto relative pb-8 custom-scrollbar">
         <div className="w-full h-full flex flex-col justify-center items-center p-2 sm:p-4 min-h-fit">
           
           {/* Stage Headers - Mobile responsive */}
-          <div className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,0.9fr)_minmax(0,0.75fr)] gap-2 sm:gap-4 md:gap-6 w-full max-w-4xl mb-4 sm:mb-6 px-1 sm:px-2">
+          <div className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,0.9fr)_minmax(0,0.75fr)] gap-2 sm:gap-4 md:gap-6 w-full max-w-5xl mb-4 sm:mb-6 px-1 sm:px-2">
             <div className="text-center min-w-0">
               <div className="text-[10px] sm:text-xs md:text-sm font-arcade text-neon-pink font-bold uppercase tracking-wider">Round 1</div>
               <div className="text-[8px] sm:text-[9px] text-neon-pink/60">20 Rooms</div>
@@ -177,7 +176,7 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
           </div>
 
           {/* Main Bracket */}
-          <div className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,0.9fr)_minmax(0,0.75fr)] gap-2 sm:gap-4 md:gap-6 w-full max-w-4xl px-1 sm:px-2 pb-2 items-center">
+          <div className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,0.9fr)_minmax(0,0.75fr)] gap-2 sm:gap-4 md:gap-6 w-full max-w-5xl px-1 sm:px-2 pb-2 items-center">
             
             {/* ROUND 1 - 20 Rooms (G1-G20) - Mobile optimized */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 min-w-0">
