@@ -602,30 +602,42 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
       <div className="flex-1 flex overflow-auto relative">
         {/* BROWSE - Initial Tournament Selection */}
         {phase === 'BROWSE' && (
-          <div className="flex-1 flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto">
-            <div className="text-center w-full max-w-sm sm:max-w-md">
-              <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 md:mb-6 animate-bounce">🎰</div>
-              <div className="text-3xl sm:text-4xl md:text-5xl font-arcade text-transparent bg-clip-text bg-gradient-to-r from-neon-gold via-neon-pink to-neon-cyan mb-2 sm:mb-3 md:mb-4 drop-shadow-[0_0_20px_rgba(255,215,0,0.6)] animate-pulse font-black tracking-wider">TOURNAMENT</div>
-              <div className="text-neon-cyan text-sm sm:text-base md:text-lg mb-4 sm:mb-6 md:mb-8 font-arcade tracking-wider drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]">200 Players • 20 Groups • Winner Takes All</div>
-              <div className="bg-gradient-to-br from-slate-900/80 via-black/80 to-slate-900/60 border-2 border-neon-pink/40 rounded-xl p-4 sm:p-5 md:p-7 mb-5 sm:mb-7 md:mb-9 shadow-[0_0_30px_rgba(255,0,128,0.2)]">
-                <div className="text-[10px] sm:text-xs md:text-sm text-slate-300 space-y-2 sm:space-y-3 font-arcade tracking-wider">
+          <div className="flex-1 flex items-center justify-center bg-black/95 p-2 sm:p-3 md:p-4 overflow-y-auto">
+            <div className="bg-vegas-panel/95 border border-neon-cyan/50 p-3 sm:p-4 md:p-6 lg:p-8 rounded-lg w-full max-w-sm sm:max-w-md relative shadow-[0_0_50px_rgba(0,255,255,0.15)] clip-corner text-center">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50"></div>
+              <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-1 sm:mb-2 text-neon-pink text-glow-pink">🎰</div>
+              <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-arcade text-white mb-1 tracking-widest uppercase">TOURNAMENT</div>
+              <div className="text-[10px] sm:text-xs md:text-sm font-mono text-neon-cyan opacity-80 mb-4 sm:mb-5 md:mb-6">200 Players • 20 Groups • Winner Takes All</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 sm:mb-4 md:mb-6 text-left">
+                <div className="bg-black/40 border border-white/10 rounded-sm p-2 sm:p-3 md:p-4">
+                  <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">Entry Fee</div>
+                  <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade text-neon-green font-black">${ENTRY_FEE}</div>
+                </div>
+                <div className="bg-black/40 border border-white/10 rounded-sm p-2 sm:p-3 md:p-4">
+                  <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">Prize Pool</div>
+                  <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade text-neon-gold font-black">${totalPot.toLocaleString()}</div>
+                </div>
+              </div>
+
+              <div className="bg-neon-purple/10 border border-neon-purple/30 rounded-sm p-2 sm:p-3 md:p-4 mb-4 sm:mb-5 md:mb-8">
+                <div className="text-slate-400 text-[8px] sm:text-[9px] md:text-xs font-mono leading-relaxed space-y-1.5 text-left">
                   <div className="flex items-center gap-2"><span className="text-neon-green text-base sm:text-lg">✓</span><span>20 groups of 5 players</span></div>
                   <div className="flex items-center gap-2"><span className="text-neon-cyan text-base sm:text-lg">✓</span><span>Win your group → Join Final Round</span></div>
                   <div className="flex items-center gap-2"><span className="text-neon-gold text-base sm:text-lg">✓</span><span>Grand Champion wins <span className="font-black text-neon-gold">${totalPot.toLocaleString()}</span></span></div>
                 </div>
               </div>
-              <div className="flex gap-2 sm:gap-3 md:gap-4 flex-col sm:flex-row justify-center items-center w-full">
+              <div className="flex gap-2 sm:gap-3 md:gap-4">
                 <button
-                  onClick={() => { soundManager.play('click'); window.location.hash = '/#/dashboard'; }}
-                  className="px-6 sm:px-8 md:px-10 py-2.5 sm:py-3 md:py-3.5 border-2 border-slate-500 text-slate-300 font-arcade text-xs sm:text-sm md:text-base hover:border-neon-pink hover:text-neon-pink transition-all duration-300 rounded-lg hover:shadow-[0_0_15px_rgba(255,0,128,0.3)] font-bold w-full sm:w-auto"
+                  onClick={() => { soundManager.play('click'); navigate('/'); }}
+                  className="flex-1 py-2 sm:py-2.5 md:py-3 border border-slate-700 text-slate-400 font-arcade hover:border-white hover:text-white transition-colors uppercase text-[8px] sm:text-[9px] md:text-xs tracking-wide rounded-sm"
                 >
                   CANCEL
                 </button>
                 <button
                   onClick={() => { soundManager.play('click'); startBetFlow(); }}
-                  className="px-6 sm:px-8 md:px-10 py-2.5 sm:py-3 md:py-3.5 text-neon-green border-2 border-neon-green font-arcade text-xs sm:text-sm md:text-base font-black transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-neon-green hover:to-neon-cyan hover:text-black hover:shadow-[0_0_30px_rgba(0,255,0,0.8)] w-full sm:w-auto"
+                  className="flex-1 py-2 sm:py-2.5 md:py-3 bg-neon-cyan text-black font-arcade hover:bg-neon-cyan/80 transition-colors uppercase text-[8px] sm:text-[9px] md:text-xs tracking-wide rounded-sm shadow-[0_0_15px_rgba(0,255,255,0.4)] font-black"
                 >
-                  JOIN TOURNAMENT
+                  JOIN
                 </button>
               </div>
             </div>
@@ -634,16 +646,29 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
         {/* BET_PROMPT - Place Bet */}
         {phase === 'BET_PROMPT' && (
-          <div className="flex-1 flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto">
-            <div className="text-center max-w-sm sm:max-w-md w-full">
-              <div className="text-5xl sm:text-6xl md:text-7xl mb-4 sm:mb-5 md:mb-6 animate-bounce">💰</div>
-              <div className="text-2xl sm:text-3xl md:text-4xl font-arcade text-transparent bg-clip-text bg-gradient-to-r from-neon-pink to-neon-cyan mb-4 sm:mb-5 md:mb-6 font-black tracking-wider">Place Your Bet</div>
-              <div className="bg-gradient-to-br from-slate-900/80 via-black/80 to-slate-900/60 border-2 border-neon-pink/40 rounded-xl p-4 sm:p-5 md:p-6 mb-4 sm:mb-5 md:mb-6 shadow-[0_0_30px_rgba(255,0,128,0.2)]">
-                <div className="text-slate-400 mb-2 sm:mb-3 text-[10px] sm:text-xs font-arcade tracking-wider uppercase">Entry Fee</div>
-                <div className="text-4xl sm:text-5xl md:text-6xl font-arcade text-neon-cyan mb-4 sm:mb-5 md:mb-6 drop-shadow-[0_0_15px_rgba(0,255,255,0.5)] font-black"><span className="text-neon-gold">$</span>{ENTRY_FEE}</div>
-                <div className="text-xs sm:text-sm text-slate-300 mb-1 font-arcade">
-                  Your Balance: <span className={`font-black ${user.balance >= ENTRY_FEE ? 'text-neon-green' : 'text-red-400'}`}>${user.balance}</span>
+          <div className="flex-1 flex items-center justify-center bg-black/95 p-2 sm:p-3 md:p-4 overflow-y-auto">
+            <div className="bg-vegas-panel/95 border border-neon-cyan/50 p-3 sm:p-4 md:p-6 lg:p-8 rounded-lg w-full max-w-sm sm:max-w-md relative shadow-[0_0_50px_rgba(0,255,255,0.15)] clip-corner text-center">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50"></div>
+              <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-arcade font-black text-neon-cyan mb-1 sm:mb-2 text-glow-cyan">💰</div>
+              <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-arcade text-white mb-1 tracking-widest uppercase">Place Your Bet</div>
+              <div className="text-[10px] sm:text-xs md:text-sm font-mono text-neon-cyan opacity-80 mb-4 sm:mb-5 md:mb-6">TOURNAMENT • {TOTAL_PLAYERS}-Player Bracket</div>
+
+              <div className="bg-black/40 border border-white/10 rounded-sm p-2 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-6 text-left">
+                <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">Available Balance</div>
+                <div className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade font-black ${user.balance >= ENTRY_FEE ? 'text-neon-green' : 'text-red-400'}`}>
+                  ${Math.max(0, user.balance - ENTRY_FEE).toLocaleString()}
                 </div>
+              </div>
+
+              <div className="bg-black/40 border border-white/10 rounded-sm p-2 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-6 text-left">
+                <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">Bet Amount</div>
+                <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade text-neon-cyan font-black">${ENTRY_FEE}</div>
+              </div>
+
+              <div className="bg-neon-purple/10 border border-neon-purple/30 rounded-sm p-2 sm:p-3 md:p-4 mb-4 sm:mb-5 md:mb-8">
+                <p className="text-slate-400 text-[8px] sm:text-[9px] md:text-xs font-mono leading-relaxed text-left">
+                  Your entry is locked once confirmed. Your color and group are assigned before the tournament bracket opens.
+                </p>
                 <div className={`text-[10px] sm:text-xs font-arcade mt-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg ${
                   user.balance >= ENTRY_FEE 
                     ? 'bg-neon-green/20 text-neon-green border border-neon-green/40' 
@@ -652,23 +677,23 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                   {user.balance >= ENTRY_FEE ? '✓ Sufficient funds' : '⚠ Insufficient funds'}
                 </div>
               </div>
-              <div className="flex gap-2 sm:gap-3 md:gap-4 flex-col sm:flex-row justify-center items-center w-full">
+              <div className="flex gap-2 sm:gap-3 md:gap-4">
                 <button
                   onClick={() => { soundManager.play('click'); setPhase('BROWSE'); }}
-                  className="px-6 sm:px-8 md:px-10 py-2.5 sm:py-3 md:py-3.5 font-arcade text-[10px] sm:text-xs md:text-sm tracking-wider transition-all border-2 border-slate-500 text-slate-300 hover:border-neon-pink hover:text-neon-pink rounded-lg hover:shadow-[0_0_15px_rgba(255,0,128,0.3)] whitespace-nowrap font-bold duration-300 w-full sm:w-auto"
+                  className="flex-1 py-2 sm:py-2.5 md:py-3 border border-slate-700 text-slate-400 font-arcade hover:border-white hover:text-white transition-colors uppercase text-[8px] sm:text-[9px] md:text-xs tracking-wide rounded-sm"
                 >
                   CANCEL
                 </button>
                 <button
                   onClick={() => { soundManager.play('click'); confirmBet(); }}
                   disabled={user.balance < ENTRY_FEE}
-                  className={`px-6 sm:px-8 md:px-10 py-2.5 sm:py-3 md:py-3.5 font-arcade text-[10px] sm:text-xs md:text-sm tracking-wider transition-all border-2 rounded-lg whitespace-nowrap font-black duration-300 w-full sm:w-auto ${
+                  className={`flex-1 py-2 sm:py-2.5 md:py-3 font-arcade uppercase text-[8px] sm:text-[9px] md:text-xs tracking-wide rounded-sm font-black transition-colors ${
                     user.balance < ENTRY_FEE
-                      ? 'border-slate-600 text-slate-600 cursor-not-allowed opacity-50'
-                      : 'border-neon-green text-neon-green hover:bg-gradient-to-r hover:from-neon-green hover:to-neon-cyan hover:text-black hover:shadow-[0_0_25px_rgba(0,255,0,0.6)]'
+                      ? 'bg-slate-900 text-slate-700 cursor-not-allowed border border-white/5'
+                      : 'bg-neon-cyan text-black hover:bg-neon-cyan/80 shadow-[0_0_15px_rgba(0,255,255,0.4)]'
                   }`}
                 >
-                  CONFIRM
+                  CONFIRM BET
                 </button>
               </div>
             </div>
@@ -677,30 +702,54 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
         {/* COLOR_ASSIGN - Color Assignment */}
         {phase === 'COLOR_ASSIGN' && (
-          <div className="flex-1 flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto">
-            <div className="text-center max-w-sm sm:max-w-md w-full">
-              <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 md:mb-5">🎨</div>
-              <div className="text-2xl sm:text-3xl md:text-4xl font-arcade text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink mb-3 sm:mb-4 md:mb-5 font-black tracking-wider">Color Assigned</div>
-              <div className="bg-gradient-to-br from-slate-900/80 via-black/80 to-slate-900/60 border-2 border-neon-cyan/40 rounded-xl p-4 sm:p-5 md:p-6 mb-4 sm:mb-5 md:mb-6 shadow-[0_0_30px_rgba(0,255,255,0.2)]">
-                <div className="text-slate-400 mb-2 sm:mb-3 text-[10px] sm:text-xs font-arcade tracking-wider uppercase">Your Tournament Color</div>
-                <div className="flex justify-center items-center mb-3 sm:mb-4">
+          <div className="flex-1 flex items-center justify-center bg-black/95 p-3 sm:p-4 overflow-y-auto">
+            <div className="bg-vegas-panel/95 border border-white/20 p-4 sm:p-6 md:p-8 rounded-lg w-full max-w-md relative shadow-[0_0_50px_rgba(0,255,255,0.15)] clip-corner text-center">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50"></div>
+              <div className="mb-6 sm:mb-8">
+                <div className="text-sm sm:text-base md:text-lg font-arcade text-slate-500 uppercase tracking-widest mb-3">TOURNAMENT</div>
+                <h2 className="text-lg sm:text-xl md:text-2xl font-arcade text-white mb-4 tracking-widest uppercase">Your Color Assignment</h2>
+              </div>
+              <div className="flex justify-center mb-6 sm:mb-8">
+                <div className="relative" style={{ boxShadow: `0 0 60px ${COLOR_HEX[userColor as keyof typeof COLOR_HEX]}99, inset 0 0 30px ${COLOR_HEX[userColor as keyof typeof COLOR_HEX]}44` }}>
                   <div
-                    className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-lg border-4 border-white shadow-[0_0_30px_rgba(255,255,255,0.3)] transform hover:scale-105 transition-transform duration-300"
-                    style={{ backgroundColor: COLOR_HEX[userColor as keyof typeof COLOR_HEX], boxShadow: `0_0_40px_${COLOR_HEX[userColor as keyof typeof COLOR_HEX]}66` }}
-                  />
+                    className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 border-4 rounded-full flex items-center justify-center text-5xl sm:text-6xl md:text-7xl font-arcade font-black"
+                    style={{
+                      borderColor: COLOR_HEX[userColor as keyof typeof COLOR_HEX],
+                      backgroundColor: `${COLOR_HEX[userColor as keyof typeof COLOR_HEX]}15`,
+                      color: COLOR_HEX[userColor as keyof typeof COLOR_HEX]
+                    }}
+                  >
+                    {userColor.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="absolute inset-0 rounded-full border-2 animate-pulse" style={{ borderColor: COLOR_HEX[userColor as keyof typeof COLOR_HEX], opacity: 0.3 }} />
+                  <div className="absolute -inset-4 rounded-full border-2 animate-pulse" style={{ borderColor: COLOR_HEX[userColor as keyof typeof COLOR_HEX], opacity: 0.15, animationDelay: '0.2s' }} />
                 </div>
-                <div className="text-xl sm:text-2xl md:text-3xl font-arcade capitalize text-neon-cyan mb-3 sm:mb-4 md:mb-5 font-black tracking-wider">{userColorDisplay}</div>
-                <div className="text-[10px] sm:text-xs font-arcade text-slate-300 bg-neon-green/20 border-2 border-neon-green/40 rounded-lg p-2 sm:p-2.5 md:p-3">
-                  <div className="text-neon-green font-black mb-1">✓ Bet Locked: ${ENTRY_FEE}</div>
-                  <div className="text-slate-400 text-[9px] sm:text-[10px] md:text-xs">Your color is fixed for this tournament</div>
+              </div>
+              <div className="text-center mb-2">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-arcade font-black uppercase tracking-wider mb-1" style={{ color: COLOR_HEX[userColor as keyof typeof COLOR_HEX] }}>{userColorDisplay}</div>
+                <div className="text-xs sm:text-sm font-mono text-slate-500">{COLOR_HEX[userColor as keyof typeof COLOR_HEX]}</div>
+              </div>
+              <div className="bg-black/40 border border-white/10 rounded-sm p-3 sm:p-4 mb-6 sm:mb-8 mt-6 sm:mt-8 text-left">
+                <div className="text-slate-400 text-[9px] sm:text-xs font-bold uppercase tracking-wider mb-2">Game Status</div>
+                <div className="text-slate-300 text-[10px] sm:text-xs font-mono leading-relaxed">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="inline-block w-2 h-2 bg-neon-purple rounded-full animate-pulse"></span>
+                    COLOR LOCKED
+                  </div>
+                  <div className="text-slate-500 text-[9px] mt-2">
+                    Your <span className="font-bold uppercase" style={{ color: COLOR_HEX[userColor as keyof typeof COLOR_HEX] }}>{userColorDisplay}</span> color is fixed for this tournament. Bet locked: ${ENTRY_FEE}.
+                  </div>
                 </div>
               </div>
               <button
                 onClick={() => { soundManager.play('click'); proceedFromColor(); }}
-                className="w-full px-6 sm:px-8 md:px-10 py-2.5 sm:py-3 md:py-4 text-neon-cyan border-2 border-neon-cyan font-arcade text-sm sm:text-base md:text-lg font-black hover:bg-gradient-to-r hover:from-neon-cyan hover:to-neon-green hover:text-black hover:shadow-[0_0_30px_rgba(0,255,255,0.6)] transition-all duration-300 rounded-lg"
+                className="w-full py-3 sm:py-4 bg-neon-cyan text-black font-arcade hover:bg-neon-cyan/80 transition-colors uppercase text-[9px] sm:text-xs tracking-widest rounded-sm shadow-[0_0_15px_rgba(0,255,255,0.4)] font-black"
               >
-                Proceed
+                ENTER GAME ROOM
               </button>
+              <div className="text-center mt-4 sm:mt-6">
+                <p className="text-slate-500 text-[8px] sm:text-[9px] font-mono uppercase tracking-wider">All players must place bets to proceed</p>
+              </div>
             </div>
           </div>
         )}
