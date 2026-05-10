@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@anthropic-ai/claude-code": "^2.1.126",
     "@google/generative-ai": "^0.21.0",
     "d3": "7.9.0",
     "firebase": "^12.11.0",
