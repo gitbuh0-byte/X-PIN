@@ -14,7 +14,8 @@ interface TournamentRoomProps {
   onLeaveGame?: (roomId: string) => void;
 }
 
-const ENTRY_FEE = 10;
+const DEFAULT_ENTRY_FEE = 10;
+const BET_OPTIONS = [10, 25, 50, 100];
 const TOTAL_PLAYERS = 100;
 const GROUPS_COUNT = 20;
 const PLAYERS_PER_GROUP = 5;
@@ -44,8 +45,8 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
   const navigate = useNavigate();
   const mounted = useRef(true);
 
-  // Phase: BROWSE -> BET_PROMPT -> COLOR_ASSIGN -> ROOM_ASSIGN -> BRACKET_VIEW -> LOBBY -> GROUPS -> QUARTERFINALS -> FINAL_COLOR -> FINAL_PREP -> FINAL -> FINAL_RESULT -> (back to BROWSE or ELIM_LOSE if lose)
-  const [phase, setPhase] = useState<'BROWSE' | 'BET_PROMPT' | 'COLOR_ASSIGN' | 'ROOM_ASSIGN' | 'BRACKET_VIEW' | 'LOBBY' | 'GROUPS' | 'QUARTERFINALS' | 'FINAL_COLOR' | 'FINAL_PREP' | 'FINAL' | 'FINAL_RESULT' | 'ELIM_LOSE' | 'GROUP_RESULT'>('BROWSE');
+  // Phase: BET_PROMPT -> COLOR_ASSIGN -> BRACKET_VIEW -> LOBBY -> GROUPS -> QUARTERFINALS -> FINAL_COLOR -> FINAL_PREP -> FINAL -> FINAL_RESULT -> (back to BROWSE or ELIM_LOSE if lose)
+  const [phase, setPhase] = useState<'BROWSE' | 'BET_PROMPT' | 'COLOR_ASSIGN' | 'ROOM_ASSIGN' | 'BRACKET_VIEW' | 'LOBBY' | 'GROUPS' | 'QUARTERFINALS' | 'FINAL_COLOR' | 'FINAL_PREP' | 'FINAL' | 'FINAL_RESULT' | 'ELIM_LOSE' | 'GROUP_RESULT'>('BET_PROMPT');
   
   // Tournament data
   const [groups, setGroups] = useState<Array<{ groupNumber: number; players: Player[]; totalPot: number }>>([]);
@@ -85,13 +86,14 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
   // Rank-up state
   const [showRankUp, setShowRankUp] = useState(false);
   const [previousRank, setPreviousRank] = useState<UserRank>(user.rank);
+  const [tournamentBetAmount, setTournamentBetAmount] = useState(DEFAULT_ENTRY_FEE);
   
   const isColorVisible = phase === 'COLOR_ASSIGN' || ((phase !== 'BROWSE' && phase !== 'BET_PROMPT') && colorRevealed);
   const userColorDisplay = isColorVisible ? userColor : 'Hidden';
   const userColorStyle = isColorVisible ? COLOR_HEX[userColor as keyof typeof COLOR_HEX] : '#4b5563';
 
-  // Calculate total pot (100 players * entry fee)
-  const totalPot = TOTAL_PLAYERS * ENTRY_FEE;
+  // Calculate total pot (100 players * selected entry fee)
+  const totalPot = TOTAL_PLAYERS * tournamentBetAmount;
 
   // Initialize groups and assign user on mount
   useEffect(() => {
@@ -116,7 +118,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
               id: user.id,
               username: user.username,
               avatar: user.avatar,
-              betAmount: ENTRY_FEE,
+              betAmount: tournamentBetAmount,
               selectedColor: assignedColor,
               assignedColor: assignedColor,
               status: 'CONFIRMED' as any,
@@ -133,7 +135,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
             id: `bot-${groupNumber}-${pi}`,
             username: botName,
             avatar: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${botName}`,
-            betAmount: ENTRY_FEE,
+            betAmount: tournamentBetAmount,
             selectedColor: playerColor,
             assignedColor: playerColor,
             status: 'CONFIRMED' as any,
@@ -141,7 +143,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
           } as Player;
         });
 
-        return { groupNumber, players, totalPot: ENTRY_FEE * PLAYERS_PER_GROUP };
+        return { groupNumber, players, totalPot: tournamentBetAmount * PLAYERS_PER_GROUP };
       });
 
       setGroups(newGroups);
@@ -184,9 +186,18 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
     setPhase('BET_PROMPT');
   };
 
+  const updateTournamentBet = (amount: number) => {
+    setTournamentBetAmount(amount);
+    setGroups(prev => prev.map(group => ({
+      ...group,
+      totalPot: amount * PLAYERS_PER_GROUP,
+      players: group.players.map(player => ({ ...player, betAmount: amount }))
+    })));
+  };
+
   const confirmBet = () => {
-    if (user.balance < ENTRY_FEE) {
-      alert('Insufficient balance. Need $' + ENTRY_FEE);
+    if (user.balance < tournamentBetAmount) {
+      alert('Insufficient balance. Need $' + tournamentBetAmount);
       return;
     }
     setPhase('COLOR_ASSIGN');
@@ -194,11 +205,11 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
   const proceedFromColor = () => {
     setColorRevealed(true);
-    setPhase('ROOM_ASSIGN');
+    joinGameroom();
   };
 
   const joinGameroom = () => {
-    updateBalance(-ENTRY_FEE);
+    updateBalance(-tournamentBetAmount);
     setPhase('BRACKET_VIEW');
   };
 
@@ -611,7 +622,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 sm:mb-4 md:mb-6 text-left">
                 <div className="bg-black/40 border border-white/10 rounded-sm p-2 sm:p-3 md:p-4">
                   <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">Entry Fee</div>
-                  <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade text-neon-green font-black">${ENTRY_FEE}</div>
+                  <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade text-neon-green font-black">${tournamentBetAmount}</div>
                 </div>
                 <div className="bg-black/40 border border-white/10 rounded-sm p-2 sm:p-3 md:p-4">
                   <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">Prize Pool</div>
@@ -655,14 +666,38 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
               <div className="bg-black/40 border border-white/10 rounded-sm p-2 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-6 text-left">
                 <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">Available Balance</div>
-                <div className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade font-black ${user.balance >= ENTRY_FEE ? 'text-neon-green' : 'text-red-400'}`}>
-                  ${Math.max(0, user.balance - ENTRY_FEE).toLocaleString()}
+                <div className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade font-black ${user.balance >= tournamentBetAmount ? 'text-neon-green' : 'text-red-400'}`}>
+                  ${Math.max(0, user.balance - tournamentBetAmount).toLocaleString()}
                 </div>
               </div>
 
               <div className="bg-black/40 border border-white/10 rounded-sm p-2 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-6 text-left">
                 <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">Bet Amount</div>
-                <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade text-neon-cyan font-black">${ENTRY_FEE}</div>
+                <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade text-neon-cyan font-black">${tournamentBetAmount}</div>
+              </div>
+
+              <div className="mb-4 sm:mb-5 md:mb-8">
+                <div className="text-slate-500 text-[8px] sm:text-[9px] md:text-[10px] font-bold uppercase tracking-wider mb-1 sm:mb-2 text-left">
+                  Quick Select
+                </div>
+                <div className="grid grid-cols-4 gap-1 sm:gap-2">
+                  {BET_OPTIONS.map(amount => (
+                    <button
+                      key={amount}
+                      onClick={() => { soundManager.play('click'); updateTournamentBet(amount); }}
+                      disabled={amount > user.balance}
+                      className={`py-1.5 sm:py-2 md:py-2.5 border font-arcade text-[8px] sm:text-[9px] md:text-xs uppercase tracking-widest transition-all rounded-sm ${
+                        amount === tournamentBetAmount
+                          ? 'border-neon-cyan bg-neon-cyan text-black shadow-[0_0_15px_rgba(0,255,255,0.4)]'
+                          : amount > user.balance
+                            ? 'border-slate-700 text-slate-600 opacity-50 cursor-not-allowed'
+                            : 'border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20'
+                      }`}
+                    >
+                      ${amount}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="bg-neon-purple/10 border border-neon-purple/30 rounded-sm p-2 sm:p-3 md:p-4 mb-4 sm:mb-5 md:mb-8">
@@ -670,25 +705,25 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                   Your entry is locked once confirmed. Your color and group are assigned before the tournament bracket opens.
                 </p>
                 <div className={`text-[10px] sm:text-xs font-arcade mt-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg ${
-                  user.balance >= ENTRY_FEE 
+                  user.balance >= tournamentBetAmount
                     ? 'bg-neon-green/20 text-neon-green border border-neon-green/40' 
                     : 'bg-red-500/20 text-red-300 border border-red-500/40'
                 }`}>
-                  {user.balance >= ENTRY_FEE ? '✓ Sufficient funds' : '⚠ Insufficient funds'}
+                  {user.balance >= tournamentBetAmount ? '✓ Sufficient funds' : '⚠ Insufficient funds'}
                 </div>
               </div>
               <div className="flex gap-2 sm:gap-3 md:gap-4">
                 <button
-                  onClick={() => { soundManager.play('click'); setPhase('BROWSE'); }}
+                  onClick={() => { soundManager.play('click'); navigate('/'); }}
                   className="flex-1 py-2 sm:py-2.5 md:py-3 border border-slate-700 text-slate-400 font-arcade hover:border-white hover:text-white transition-colors uppercase text-[8px] sm:text-[9px] md:text-xs tracking-wide rounded-sm"
                 >
                   CANCEL
                 </button>
                 <button
                   onClick={() => { soundManager.play('click'); confirmBet(); }}
-                  disabled={user.balance < ENTRY_FEE}
+                  disabled={user.balance < tournamentBetAmount}
                   className={`flex-1 py-2 sm:py-2.5 md:py-3 font-arcade uppercase text-[8px] sm:text-[9px] md:text-xs tracking-wide rounded-sm font-black transition-colors ${
-                    user.balance < ENTRY_FEE
+                    user.balance < tournamentBetAmount
                       ? 'bg-slate-900 text-slate-700 cursor-not-allowed border border-white/5'
                       : 'bg-neon-cyan text-black hover:bg-neon-cyan/80 shadow-[0_0_15px_rgba(0,255,255,0.4)]'
                   }`}
@@ -737,7 +772,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                     COLOR LOCKED
                   </div>
                   <div className="text-slate-500 text-[9px] mt-2">
-                    Your <span className="font-bold uppercase" style={{ color: COLOR_HEX[userColor as keyof typeof COLOR_HEX] }}>{userColorDisplay}</span> color is fixed for this tournament. Bet locked: ${ENTRY_FEE}.
+                    Your <span className="font-bold uppercase" style={{ color: COLOR_HEX[userColor as keyof typeof COLOR_HEX] }}>{userColorDisplay}</span> color is fixed for this tournament. Bet locked: ${tournamentBetAmount}.
                   </div>
                 </div>
               </div>
@@ -785,7 +820,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
         {/* BRACKET_VIEW - Tournament Bracket with Proceed Button */}
         {phase === 'BRACKET_VIEW' && (
-          <div className="flex-1 flex items-center justify-center bg-black/40">
+          <div className="flex-1 flex items-center justify-center bg-black/95 p-2 sm:p-4 overflow-hidden">
             <TournamentBracketNew 
               groupNumber={userGroup}
               playersInGroup={PLAYERS_PER_GROUP}
@@ -939,7 +974,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                   </div>
                   <div>
                     <span className="text-slate-400">Bet:</span>
-                    <div className="font-arcade text-neon-green">${ENTRY_FEE} 🔒</div>
+                    <div className="font-arcade text-neon-green">${tournamentBetAmount} 🔒</div>
                   </div>
                 </div>
               </div>
@@ -1080,7 +1115,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                       </div>
                       <div className="pt-2 border-t border-neon-pink/20">
                         <span className="text-slate-400 text-xs">Bet Amount</span>
-                        <div className="font-arcade text-neon-green mt-1">${ENTRY_FEE} 🔒</div>
+                        <div className="font-arcade text-neon-green mt-1">${tournamentBetAmount} 🔒</div>
                       </div>
                       <div className="pt-2 border-t border-neon-pink/20">
                         <span className="text-slate-400 text-xs">Your Group</span>
@@ -1736,7 +1771,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                   </div>
                   <div>
                     <span className="text-slate-400">Bet:</span>
-                    <div className="font-arcade text-neon-green text-[7px] sm:text-xs">${ENTRY_FEE} 🔒</div>
+                    <div className="font-arcade text-neon-green text-[7px] sm:text-xs">${tournamentBetAmount} 🔒</div>
                   </div>
                 </div>
               </div>
@@ -1822,7 +1857,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                       </div>
                       <div className="pt-2 border-t border-neon-pink/20">
                         <span className="text-slate-400 text-xs">Bet Amount</span>
-                        <div className="font-arcade text-neon-green mt-1">${ENTRY_FEE} 🔒</div>
+                        <div className="font-arcade text-neon-green mt-1">${tournamentBetAmount} 🔒</div>
                       </div>
                     </div>
                   </div>

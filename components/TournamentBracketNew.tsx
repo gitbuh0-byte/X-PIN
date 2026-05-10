@@ -139,14 +139,15 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-gradient-to-b from-black via-black to-black overflow-hidden">
-      {/* Header - Fixed and Mobile responsive */}
-      <div className="sticky top-0 bg-gradient-to-r from-black via-black to-black border-b-2 border-neon-cyan/60 px-2 sm:px-3 md:px-4 py-2 sm:py-3 z-20 backdrop-blur-sm flex-shrink-0">
+    <div className="w-full max-w-5xl max-h-[92dvh] flex flex-col bg-vegas-panel/95 border border-neon-cyan/50 rounded-lg shadow-[0_0_50px_rgba(0,255,255,0.15)] clip-corner overflow-hidden">
+      <div className="h-1 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50 flex-shrink-0"></div>
+      {/* Header - compact modal style */}
+      <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b border-white/10 flex-shrink-0">
         <div className="text-center">
-          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-arcade text-neon-gold tracking-widest mb-1 drop-shadow-[0_0_20px_rgba(255,215,0,0.6)]">
+          <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-arcade text-white tracking-widest mb-1 uppercase">
             GRAND PRIX TOURNAMENT
           </h1>
-          <p className="text-[8px] sm:text-[9px] md:text-xs text-neon-cyan font-mono">
+          <p className="text-[8px] sm:text-[9px] md:text-xs text-neon-cyan font-mono opacity-80">
             Round 1: 20 Rooms • Round 2: 4 Rooms • Final: 1 Room
           </p>
           <p className="text-[7px] sm:text-[8px] md:text-[9px] text-neon-pink font-arcade mt-1">
@@ -156,30 +157,30 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
       </div>
 
       {/* Bracket Container */}
-      <div className="flex-1 overflow-auto relative pb-8">
+      <div className="flex-1 overflow-auto relative pb-4 custom-scrollbar">
         <div className="w-full h-full flex flex-col justify-center items-center p-2 sm:p-4 min-h-fit">
           
           {/* Stage Headers - Mobile responsive */}
-          <div className="flex gap-2 sm:gap-4 md:gap-8 justify-center w-full mb-4 sm:mb-6 px-2 overflow-x-auto">
-            <div className="text-center flex-shrink-0">
+          <div className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,0.9fr)_minmax(0,0.75fr)] gap-2 sm:gap-4 md:gap-6 w-full max-w-4xl mb-4 sm:mb-6 px-1 sm:px-2">
+            <div className="text-center min-w-0">
               <div className="text-[10px] sm:text-xs md:text-sm font-arcade text-neon-pink font-bold uppercase tracking-wider">Round 1</div>
               <div className="text-[8px] sm:text-[9px] text-neon-pink/60">20 Rooms</div>
             </div>
-            <div className="text-center flex-shrink-0">
+            <div className="text-center min-w-0">
               <div className="text-[10px] sm:text-xs md:text-sm font-arcade text-neon-cyan font-bold uppercase tracking-wider">Round 2</div>
               <div className="text-[8px] sm:text-[9px] text-neon-cyan/60">4 Rooms</div>
             </div>
-            <div className="text-center flex-shrink-0">
+            <div className="text-center min-w-0">
               <div className="text-[10px] sm:text-xs md:text-sm font-arcade text-neon-gold font-bold uppercase tracking-wider">Final</div>
               <div className="text-[8px] sm:text-[9px] text-neon-gold/60">1 Room</div>
             </div>
           </div>
 
-          {/* Main Bracket - Scrollable on mobile */}
-          <div className="flex gap-2 sm:gap-4 md:gap-6 lg:gap-12 justify-center items-center relative w-full overflow-x-auto px-2 pb-4">
+          {/* Main Bracket */}
+          <div className="grid grid-cols-[minmax(0,1.7fr)_minmax(0,0.9fr)_minmax(0,0.75fr)] gap-2 sm:gap-4 md:gap-6 w-full max-w-4xl px-1 sm:px-2 pb-2 items-center">
             
             {/* ROUND 1 - 20 Rooms (G1-G20) - Mobile optimized */}
-            <div className="flex flex-col gap-0.5 justify-center flex-shrink-0 min-w-[120px] sm:min-w-[140px] md:min-w-[160px]">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 min-w-0">
               {round1Rooms.map((room, idx) => {
                 const isUserRoom = (idx + 1) === groupNumber;  // Fixed: direct comparison with groupNumber (1-20)
                 const isHovered = hoveredRoom === `r1-${idx}`;
@@ -194,7 +195,7 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
                       }}
                       onMouseEnter={() => setHoveredRoom(`r1-${idx}`)}
                       onMouseLeave={() => setHoveredRoom(null)}
-                      className={`cursor-pointer transition-all duration-300 border rounded px-1.5 py-1 sm:px-2 sm:py-1.5 md:px-3 md:py-2 w-full text-center backdrop-blur-sm text-[7px] sm:text-[8px] md:text-[9px] ${
+                      className={`cursor-pointer transition-all duration-300 border rounded px-1 py-1 sm:px-1.5 sm:py-1.5 md:px-2 md:py-2 w-full text-center backdrop-blur-sm text-[7px] sm:text-[8px] md:text-[9px] ${
                         isUserRoom
                           ? 'border-neon-green/90 bg-neon-green/20 shadow-[0_0_25px_rgba(0,255,0,0.6)] ring-2 ring-neon-green/70'  // User's room highlighted in green
                           : selectedRoom === `r1-${idx}`
@@ -211,7 +212,7 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
             </div>
 
             {/* ROUND 2 - 4 Quarter Finals - Mobile optimized */}
-            <div className="flex flex-col gap-2 sm:gap-4 justify-center flex-shrink-0 min-w-[120px] sm:min-w-[140px] md:min-w-[160px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 min-w-0">
               {round2Rooms.map((room, idx) => {
                 const isHovered = hoveredRoom === `r2-${idx}`;
                 const isSelected = selectedRoom === `r2-${idx}`;
@@ -225,7 +226,7 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
                       }}
                       onMouseEnter={() => setHoveredRoom(`r2-${idx}`)}
                       onMouseLeave={() => setHoveredRoom(null)}
-                      className={`cursor-pointer transition-all duration-300 border-2 rounded px-1.5 py-1 sm:px-2 sm:py-1.5 md:px-3 md:py-2 w-full text-center backdrop-blur-sm text-[7px] sm:text-[8px] md:text-[9px] ${
+                      className={`cursor-pointer transition-all duration-300 border-2 rounded px-1 py-1 sm:px-1.5 sm:py-1.5 md:px-2 md:py-2 w-full text-center backdrop-blur-sm text-[7px] sm:text-[8px] md:text-[9px] ${
                         selectedRoom === `r2-${idx}`
                           ? 'border-neon-pink bg-neon-pink/20 shadow-[0_0_20px_rgba(255,0,128,0.4)]'
                           : 'border-neon-pink/40 bg-black/50 hover:border-neon-pink'
@@ -240,7 +241,7 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
             </div>
 
             {/* ROUND 3 - Final - Mobile optimized */}
-            <div className="flex flex-col gap-1.5 justify-center flex-shrink-0 min-w-[120px] sm:min-w-[140px] md:min-w-[160px]">
+            <div className="flex flex-col gap-1.5 justify-center min-w-0">
               {round3Rooms.map((room, idx) => {
                 const isHovered = hoveredRoom === `r3-${idx}`;
                 const isSelected = selectedRoom === `r3-${idx}`;
@@ -254,7 +255,7 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
                       }}
                       onMouseEnter={() => setHoveredRoom(`r3-${idx}`)}
                       onMouseLeave={() => setHoveredRoom(null)}
-                      className={`cursor-pointer transition-all duration-300 border-2 rounded px-1.5 py-1 sm:px-2 sm:py-1.5 md:px-3 md:py-2 w-full text-center backdrop-blur-sm text-[7px] sm:text-[8px] md:text-[9px] ${
+                      className={`cursor-pointer transition-all duration-300 border-2 rounded px-1 py-1 sm:px-1.5 sm:py-1.5 md:px-2 md:py-2 w-full text-center backdrop-blur-sm text-[7px] sm:text-[8px] md:text-[9px] ${
                         selectedRoom === `r3-${idx}`
                           ? 'border-neon-gold bg-neon-gold/20 shadow-[0_0_25px_rgba(255,215,0,0.5)]'
                           : 'border-neon-gold/40 bg-black/50 hover:border-neon-gold/70'
@@ -267,12 +268,6 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
                 );
               })}
             </div>
-
-            {/* Trophy Decoration - Mobile responsive */}
-            <div className="flex flex-col justify-center items-center gap-1 sm:gap-2 flex-shrink-0 ml-2 sm:ml-4 md:ml-6">
-              <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl drop-shadow-[0_0_30px_rgba(255,215,0,0.8)] animate-bounce">🏆</div>
-              <div className="text-[8px] sm:text-[10px] md:text-xs font-arcade text-neon-gold font-bold tracking-wider hidden sm:block">CHAMPION</div>
-            </div>
           </div>
 
           {/* Proceed Button - Desktop and iPad Pro only (hidden on mobile where bottom bar shows) */}
@@ -282,7 +277,7 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
                 soundManager.play('click');
                 if (onProceedClick) onProceedClick();
               }}
-              className="px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 font-arcade text-sm sm:text-base md:text-lg tracking-wider text-black bg-gradient-to-r from-neon-green to-neon-cyan hover:shadow-[0_0_30px_rgba(0,255,0,0.6)] transition-all duration-300 shadow-[0_0_15px_rgba(0,255,0,0.4)] rounded-lg border-2 border-transparent hover:border-neon-green whitespace-nowrap font-black"
+              className="px-8 sm:px-10 py-3 sm:py-3.5 bg-neon-cyan text-black font-arcade hover:bg-neon-cyan/80 transition-colors uppercase text-xs sm:text-sm tracking-wide rounded-sm shadow-[0_0_15px_rgba(0,255,255,0.4)] whitespace-nowrap font-black"
             >
               START TOURNAMENT
             </button>
