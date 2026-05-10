@@ -409,7 +409,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
   };
 
   return (
-    <div className="w-full h-screen bg-gradient-to-b from-slate-900 to-black text-white flex flex-col overflow-hidden">
+    <div className="w-full h-[100dvh] bg-gradient-to-b from-slate-900 to-black text-white flex flex-col overflow-hidden">
       {/* Main Header - Always visible except on BROWSE */}
       {phase !== 'BROWSE' && (
         <div className="bg-gradient-to-r from-neon-gold/15 via-black to-neon-pink/15 border-b-2 border-neon-gold/40 shadow-[0_0_30px_rgba(255,215,0,0.3)] px-2 sm:px-4 py-2 sm:py-3 md:py-4 flex items-center justify-between flex-shrink-0 gap-2 backdrop-blur-sm">
@@ -426,8 +426,8 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
       {/* Content Area */}
       {/* GROUPS Phase: 20 wheels spinning (invisible), only player's room wheel visible */}
       {phase === 'GROUPS' && (
-        <div className={`fixed inset-0 z-30 flex items-center justify-center pointer-events-none px-2 sm:px-0 pt-12 sm:pt-16 md:pt-24`}>
-          <div className="pointer-events-none scale-75 sm:scale-90 md:scale-100 origin-center">
+        <div className={`fixed inset-0 z-30 flex items-center justify-center pointer-events-none px-2 sm:px-0 pt-12 sm:pt-16 md:pt-24 pb-20 lg:pb-0`}>
+          <div className="pointer-events-none origin-center">
             {/* Player's group wheel for current spin */}
             <SpinWheel
               segments={TOURNAMENT_SEGMENTS_ROUND1_2}
@@ -443,8 +443,8 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
       {/* QUARTERFINALS Phase: Shared wheel with 5 players per group */}
       {phase === 'QUARTERFINALS' && (
-        <div className={`fixed inset-0 z-30 flex items-center justify-center pointer-events-none px-2 sm:px-0 pt-12 sm:pt-16 md:pt-24`}>
-          <div className="pointer-events-none scale-75 sm:scale-90 md:scale-100 origin-center">
+        <div className={`fixed inset-0 z-30 flex items-center justify-center pointer-events-none px-2 sm:px-0 pt-12 sm:pt-16 md:pt-24 pb-20 lg:pb-0`}>
+          <div className="pointer-events-none origin-center">
             {/* Quarterfinals wheel for current spin */}
             <SpinWheel
               segments={TOURNAMENT_SEGMENTS_ROUND1_2}
@@ -460,8 +460,8 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
       {/* FINAL Phase: Shared wheel with 4 finalists */}
       {phase === 'FINAL' && (
-        <div className={`fixed inset-0 z-30 flex items-center justify-center pointer-events-none px-2 sm:px-0 pt-8 sm:pt-12 md:pt-16`}>
-          <div className="pointer-events-none scale-75 sm:scale-90 md:scale-100 origin-center">
+        <div className={`fixed inset-0 z-30 flex items-center justify-center pointer-events-none px-2 sm:px-0 pt-8 sm:pt-12 md:pt-16 pb-20 lg:pb-0`}>
+          <div className="pointer-events-none origin-center">
             <SpinWheel
               segments={TOURNAMENT_SEGMENTS_FINAL}
               spinning={finalSpinning}
@@ -1592,7 +1592,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
         {/* FINAL - Grand Final Spin */}
         {phase === 'FINAL' && (
-          <div className="flex-1 flex flex-col lg:flex-row gap-4 p-4 overflow-hidden w-full h-auto relative">
+          <div className="flex-1 flex flex-col lg:flex-row gap-2 lg:gap-4 p-2 lg:p-4 overflow-hidden w-full h-auto relative">
             {/* Left: Finalists - Hidden on mobile */}
             <div className="hidden lg:flex w-72 bg-black/40 border border-neon-gold/30 rounded overflow-hidden flex-col flex-shrink-0">
               <div className="sticky top-0 bg-black/80 border-b border-neon-gold/30 p-3">
