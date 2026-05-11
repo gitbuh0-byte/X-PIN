@@ -158,9 +158,6 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
       {/* Header - full tournament style */}
       <div className="sticky top-0 bg-gradient-to-r from-black via-black to-black border-b-2 border-neon-cyan/60 px-2 sm:px-3 md:px-4 py-2 sm:py-3 z-20 backdrop-blur-sm flex-shrink-0">
         <div className="text-center">
-          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-arcade text-neon-gold tracking-widest mb-1 drop-shadow-[0_0_20px_rgba(255,215,0,0.6)] uppercase">
-            GRAND PRIX TOURNAMENT
-          </h1>
           <p className="text-[8px] sm:text-[9px] md:text-xs text-neon-cyan font-mono">
             Round 1: 20 Rooms • Round 2: 4 Rooms • Final: 1 Room
           </p>
