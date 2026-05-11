@@ -58,12 +58,12 @@ const TournamentWinnerAnimation: React.FC<TournamentWinnerAnimationProps> = ({ i
         </div>
       </div>
 
-      {/* Winner/Loser Image - Bottom Right Corner of Screen - Static (No Animation) */}
+      {/* Winner/Loser Image - Bottom Right Corner of Screen */}
       <div className="fixed bottom-6 right-6 z-[250] pointer-events-none bg-transparent max-w-[320px] max-h-[320px]">
         <img 
-          src={isUserWinner ? '/winnerman.png' : '/loserman.png'} 
+          src={isUserWinner ? '/winner.png' : '/loser.png'}
           alt={isUserWinner ? 'Winner' : 'Loser'}
-          className={`w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.8)] bg-transparent`}
+          className={`w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.8)] bg-transparent ${isUserWinner ? 'animate-winner-bounce' : 'animate-loser-shake'}`}
           style={{ backgroundColor: 'transparent' }}
         />
       </div>
@@ -79,6 +79,22 @@ const TournamentWinnerAnimation: React.FC<TournamentWinnerAnimationProps> = ({ i
             transform: translateY(100vh) rotate(360deg);
             opacity: 0;
           }
+        }
+        @keyframes winnerBreathe {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.12); }
+        }
+        @keyframes loserShake {
+          0%, 100% { transform: translateX(0) rotate(0deg) scale(1); opacity: 1; }
+          25% { transform: translateX(-8px) rotate(-4deg) scale(0.96); opacity: 0.85; }
+          50% { transform: translateX(8px) rotate(4deg) scale(0.92); opacity: 0.7; }
+          75% { transform: translateX(-8px) rotate(-4deg) scale(0.96); opacity: 0.85; }
+        }
+        .animate-winner-bounce {
+          animation: winnerBreathe 2.5s ease-in-out infinite;
+        }
+        .animate-loser-shake {
+          animation: loserShake 2.5s ease-in-out infinite;
         }
       `}</style>
     </div>

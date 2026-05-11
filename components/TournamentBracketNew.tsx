@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { soundManager } from '../services/soundManager.ts';
 
 interface Player {
@@ -22,16 +22,31 @@ interface TournamentBracketNewProps {
   playersInGroup: number;
   onProceedClick?: () => void;
   userUsername?: string;  // User's actual username to display in their room
+  autoStartSeconds?: number;
 }
 
 const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({ 
   groupNumber, 
   playersInGroup,
   onProceedClick,
-  userUsername
+  userUsername,
+  autoStartSeconds = 10
 }) => {
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
   const [hoveredRoom, setHoveredRoom] = useState<string | null>(null);
+  const [autoStartCountdown, setAutoStartCountdown] = useState(autoStartSeconds);
+  const [hasAutoStarted, setHasAutoStarted] = useState(false);
+
+  useEffect(() => {
+    if (!onProceedClick || hasAutoStarted) return;
+    if (autoStartCountdown <= 0) {
+      setHasAutoStarted(true);
+      onProceedClick();
+      return;
+    }
+    const timer = setTimeout(() => setAutoStartCountdown(seconds => seconds - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [autoStartCountdown, hasAutoStarted, onProceedClick]);
 
   // Generate mock players for demonstration
   const generatePlayers = (seedValue: string, count: number, includeUser: boolean = false): Player[] => {
@@ -288,17 +303,16 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
             </div>
           </div>
 
-          {/* Proceed Button - Desktop and iPad Pro only (hidden on mobile where bottom bar shows) */}
-          <div className="hidden lg:flex mt-6 sm:mt-8 md:mt-12 justify-center">
-            <button
-              onClick={() => {
-                soundManager.play('click');
-                if (onProceedClick) onProceedClick();
-              }}
-              className="px-8 sm:px-10 py-3 sm:py-3.5 bg-neon-cyan text-black font-arcade hover:bg-neon-cyan/80 transition-colors uppercase text-xs sm:text-sm tracking-wide rounded-sm shadow-[0_0_15px_rgba(0,255,255,0.4)] whitespace-nowrap font-black"
-            >
-              START TOURNAMENT
-            </button>
+          {/* Auto-start countdown */}
+          <div className="mt-6 sm:mt-8 md:mt-12 flex justify-center">
+            <div className="min-w-[220px] border border-neon-cyan/60 bg-black/70 px-6 py-3 text-center shadow-[0_0_20px_rgba(0,255,255,0.25)]">
+              <div className="text-[8px] sm:text-[9px] font-arcade uppercase tracking-widest text-neon-cyan/70 mb-1">
+                Game Starts In
+              </div>
+              <div className="text-3xl sm:text-4xl font-arcade font-black text-neon-cyan drop-shadow-[0_0_18px_rgba(0,255,255,0.8)]">
+                {Math.max(0, autoStartCountdown)}
+              </div>
+            </div>
           </div>
 
         </div>
