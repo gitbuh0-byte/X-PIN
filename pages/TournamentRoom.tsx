@@ -643,8 +643,8 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
       <div className="flex-1 flex overflow-auto relative">
         {/* BROWSE - Initial Tournament Selection */}
         {phase === 'BROWSE' && (
-          <div className="flex-1 flex items-center justify-center bg-black/95 p-2 sm:p-3 md:p-4 overflow-y-auto">
-            <div className="bg-vegas-panel/95 border border-neon-cyan/50 p-3 sm:p-4 md:p-6 lg:p-8 rounded-lg w-full max-w-sm sm:max-w-md relative shadow-[0_0_50px_rgba(0,255,255,0.15)] clip-corner text-center">
+          <div className="flex-1 flex items-center justify-center bg-black/95 px-3 py-4 sm:p-4 overflow-y-auto">
+            <div className="bg-vegas-panel/95 border border-neon-cyan/50 px-4 py-4 sm:px-5 sm:py-5 md:px-6 md:py-6 rounded-lg w-full max-w-sm sm:max-w-md max-h-[calc(100dvh-32px)] overflow-y-auto custom-scrollbar relative shadow-[0_0_50px_rgba(0,255,255,0.15)] clip-corner text-center">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50"></div>
               <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-1 sm:mb-2 text-neon-pink text-glow-pink">🎰</div>
               <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-arcade text-white mb-1 tracking-widest uppercase">TOURNAMENT</div>
@@ -660,7 +660,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                 </div>
               </div>
 
-              <div className="bg-neon-purple/10 border border-neon-purple/30 rounded-sm p-2 sm:p-3 md:p-4 mb-4 sm:mb-5 md:mb-8">
+              <div className="bg-neon-purple/10 border border-neon-purple/30 rounded-sm p-2.5 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-5">
                 <div className="text-slate-400 text-[8px] sm:text-[9px] md:text-xs font-mono leading-relaxed space-y-1.5 text-left">
                   <div className="flex items-center gap-2"><span className="text-neon-green text-base sm:text-lg">✓</span><span>20 groups of 5 players</span></div>
                   <div className="flex items-center gap-2"><span className="text-neon-cyan text-base sm:text-lg">✓</span><span>Win your group → Join Final Round</span></div>
@@ -687,26 +687,26 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
         {/* BET_PROMPT - Place Bet */}
         {phase === 'BET_PROMPT' && (
-          <div className="flex-1 flex items-center justify-center bg-black/95 p-2 sm:p-3 md:p-4 overflow-y-auto">
-            <div className="bg-vegas-panel/95 border border-neon-cyan/50 p-3 sm:p-4 md:p-6 lg:p-8 rounded-lg w-full max-w-sm sm:max-w-md relative shadow-[0_0_50px_rgba(0,255,255,0.15)] clip-corner text-center">
+          <div className="flex-1 flex items-center justify-center bg-black/95 px-3 py-4 sm:p-4 overflow-y-auto">
+            <div className="bg-vegas-panel/95 border border-neon-cyan/50 px-4 py-4 sm:px-5 sm:py-5 md:px-6 md:py-6 rounded-lg w-full max-w-sm sm:max-w-md max-h-[calc(100dvh-32px)] overflow-y-auto custom-scrollbar relative shadow-[0_0_50px_rgba(0,255,255,0.15)] clip-corner text-center">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50"></div>
               <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-arcade font-black text-neon-cyan mb-1 sm:mb-2 text-glow-cyan">💰</div>
               <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-arcade text-white mb-1 tracking-widest uppercase">Place Your Bet</div>
-              <div className="text-[10px] sm:text-xs md:text-sm font-mono text-neon-cyan opacity-80 mb-4 sm:mb-5 md:mb-6">TOURNAMENT • {TOTAL_PLAYERS}-Player Bracket</div>
+              <div className="text-[10px] sm:text-xs md:text-sm font-mono text-neon-cyan opacity-80 mb-3 sm:mb-4">TOURNAMENT • {TOTAL_PLAYERS}-Player Bracket</div>
 
-              <div className="bg-black/40 border border-white/10 rounded-sm p-2 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-6 text-left">
+              <div className="bg-black/40 border border-white/10 rounded-sm p-2.5 sm:p-3 md:p-4 mb-2.5 sm:mb-3 md:mb-4 text-left">
                 <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">Available Balance</div>
                 <div className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade font-black ${user.balance >= tournamentBetAmount ? 'text-neon-green' : 'text-red-400'}`}>
                   ${Math.max(0, user.balance - tournamentBetAmount).toLocaleString()}
                 </div>
               </div>
 
-              <div className="bg-black/40 border border-white/10 rounded-sm p-2 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-6 text-left">
+              <div className="bg-black/40 border border-white/10 rounded-sm p-2.5 sm:p-3 md:p-4 mb-2.5 sm:mb-3 md:mb-4 text-left">
                 <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">Bet Amount</div>
                 <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade text-neon-cyan font-black">${tournamentBetAmount}</div>
               </div>
 
-              <div className="mb-4 sm:mb-5 md:mb-8">
+              <div className="mb-3 sm:mb-4 md:mb-5">
                 <div className="text-slate-500 text-[8px] sm:text-[9px] md:text-[10px] font-bold uppercase tracking-wider mb-1 sm:mb-2 text-left">
                   Quick Select
                 </div>
@@ -730,7 +730,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                 </div>
               </div>
 
-              <div className="bg-neon-purple/10 border border-neon-purple/30 rounded-sm p-2 sm:p-3 md:p-4 mb-4 sm:mb-5 md:mb-8">
+              <div className="bg-neon-purple/10 border border-neon-purple/30 rounded-sm p-2.5 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-5">
                 <p className="text-slate-400 text-[8px] sm:text-[9px] md:text-xs font-mono leading-relaxed text-left">
                   Your entry is locked once confirmed. Your color and group are assigned before the tournament bracket opens.
                 </p>

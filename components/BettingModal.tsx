@@ -77,13 +77,13 @@ const BettingModal: React.FC<BettingModalProps> = ({
   const config = modeConfig[gameMode];
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-lg p-2 sm:p-3 md:p-4">
-      <div className={`bg-vegas-panel/95 border border-${config.color}/50 p-3 sm:p-4 md:p-6 lg:p-8 rounded-lg w-full max-w-sm sm:max-w-md relative shadow-[0_0_50px_rgba(0,255,255,0.15)] clip-corner`}>
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-lg px-3 py-4 sm:p-4">
+      <div className={`bg-vegas-panel/95 border border-${config.color}/50 px-4 py-4 sm:px-5 sm:py-5 md:px-6 md:py-6 rounded-lg w-full max-w-sm sm:max-w-md max-h-[calc(100dvh-32px)] overflow-y-auto custom-scrollbar relative shadow-[0_0_50px_rgba(0,255,255,0.15)] clip-corner`}>
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50"></div>
         
         {/* Header */}
-        <div className="text-center mb-4 sm:mb-5 md:mb-6">
-          <div className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-arcade font-black text-${config.color} mb-1 sm:mb-2 text-glow-cyan`}>
+        <div className="text-center mb-3 sm:mb-4">
+          <div className={`text-3xl sm:text-4xl md:text-5xl font-arcade font-black text-${config.color} mb-1 text-glow-cyan`}>
             💰
           </div>
           <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-arcade text-white mb-1 tracking-widest uppercase">
@@ -95,7 +95,7 @@ const BettingModal: React.FC<BettingModalProps> = ({
         </div>
 
         {/* Balance Display */}
-        <div className="bg-black/40 border border-white/10 rounded-sm p-2 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-6">
+        <div className="bg-black/40 border border-white/10 rounded-sm p-2.5 sm:p-3 md:p-4 mb-2.5 sm:mb-3 md:mb-4">
           <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">
             Available Balance
           </div>
@@ -107,7 +107,7 @@ const BettingModal: React.FC<BettingModalProps> = ({
         </div>
 
         {/* Bet Amount Display */}
-        <div className="bg-black/40 border border-white/10 rounded-sm p-2 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-6">
+        <div className="bg-black/40 border border-white/10 rounded-sm p-2.5 sm:p-3 md:p-4 mb-2.5 sm:mb-3 md:mb-4">
           <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">
             Bet Amount
           </div>
@@ -117,7 +117,7 @@ const BettingModal: React.FC<BettingModalProps> = ({
         </div>
 
         {/* Quick Bet Buttons */}
-        <div className="mb-4 sm:mb-5 md:mb-8">
+        <div className="mb-3 sm:mb-4 md:mb-5">
           <div className="text-slate-500 text-[8px] sm:text-[9px] md:text-[10px] font-bold uppercase tracking-wider mb-1 sm:mb-2">
             Quick Select
           </div>
@@ -140,7 +140,7 @@ const BettingModal: React.FC<BettingModalProps> = ({
         </div>
 
         {/* Info Text */}
-        <div className="bg-neon-purple/10 border border-neon-purple/30 rounded-sm p-2 sm:p-3 md:p-4 mb-4 sm:mb-5 md:mb-8">
+        <div className="bg-neon-purple/10 border border-neon-purple/30 rounded-sm p-2.5 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-5">
           <p className="text-slate-400 text-[8px] sm:text-[9px] md:text-xs font-mono leading-relaxed">
             Your bet is locked in once confirmed. You cannot enter the game room without placing a bet.
           </p>

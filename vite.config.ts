@@ -16,15 +16,18 @@ export default defineConfig(({ mode }) => {
           registerType: 'autoUpdate',
           includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
           manifest: {
+            id: '/',
             name: 'X-SPIN Tournament',
             short_name: 'X-SPIN',
             description: 'Ultimate tournament gaming experience',
             theme_color: '#00FFFF',
             background_color: '#000000',
             display: 'standalone',
+            display_override: ['standalone', 'fullscreen', 'minimal-ui'],
             orientation: 'portrait',
             scope: '/',
             start_url: '/',
+            categories: ['games', 'entertainment'],
             icons: [
               {
                 src: 'masked-icon.svg',
@@ -45,7 +48,7 @@ export default defineConfig(({ mode }) => {
                 src: 'pwa-512x512.png',
                 sizes: '512x512',
                 type: 'image/png',
-                purpose: 'any maskable'
+                purpose: 'maskable any'
               }
             ]
           }
