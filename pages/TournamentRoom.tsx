@@ -467,7 +467,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
       {/* Content Area */}
       {/* GROUPS Phase: 20 wheels spinning (invisible), only player's room wheel visible */}
       {phase === 'GROUPS' && (
-        <div className={`fixed inset-0 z-30 flex items-center justify-center pointer-events-none px-2 sm:px-0 pt-12 sm:pt-16 md:pt-24 pb-20 lg:pb-0`}>
+        <div className={`fixed inset-0 z-30 flex items-center justify-center pointer-events-none px-2 sm:px-0 pt-12 sm:pt-16 md:pt-24 pb-32 lg:pb-0`}>
           <div className="pointer-events-none origin-center">
             {/* Player's group wheel for current spin */}
             <SpinWheel
@@ -484,7 +484,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
       {/* QUARTERFINALS Phase: Shared wheel with 5 players per group */}
       {phase === 'QUARTERFINALS' && (
-        <div className={`fixed inset-0 z-30 flex items-center justify-center pointer-events-none px-2 sm:px-0 pt-12 sm:pt-16 md:pt-24 pb-20 lg:pb-0`}>
+        <div className={`fixed inset-0 z-30 flex items-center justify-center pointer-events-none px-2 sm:px-0 pt-12 sm:pt-16 md:pt-24 pb-32 lg:pb-0`}>
           <div className="pointer-events-none origin-center">
             {/* Quarterfinals wheel for current spin */}
             <SpinWheel
@@ -501,7 +501,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
       {/* FINAL Phase: Shared wheel with 4 finalists */}
       {phase === 'FINAL' && (
-        <div className={`fixed inset-0 z-30 flex items-center justify-center pointer-events-none px-2 sm:px-0 pt-8 sm:pt-12 md:pt-16 pb-20 lg:pb-0`}>
+        <div className={`fixed inset-0 z-30 flex items-center justify-center pointer-events-none px-2 sm:px-0 pt-8 sm:pt-12 md:pt-16 pb-32 lg:pb-0`}>
           <div className="pointer-events-none origin-center">
             <SpinWheel
               segments={TOURNAMENT_SEGMENTS_FINAL}
@@ -517,21 +517,21 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
       {/* FINAL Phase - Buttons at bottom on mobile - Vegas Casino style */}
       {phase === 'FINAL' && (
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-20 px-3 py-3 bg-gradient-to-t from-black via-black/90 to-transparent border-t-2 border-neon-cyan/50 shadow-[0_-10px_30px_rgba(0,255,255,0.2)] pointer-events-auto">
+        <div className="lg:hidden fixed left-0 right-0 bottom-28 z-50 px-4 pointer-events-auto">
           <div className="grid grid-cols-3 gap-2 w-full">
             <button 
               onClick={() => { soundManager.play('click'); setShowGroupsPanel(true); }}
-              className="px-4 py-3 text-neon-cyan font-arcade text-sm border-2 border-neon-cyan hover:bg-neon-cyan hover:text-black transition font-black tracking-wider shadow-[0_0_15px_rgba(0,255,255,0.5)] active:scale-95">
+              className="px-3 py-3 text-neon-cyan bg-black/50 font-arcade text-[10px] border-2 border-neon-cyan hover:bg-neon-cyan hover:text-black transition font-black tracking-wider shadow-[0_0_15px_rgba(0,255,255,0.5)] active:scale-95">
               FINALISTS
             </button>
             <button 
               onClick={() => { soundManager.play('click'); setShowStatusPanel(true); }}
-              className="px-4 py-3 text-neon-pink font-arcade text-sm border border-neon-pink hover:bg-neon-pink hover:text-black transition font-black tracking-wider shadow-[0_0_15px_rgba(255,0,128,0.5)] active:scale-95">
+              className="px-3 py-3 text-neon-pink bg-black/50 font-arcade text-[10px] border border-neon-pink hover:bg-neon-pink hover:text-black transition font-black tracking-wider shadow-[0_0_15px_rgba(255,0,128,0.5)] active:scale-95">
               STATUS
             </button>
             <button 
               onClick={() => { soundManager.play('click'); setShowChatPanel(true); }}
-              className="px-4 py-3 text-neon-green font-arcade text-sm border border-neon-green hover:bg-neon-green hover:text-black transition font-black tracking-wider shadow-[0_0_15px_rgba(0,255,0,0.5)] active:scale-95">
+              className="px-3 py-3 text-neon-green bg-black/50 font-arcade text-[10px] border border-neon-green hover:bg-neon-green hover:text-black transition font-black tracking-wider shadow-[0_0_15px_rgba(0,255,0,0.5)] active:scale-95">
               CHATS
             </button>
           </div>
@@ -986,22 +986,22 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
               </div>
 
               {/* Mobile Control Buttons - Below wheel */}
-              <div className="w-full flex gap-2 sm:gap-3 justify-center flex-shrink-0">
+              <div className="fixed left-0 right-0 bottom-28 z-50 flex gap-2 justify-center px-4 pointer-events-auto">
                 <button
                   onClick={() => { soundManager.play('click'); setShowGroupsPanel(true); }}
-                  className="px-5 sm:px-8 py-2.5 sm:py-3 font-arcade text-xs sm:text-sm tracking-wider transition-all border-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-black whitespace-nowrap font-black"
+                  className="min-w-[104px] px-4 py-3 font-arcade text-[10px] tracking-wider transition-all border-2 border-neon-cyan text-neon-cyan bg-black/50 hover:bg-neon-cyan hover:text-black whitespace-nowrap font-black"
                 >
                   GROUPS
                 </button>
                 <button
                   onClick={() => { soundManager.play('click'); setShowStatusPanel(true); }}
-                  className="px-5 sm:px-8 py-2.5 sm:py-3 font-arcade text-xs sm:text-sm tracking-wider transition-all border border-neon-pink text-neon-pink hover:bg-neon-pink hover:text-black whitespace-nowrap font-black"
+                  className="min-w-[104px] px-4 py-3 font-arcade text-[10px] tracking-wider transition-all border border-neon-pink text-neon-pink bg-black/50 hover:bg-neon-pink hover:text-black whitespace-nowrap font-black"
                 >
                   STATUS
                 </button>
                 <button
                   onClick={() => { soundManager.play('click'); setShowChatPanel(true); }}
-                  className="px-5 sm:px-8 py-2.5 sm:py-3 font-arcade text-xs sm:text-sm tracking-wider transition-all border border-neon-green text-neon-green hover:bg-neon-green hover:text-black whitespace-nowrap font-black"
+                  className="min-w-[104px] px-4 py-3 font-arcade text-[10px] tracking-wider transition-all border border-neon-green text-neon-green bg-black/50 hover:bg-neon-green hover:text-black whitespace-nowrap font-black"
                 >
                   CHATS
                 </button>
@@ -1335,22 +1335,22 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
               </div>
 
               {/* Mobile Control Buttons - Below wheel */}
-              <div className="w-full flex gap-2 sm:gap-3 justify-center flex-shrink-0">
+              <div className="fixed left-0 right-0 bottom-28 z-50 flex gap-2 justify-center px-4 pointer-events-auto">
                 <button
                   onClick={() => { soundManager.play('click'); setShowGroupsPanel(true); }}
-                  className="px-5 sm:px-8 py-2.5 sm:py-3 font-arcade text-xs sm:text-sm tracking-wider transition-all border-2 border-neon-pink text-neon-pink hover:bg-neon-pink hover:text-black whitespace-nowrap font-black"
+                  className="min-w-[104px] px-4 py-3 font-arcade text-[10px] tracking-wider transition-all border-2 border-neon-pink text-neon-pink bg-black/50 hover:bg-neon-pink hover:text-black whitespace-nowrap font-black"
                 >
                   MATCHES
                 </button>
                 <button
                   onClick={() => { soundManager.play('click'); setShowStatusPanel(true); }}
-                  className="px-5 sm:px-8 py-2.5 sm:py-3 font-arcade text-xs sm:text-sm tracking-wider transition-all border border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-black whitespace-nowrap font-black"
+                  className="min-w-[104px] px-4 py-3 font-arcade text-[10px] tracking-wider transition-all border border-neon-cyan text-neon-cyan bg-black/50 hover:bg-neon-cyan hover:text-black whitespace-nowrap font-black"
                 >
                   STATUS
                 </button>
                 <button
                   onClick={() => { soundManager.play('click'); setShowChatPanel(true); }}
-                  className="px-5 sm:px-8 py-2.5 sm:py-3 font-arcade text-xs sm:text-sm tracking-wider transition-all border border-neon-green text-neon-green hover:bg-neon-green hover:text-black whitespace-nowrap font-black"
+                  className="min-w-[104px] px-4 py-3 font-arcade text-[10px] tracking-wider transition-all border border-neon-green text-neon-green bg-black/50 hover:bg-neon-green hover:text-black whitespace-nowrap font-black"
                 >
                   CHATS
                 </button>
@@ -2118,7 +2118,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
       </div>
 
       {/* Bottom Status Bar - visible from ROOM_ASSIGN onwards (after COLOR_ASSIGN flow) */}
-      {(phase === 'ROOM_ASSIGN' || phase === 'LOBBY' || phase === 'GROUPS' || phase === 'QUARTERFINALS' || phase === 'FINAL_COLOR' || phase === 'FINAL_PREP' || phase === 'FINAL' || phase === 'FINAL_RESULT' || phase === 'ELIM_LOSE' || phase === 'GROUP_RESULT') && (
+      {(phase === 'ROOM_ASSIGN' || phase === 'LOBBY' || phase === 'FINAL_COLOR' || phase === 'FINAL_PREP' || phase === 'FINAL_RESULT' || phase === 'ELIM_LOSE' || phase === 'GROUP_RESULT') && (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 px-2 sm:px-3 py-2 sm:py-3 bg-black border-t-2 border-neon-cyan flex items-center justify-between gap-2">
           <div className="text-[10px] sm:text-xs font-arcade text-slate-400">Your Group: <span className="room-badge">G{userGroup}</span></div>
           {phase === 'ROOM_ASSIGN' && (
@@ -2129,6 +2129,23 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
               JOIN
             </button>
           )}
+        </div>
+      )}
+
+      {(phase === 'GROUPS' || phase === 'QUARTERFINALS' || phase === 'FINAL') && (
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 p-3 bg-vegas-panel/95 border-t border-white/10 backdrop-blur-md">
+          <div className="text-center">
+            <div className="text-[8px] sm:text-[9px] font-arcade text-white/60 uppercase tracking-widest mb-2">YOUR COLOR</div>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <div className="w-7 h-7 rounded border-2" style={{ borderColor: userColorStyle, backgroundColor: `${userColorStyle}33` }}></div>
+              <div className="text-xl font-arcade font-black tracking-wider uppercase" style={{ color: userColorStyle }}>
+                {userColorDisplay}
+              </div>
+            </div>
+            <div className="text-[8px] text-white/50 font-mono tracking-widest">
+              BET LOCKED - WAITING FOR SPIN
+            </div>
+          </div>
         </div>
       )}
 
