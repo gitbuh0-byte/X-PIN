@@ -12,7 +12,7 @@ interface PaymentModalProps {
   defaultAmount?: number;
 }
 
-const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onProcess, type, userPhoneNumber, defaultAmount }) => {
+const PaymentModal = ({ isOpen, onClose, onProcess, type, userPhoneNumber, defaultAmount }: PaymentModalProps) => {
   const [amount, setAmount] = useState<string>('50');
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
   const [processing, setProcessing] = useState(false);
@@ -93,7 +93,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onProcess,
               <input
                 type="number"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmount(e.target.value)}
                 className="w-full bg-black border-2 border-neon-green py-2 sm:py-3 pl-8 sm:pl-10 pr-3 sm:pr-4 text-center text-neon-green font-arcade text-lg sm:text-2xl focus:outline-none focus:shadow-[0_0_20px_rgba(0,255,0,0.4)]"
               />
             </div>
