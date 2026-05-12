@@ -14,13 +14,13 @@ export default defineConfig(({ mode }) => {
         react(),
         VitePWA({
           registerType: 'autoUpdate',
-          includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'xpin-logo.svg', 'pwa-192x192.png', 'pwa-512x512.png'],
+          includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'xpin-favicon.svg', 'masked-icon.svg'],
           manifest: {
             id: '/',
             name: 'X-SPIN Tournament',
             short_name: 'X-SPIN',
-            description: 'Ultimate tournament gaming experience',
-            theme_color: '#00FFFF',
+            description: 'Ultimate tournament gaming experience - Hyper-Competitive Betting Engine',
+            theme_color: '#FF00FF',
             background_color: '#000000',
             display: 'standalone',
             display_override: ['standalone', 'fullscreen', 'minimal-ui'],
@@ -30,34 +30,16 @@ export default defineConfig(({ mode }) => {
             categories: ['games', 'entertainment'],
             icons: [
               {
-                src: 'xpin-logo.svg',
+                src: 'xpin-favicon.svg',
                 sizes: 'any',
                 type: 'image/svg+xml',
                 purpose: 'any'
               },
               {
-                src: 'pwa-192x192.png',
-                sizes: '192x192',
-                type: 'image/png',
-                purpose: 'any'
-              },
-              {
-                src: 'pwa-512x512.png',
-                sizes: '512x512',
-                type: 'image/png',
-                purpose: 'any'
-              },
-              {
-                src: 'pwa-192x192.png',
-                sizes: '192x192',
-                type: 'image/png',
+                src: 'masked-icon.svg',
+                sizes: 'any',
+                type: 'image/svg+xml',
                 purpose: 'maskable'
-              },
-              {
-                src: 'pwa-512x512.png',
-                sizes: '512x512',
-                type: 'image/png',
-                purpose: 'maskable any'
               }
             ]
           }
