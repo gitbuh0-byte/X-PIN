@@ -1,5 +1,6 @@
 /**
  * Performance optimization utility for low-end devices
+ * Automatically detects device capabilities and applies optimizations
  */
 
 export interface PerformanceProfile {
@@ -8,6 +9,9 @@ export interface PerformanceProfile {
   reduceParticles: boolean;
   disableFilters: boolean;
   reduceQuality: boolean;
+  reduceFPS: boolean;
+  lazyLoadImages: boolean;
+  reduceCanvasQuality: boolean;
 }
 
 let cachedProfile: PerformanceProfile | null = null;
@@ -27,6 +31,9 @@ export function detectPerformanceProfile(): PerformanceProfile {
       reduceParticles: true,
       disableFilters: true,
       reduceQuality: true,
+      reduceFPS: true,
+      lazyLoadImages: true,
+      reduceCanvasQuality: true,
     };
     return cachedProfile;
   }
@@ -38,6 +45,9 @@ export function detectPerformanceProfile(): PerformanceProfile {
       reduceParticles: false,
       disableFilters: false,
       reduceQuality: false,
+      reduceFPS: false,
+      lazyLoadImages: false,
+      reduceCanvasQuality: false,
     };
     return cachedProfile;
   }
@@ -49,11 +59,19 @@ export function detectPerformanceProfile(): PerformanceProfile {
     reduceParticles: false,
     disableFilters: false,
     reduceQuality: false,
+    reduceFPS: false,
+    lazyLoadImages: false,
+    reduceCanvasQuality: false,
   };
 
   // Check memory (if available)
   if ((navigator as any).deviceMemory) {
-    profile.isLowEnd = (navigator as any).deviceMemory < 4;
+    const memory = (navigator as any).deviceMemory;
+    profile.isLowEnd = memory < 4;
+    if (memory < 2) {
+      profile.reduceQuality = true;
+      profile.reduceCanvasQuality = true;
+    }
   }
 
   // Check connection (if available)
@@ -61,6 +79,8 @@ export function detectPerformanceProfile(): PerformanceProfile {
     const connection = (navigator as any).connection.effectiveType;
     if (connection === 'slow-2g' || connection === '2g' || connection === '3g') {
       profile.isLowEnd = true;
+      profile.lazyLoadImages = true;
+      profile.reduceQuality = true;
     }
   }
 
@@ -75,6 +95,9 @@ export function detectPerformanceProfile(): PerformanceProfile {
     profile.reduceParticles = true;
     profile.disableFilters = true;
     profile.reduceQuality = true;
+    profile.reduceFPS = true;
+    profile.lazyLoadImages = true;
+    profile.reduceCanvasQuality = true;
   }
 
   cachedProfile = profile;
@@ -144,4 +167,51 @@ export function shouldRenderComponent(componentName: string): boolean {
   }
 
   return true;
+}
+
+/**
+ * Get animation duration multiplier for low-end devices
+ */
+export function getAnimationDuration(baseDuration: number): number {
+  const profile = detectPerformanceProfile();
+  if (profile.disableAnimations) return 0;
+  if (profile.reduceFPS) return baseDuration * 1.5; // Longer durations, fewer frames
+  return baseDuration;
+}
+
+/**
+ * Get canvas quality scale for rendering
+ */
+export function getCanvasQualityScale(): number {
+  const profile = detectPerformanceProfile();
+  if (profile.reduceCanvasQuality) return 0.75; // 75% of full resolution
+  if (profile.reduceQuality) return 0.85;
+  return 1;
+}
+
+/**
+ * Get target FPS for animations
+ */
+export function getTargetFPS(): number {
+  const profile = detectPerformanceProfile();
+  if (profile.reduceFPS) return 30; // Low-end: 30 FPS
+  return 60; // Normal: 60 FPS
+}
+
+/**
+ * Optimize image loading strategy
+ */
+export function shouldLazyLoadImage(): boolean {
+  const profile = detectPerformanceProfile();
+  return profile.lazyLoadImages;
+}
+
+/**
+ * Get CSS filter optimization level
+ */
+export function getCSSFilters(): string {
+  const profile = detectPerformanceProfile();
+  if (profile.disableFilters) return 'none';
+  if (profile.reduceQuality) return 'brightness(1) contrast(1)'; // Minimal filters
+  return ''; // Full filters
 }

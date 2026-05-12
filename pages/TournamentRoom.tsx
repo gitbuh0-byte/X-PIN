@@ -232,14 +232,19 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
     
     const winningColor = TOURNAMENT_SEGMENTS_ROUND1_2[targetIndex].color;
     
+    // TESTING MODE: Set to true to always win all rounds
+    const FORCE_TESTING_WIN = true;
+    
     // For each group, select a player only if their color matches the winning color
     const winners = groups.map((g) => {
       const playersWithWinningColor = g.players.filter(p => p.assignedColor === winningColor);
       if (playersWithWinningColor.length > 0) {
         // TESTING: Always favor user to win
-        const userInGroup = playersWithWinningColor.find(p => p.id === user.id);
-        if (userInGroup) {
-          return userInGroup;
+        if (FORCE_TESTING_WIN) {
+          const userInGroup = playersWithWinningColor.find(p => p.id === user.id);
+          if (userInGroup) {
+            return userInGroup; // USER FORCED WIN FOR TESTING
+          }
         }
         // Pick one random player from this group with the winning color
         return playersWithWinningColor[Math.floor(Math.random() * playersWithWinningColor.length)];
@@ -282,6 +287,9 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
     // Get the winning color from the spin
     const winningColor = TOURNAMENT_SEGMENTS_ROUND1_2[targetIndex].color;
     
+    // TESTING MODE: Set to true to always win all rounds
+    const FORCE_TESTING_WIN = true;
+    
     // From 20 winners, select 4 winners (1 from each group of 5)
     // Winners are divided: indices 0-4, 5-9, 10-14, 15-19
     const quarterfinalists = [];
@@ -293,9 +301,14 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
       const playersWithWinningColor = qfGroup.filter(p => p.assignedColor === winningColor);
       if (playersWithWinningColor.length > 0) {
         // TESTING: Always favor user to win
-        const userInQF = playersWithWinningColor.find(p => p.id === user.id);
-        if (userInQF) {
-          quarterfinalists.push(userInQF);
+        if (FORCE_TESTING_WIN) {
+          const userInQF = playersWithWinningColor.find(p => p.id === user.id);
+          if (userInQF) {
+            quarterfinalists.push(userInQF); // USER FORCED WIN FOR TESTING
+          } else {
+            const winner = playersWithWinningColor[Math.floor(Math.random() * playersWithWinningColor.length)];
+            quarterfinalists.push(winner);
+          }
         } else {
           const winner = playersWithWinningColor[Math.floor(Math.random() * playersWithWinningColor.length)];
           quarterfinalists.push(winner);
@@ -1636,7 +1649,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
               <div className="space-y-6">
                 {/* Stage 2: Group Winners */}
                 <div className="bg-gradient-to-br from-slate-900/80 via-black/80 to-slate-900/60 border-2 border-neon-gold/40 rounded-xl p-6 sm:p-8 relative shadow-[0_0_30px_rgba(255,215,0,0.2)]">
-                  <div className="text-xs sm:text-sm font-arcade text-slate-300 mb-5 uppercase tracking-wider font-bold">🎯 Stage 2: 10 Winners Selected</div>
+                  <div className="text-xs sm:text-sm font-arcade text-slate-300 mb-5 uppercase tracking-wider font-bold">🎯 Stage 2: 20 Winners Selected</div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-6">
                     {groupWinners.map((winner, idx) => (
                       <div 
@@ -1689,7 +1702,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                 {groupWinners.some(w => w.id === user.id) && (
                   <div className="bg-gradient-to-br from-slate-900/60 via-black/60 to-slate-900/50 border-2 border-neon-cyan/30 rounded-xl p-6 text-center">
                     <div className="text-sm font-arcade text-slate-300 mb-2 uppercase tracking-wider font-bold">⚙️ Stage 3: Final Spin</div>
-                    <div className="text-xs text-slate-400">1 Winner from 10 finalists</div>
+                    <div className="text-xs text-slate-400">1 Winner from 20 finalists</div>
                   </div>
                 )}
 
@@ -1754,8 +1767,9 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
               <div className="text-5xl sm:text-6xl mb-4 sm:mb-5">🚀</div>
               <div className="text-3xl sm:text-4xl font-arcade text-transparent bg-clip-text bg-gradient-to-r from-neon-gold to-neon-pink mb-4 sm:mb-5 font-black tracking-wider">Get Ready</div>
               <div className="text-slate-300 text-sm sm:text-base mb-6 sm:mb-8">The 20 group winners have been assigned new colors and will spin for the grand prize.</div>
+              {/* Testing: Display all 20 finalists */}
               <div className="flex items-center justify-center gap-2 mb-6 flex-wrap">
-                {groupWinners.slice(0,10).map((w, i) => (
+                {groupWinners.slice(0,20).map((w, i) => (
                   <div key={w.id} className="flex flex-col items-center text-center">
                     <div 
                       className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white shadow-lg transform hover:scale-110 transition-transform duration-300" 
@@ -2075,18 +2089,12 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                       ✨ Prize Added to Balance ✨
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3">
                     <button
                       onClick={playAgainTournament}
                       className="w-full px-5 sm:px-6 py-3 sm:py-4 bg-neon-cyan text-black font-arcade text-xs sm:text-sm font-black hover:bg-neon-cyan/80 shadow-[0_0_20px_rgba(0,255,255,0.35)] transition-all duration-300 rounded-sm uppercase tracking-widest"
                     >
                       Play Again
-                    </button>
-                    <button
-                      onClick={exitToLobby}
-                      className="w-full px-5 sm:px-6 py-3 sm:py-4 border-2 border-neon-gold text-neon-gold font-arcade text-xs sm:text-sm font-black hover:bg-neon-gold hover:text-black hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 rounded-sm uppercase tracking-widest"
-                    >
-                      Exit to Lobby
                     </button>
                   </div>
 
