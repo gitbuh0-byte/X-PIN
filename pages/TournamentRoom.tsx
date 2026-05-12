@@ -4,7 +4,6 @@ import SpinWheel from '../components/SpinWheel.tsx';
 import TournamentWinnerAnimation from '../components/TournamentWinnerAnimation.tsx';
 import TournamentBracketNew from '../components/TournamentBracketNew.tsx';
 import RankUpModal from '../components/RankUpModal.tsx';
-import Celebration from '../components/Celebration.tsx';
 import { User, Player, UserRank } from '../types.ts';
 import { COLORS, COLOR_HEX, RANK_CONFIG } from '../constants.ts';
 import { soundManager } from '../services/soundManager.ts';
@@ -2017,125 +2016,55 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
         {/* FINAL_RESULT - Grand Winner or Elimination */}
         {phase === 'FINAL_RESULT' && (
-          <>
-            {grandWinner?.id === user.id && (
-              <Celebration 
-                winnerName={user.username}
-                amount={totalPot}
-                isUserWin={true}
-              />
-            )}
-            <div className="flex-1 flex items-center justify-center relative overflow-hidden p-2 sm:p-4">
-              {/* Celebratory confetti background for grand champion */}
-              {grandWinner?.id === user.id && (
-                <div className="absolute inset-0 pointer-events-none z-0">
-                  {Array.from({ length: 120 }).map((_, i) => {
-                    const emoji = ['🎉', '✨', '🎊', '🥳', '👑', '💎', '🏆', '🎈', '💥', '⭐', '🌟', '💫'][i % 12];
-                    const left = Math.random() * 100;
-                    const delay = Math.random() * 1.5;
-                    const duration = 4 + Math.random() * 3;
-                    return (
-                      <div
-                        key={i}
-                        className="absolute text-lg sm:text-2xl md:text-3xl animate-bounce"
-                        style={{
-                          left: `${left}%`,
-                          top: '-50px',
-                          animation: `fall ${duration}s linear forwards, bounce 0.5s ease-in-out infinite`,
-                          animationDelay: `${delay}s, 0s`
-                        }}
-                      >
-                        {emoji}
-                      </div>
-                    );
-                  })}
-                  <style>{`
-                    @keyframes fall {
-                      to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-                    }
-                    @keyframes bounce {
-                      0%, 100% { transform: translateY(0); }
-                      50% { transform: translateY(-20px); }
-                    }
-                  `}</style>
-                </div>
-              )}
-              <div className="text-center relative z-10 w-full px-2 max-w-md mx-auto">
-                {grandWinner?.id === user.id ? (
-                  // Grand Champion - Mobile Responsive
-                  <div className="w-full">
-                    <div className="text-5xl sm:text-6xl md:text-7xl mb-3 sm:mb-4 md:mb-5 animate-bounce drop-shadow-[0_0_40px_rgba(255,215,0,0.8)]">👑</div>
-                    <div className="text-3xl sm:text-4xl md:text-5xl font-arcade text-transparent bg-clip-text bg-gradient-to-r from-neon-gold via-neon-pink to-neon-cyan mb-3 sm:mb-4 md:mb-5 animate-pulse drop-shadow-[0_0_30px_rgba(255,215,0,0.6)] font-black tracking-widest">GRAND CHAMPION!</div>
-                    <div className="bg-vegas-panel/95 border-2 border-neon-gold/50 rounded-sm p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 md:mb-8 shadow-[0_0_40px_rgba(255,215,0,0.3)]">
-                      <img src={user.avatar} alt="you" className="w-14 sm:w-16 md:w-20 h-14 sm:h-16 md:h-20 rounded-full mx-auto mb-3 sm:mb-4 md:mb-5 border-4 border-neon-gold shadow-[0_0_20px_rgba(255,215,0,0.5)]" />
-                      <div className="font-arcade text-sm sm:text-lg md:text-xl text-neon-cyan mb-2 sm:mb-3 md:mb-4 drop-shadow-[0_0_10px_rgba(0,255,255,0.5)] font-black">
-                        {user.username}
-                      </div>
-                      <div className="text-xs sm:text-sm text-slate-300 mb-1 sm:mb-2">Total Prize Pool</div>
-                      <div className="text-3xl sm:text-4xl md:text-5xl font-arcade text-neon-gold mb-3 sm:mb-4 md:mb-6 font-black tracking-wider drop-shadow-[0_0_25px_rgba(255,215,0,0.5)]">
-                        ${totalPot.toLocaleString()}
-                      </div>
-                      <div className="text-xs sm:text-sm font-arcade text-neon-green bg-gradient-to-r from-neon-green/20 to-neon-cyan/20 rounded-lg p-2.5 sm:p-3 md:p-3.5 border-2 border-neon-green/40 animate-pulse font-black">
-                        ✨ Prize Added to Balance ✨
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <button
-                        onClick={playAgainTournament}
-                        className="w-full px-5 sm:px-6 py-3 sm:py-4 bg-neon-cyan text-black font-arcade text-xs sm:text-sm font-black hover:bg-neon-cyan/80 shadow-[0_0_20px_rgba(0,255,255,0.35)] transition-all duration-300 rounded-sm uppercase tracking-widest"
-                      >
-                        Play Again
-                      </button>
-                      <button
-                        onClick={exitToLobby}
-                        className="w-full px-5 sm:px-6 py-3 sm:py-4 border-2 border-neon-gold text-neon-gold font-arcade text-xs sm:text-sm font-black hover:bg-neon-gold hover:text-black hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 rounded-sm uppercase tracking-widest"
-                      >
-                        Exit to Lobby
-                      </button>
-                    </div>
-
-                    {/* Winner Image - Bottom Right of Display Area */}
-                    <div className="fixed bottom-2 right-2 sm:bottom-4 sm:right-4 z-[201] pointer-events-none bg-transparent">
-                      <img 
-                        src="/winner.png"
-                        alt="Winner"
-                        className="w-28 h-28 sm:w-56 sm:h-56 md:w-64 md:h-64 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] bg-transparent animate-winner-celebrate"
-                        style={{ backgroundColor: 'transparent' }}
-                      />
-                    </div>
+          <div className="flex-1 flex items-center justify-center relative overflow-y-auto px-4 py-6 sm:px-6 sm:py-8">
+            <div className="w-full max-w-[420px] text-center">
+              {grandWinner?.id === user.id ? (
+                <div className="bg-vegas-panel/95 border border-neon-gold/60 rounded-sm px-5 py-6 sm:px-7 sm:py-8 shadow-[0_0_32px_rgba(255,215,0,0.18)]">
+                  <img src="/pwa-192x192.png" alt="X-SPIN" className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 object-contain" />
+                  <div className="text-2xl sm:text-3xl font-arcade text-neon-gold font-black tracking-widest uppercase mb-2">Grand Champion</div>
+                  <div className="text-neon-green text-base sm:text-lg font-arcade font-black mb-1">You won</div>
+                  <div className="font-arcade text-sm sm:text-base text-neon-cyan mb-5 truncate">{user.username}</div>
+                  <div className="border-y border-white/10 py-4 mb-5">
+                    <div className="text-[10px] sm:text-xs text-slate-400 font-arcade uppercase tracking-widest mb-1">Prize Pool</div>
+                    <div className="text-4xl sm:text-5xl font-arcade text-neon-gold font-black tracking-wider">${totalPot.toLocaleString()}</div>
                   </div>
-                ) : (
-                  // Eliminated - Mobile Responsive
-                  <div className="w-full">
-                    <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 md:mb-5">😔</div>
-                    <div className="text-2xl sm:text-3xl md:text-4xl font-arcade text-neon-pink mb-3 sm:mb-4 md:mb-5 font-black tracking-wider">Better luck next time!</div>
-                    <div className="bg-vegas-panel/95 border-2 border-neon-pink/40 rounded-sm p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 md:mb-8 shadow-[0_0_30px_rgba(255,0,128,0.2)]">
-                      <div className="text-xs sm:text-sm text-slate-400 mb-2 sm:mb-3 font-arcade tracking-wider uppercase">Grand Champion</div>
-                      <img src={grandWinner?.avatar} alt="champion" className="w-14 sm:w-16 md:w-20 h-14 sm:h-16 md:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-4 border-neon-gold" />
-                      <div className="font-arcade text-sm sm:text-lg md:text-xl text-neon-gold font-black mb-2 sm:mb-3">{grandWinner?.username}</div>
-                      <div className="text-xs text-slate-400">They won ${totalPot.toLocaleString()}</div>
-                    </div>
+                  <div className="text-[10px] sm:text-xs font-arcade text-neon-green bg-neon-green/10 border border-neon-green/40 rounded-sm px-3 py-3 mb-5">
+                    Prize added to balance
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button
+                      onClick={playAgainTournament}
+                      className="w-full px-5 py-3 bg-neon-cyan text-black font-arcade text-xs sm:text-sm font-black hover:bg-white transition-colors rounded-sm uppercase tracking-widest"
+                    >
+                      Play Again
+                    </button>
                     <button
                       onClick={exitToLobby}
-                      className="w-full px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 border-2 border-slate-500 text-slate-300 font-arcade text-sm sm:text-base md:text-lg font-black hover:border-neon-pink hover:text-neon-pink transition-all duration-300 rounded-lg hover:shadow-[0_0_15px_rgba(255,0,128,0.3)]"
+                      className="w-full px-5 py-3 border border-neon-gold text-neon-gold font-arcade text-xs sm:text-sm font-black hover:bg-neon-gold hover:text-black transition-colors rounded-sm uppercase tracking-widest"
                     >
-                      Back to Lobby
+                      Exit to Lobby
                     </button>
-
-                    {/* Loser Image - Bottom Right of Display Area */}
-                    <div className="fixed bottom-2 right-2 sm:bottom-4 sm:right-4 z-[201] pointer-events-none bg-transparent">
-                      <img 
-                        src="/loser.png"
-                        alt="Loser"
-                        className="w-28 h-28 sm:w-56 sm:h-56 md:w-64 md:h-64 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] bg-transparent"
-                        style={{ backgroundColor: 'transparent' }}
-                      />
-                    </div>
                   </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="bg-vegas-panel/95 border border-neon-pink/50 rounded-sm px-5 py-6 sm:px-7 sm:py-8 shadow-[0_0_28px_rgba(255,0,128,0.16)]">
+                  <img src="/loser.png" alt="Lost" className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-4 object-contain" />
+                  <div className="text-2xl sm:text-3xl font-arcade text-neon-pink font-black tracking-widest uppercase mb-3">Eliminated</div>
+                  <div className="text-sm sm:text-base text-slate-300 mb-5 leading-relaxed">The final pointer landed on another player.</div>
+                  <div className="bg-black/40 border border-white/10 rounded-sm p-4 mb-5">
+                    <div className="text-[10px] sm:text-xs text-slate-400 font-arcade uppercase tracking-widest mb-2">Champion</div>
+                    <div className="font-arcade text-sm sm:text-base text-neon-gold font-black truncate">{grandWinner?.username}</div>
+                  </div>
+                  <button
+                    onClick={exitToLobby}
+                    className="w-full px-5 py-3 border border-slate-500 text-slate-300 font-arcade text-xs sm:text-sm font-black hover:border-neon-pink hover:text-neon-pink transition-colors rounded-sm uppercase tracking-widest"
+                  >
+                    Back to Lobby
+                  </button>
+                </div>
+              )}
             </div>
-          </>
+          </div>
         )}
 
         {/* Rank Up Modal */}
