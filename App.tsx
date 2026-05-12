@@ -14,6 +14,7 @@ import Footer from './components/Footer.tsx';
 import { Auth } from './components/Auth.tsx';
 import { soundManager } from './services/soundManager.ts';
 import { RANK_CONFIG } from './constants.ts';
+import { detectPerformanceProfile, disableAnimationsGlobally } from './utils/performanceOptimizer.ts';
 
 const INITIAL_USER: User = {
   id: 'user-1',
@@ -147,6 +148,17 @@ const AppContent: React.FC = () => {
   
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Initialize performance optimization on app startup
+  useEffect(() => {
+    const perfProfile = detectPerformanceProfile();
+    if (perfProfile.disableAnimations) {
+      disableAnimationsGlobally();
+      console.log('Performance mode: LOW-END - Animations disabled for better performance');
+    } else {
+      console.log('Performance mode: HIGH-END - Full animations enabled');
+    }
+  }, []);
 
   // Set up autoplay on any user interaction
   useEffect(() => {

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import * as d3 from 'd3';
 import { soundManager } from '../services/soundManager.ts';
 import { COLOR_HEX } from '../constants.ts';
+import { detectPerformanceProfile } from '../utils/performanceOptimizer.ts';
 
 interface SpinWheelProps {
   spinning: boolean;
@@ -72,6 +73,7 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ spinning, targetIndex, onSpinEnd,
   useEffect(() => {
     if (!wheelGroupRef.current || !segments.length) return;
     
+    const perfProfile = detectPerformanceProfile();
     const radius = 220;
     const g = d3.select(wheelGroupRef.current);
     g.selectAll("*").remove();
@@ -80,25 +82,27 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ spinning, targetIndex, onSpinEnd,
     const arc = d3.arc<any>().innerRadius(45).outerRadius(radius);
     const arcs = g.selectAll("g").data(pie(segments)).enter().append("g");
 
-    // Add glow filter
-    if (!g.select("defs").node()) {
-      g.append("defs");
+    // Add glow filter only on high-end devices
+    if (!perfProfile.disableFilters) {
+      if (!g.select("defs").node()) {
+        g.append("defs");
+      }
+      const defs = g.select("defs");
+      const filter = defs.append("filter")
+        .attr("id", "glow")
+        .attr("x", "-50%")
+        .attr("y", "-50%")
+        .attr("width", "200%")
+        .attr("height", "200%");
+      
+      filter.append("feGaussianBlur")
+        .attr("stdDeviation", "6")
+        .attr("result", "coloredBlur");
+      
+      const feMerge = filter.append("feMerge");
+      feMerge.append("feMergeNode").attr("in", "coloredBlur");
+      feMerge.append("feMergeNode").attr("in", "SourceGraphic");
     }
-    const defs = g.select("defs");
-    const filter = defs.append("filter")
-      .attr("id", "glow")
-      .attr("x", "-50%")
-      .attr("y", "-50%")
-      .attr("width", "200%")
-      .attr("height", "200%");
-    
-    filter.append("feGaussianBlur")
-      .attr("stdDeviation", "6")
-      .attr("result", "coloredBlur");
-    
-    const feMerge = filter.append("feMerge");
-    feMerge.append("feMergeNode").attr("in", "coloredBlur");
-    feMerge.append("feMergeNode").attr("in", "SourceGraphic");
 
     arcs.append("path")
       .attr("d", arc)
@@ -120,8 +124,8 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ spinning, targetIndex, onSpinEnd,
       })
       .attr("stroke-opacity", "1")
       .attr("filter", (d) => {
-        // Apply glow to player's segment
-        return playerColor && d.data.color === playerColor ? "url(#glow)" : "none";
+        // Apply glow to player's segment only on high-end devices
+        return (playerColor && d.data.color === playerColor && !perfProfile.disableFilters) ? "url(#glow)" : "none";
       })
       .attr("opacity", (d) => {
         // Make other segments slightly dimmer to make player color stand out
@@ -166,7 +170,9 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ spinning, targetIndex, onSpinEnd,
     const finalRotation = currentRotation + extraFullSpins + diff;
 
     const startTime = performance.now();
-    const duration = 8000;
+    // Optimize: Reduce spin duration on low-end devices
+    const perfProfile = detectPerformanceProfile();
+    const duration = perfProfile.isLowEnd ? 3000 : 8000;
     let lastTickAngle = currentRotation;
     let animationFrameId: number | null = null;
     let hasEnded = false;

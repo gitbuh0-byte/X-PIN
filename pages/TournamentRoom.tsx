@@ -236,6 +236,11 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
     const winners = groups.map((g) => {
       const playersWithWinningColor = g.players.filter(p => p.assignedColor === winningColor);
       if (playersWithWinningColor.length > 0) {
+        // TESTING: Always favor user to win
+        const userInGroup = playersWithWinningColor.find(p => p.id === user.id);
+        if (userInGroup) {
+          return userInGroup;
+        }
         // Pick one random player from this group with the winning color
         return playersWithWinningColor[Math.floor(Math.random() * playersWithWinningColor.length)];
       }
@@ -287,8 +292,14 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
       // Select only players whose assigned color matches the winning color
       const playersWithWinningColor = qfGroup.filter(p => p.assignedColor === winningColor);
       if (playersWithWinningColor.length > 0) {
-        const winner = playersWithWinningColor[Math.floor(Math.random() * playersWithWinningColor.length)];
-        quarterfinalists.push(winner);
+        // TESTING: Always favor user to win
+        const userInQF = playersWithWinningColor.find(p => p.id === user.id);
+        if (userInQF) {
+          quarterfinalists.push(userInQF);
+        } else {
+          const winner = playersWithWinningColor[Math.floor(Math.random() * playersWithWinningColor.length)];
+          quarterfinalists.push(winner);
+        }
       }
     }
     
@@ -390,7 +401,12 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
   const onFinalSpinEnd = () => {
     setFinalSpinning(false);
-    const winner = groupWinners[finalTarget] || groupWinners[0];
+    // TESTING: Always favor user to win finals
+    let winner = groupWinners[finalTarget] || groupWinners[0];
+    const userInFinals = groupWinners.find(w => w.id === user.id);
+    if (userInFinals) {
+      winner = userInFinals;
+    }
     setGrandWinner(winner);
     if (winner.id === user.id) {
       updateBalance(totalPot);
@@ -568,7 +584,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
             
             {/* Finalists Grid - Clear and Visible */}
             <div className="max-w-2xl bg-black/60 border border-neon-pink/50 p-4 sm:p-6 shadow-[0_0_40px_rgba(255,0,128,0.3)]">
-              <div className="text-sm sm:text-base font-arcade text-neon-pink mb-3">{phase === 'QUARTERFINALS' ? 'SEMIFINALISTS (4)' : 'TOP 10 WINNERS'}</div>
+              <div className="text-sm sm:text-base font-arcade text-neon-pink mb-3">{phase === 'QUARTERFINALS' ? 'SEMIFINALISTS (4)' : 'TOP 20 WINNERS'}</div>
               <div className={`grid ${phase === 'QUARTERFINALS' ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-5'} gap-2`}>
                 {displayedWinners.map((w, idx) => (
                   <div 
@@ -2009,20 +2025,20 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
             {/* Celebratory confetti background for grand champion */}
             {grandWinner?.id === user.id && (
               <div className="absolute inset-0 pointer-events-none z-0">
-                {Array.from({ length: 60 }).map((_, i) => {
-                  const emoji = ['🎉', '✨', '🎊', '🥳', '👑', '💎', '🏆', '🎈', '💥', '⭐'][i % 10];
+                {Array.from({ length: 120 }).map((_, i) => {
+                  const emoji = ['🎉', '✨', '🎊', '🥳', '👑', '💎', '🏆', '🎈', '💥', '⭐', '🌟', '💫'][i % 12];
                   const left = Math.random() * 100;
-                  const delay = Math.random() * 0.5;
-                  const duration = 3 + Math.random() * 2;
+                  const delay = Math.random() * 1.5;
+                  const duration = 4 + Math.random() * 3;
                   return (
                     <div
                       key={i}
-                      className="absolute text-lg sm:text-2xl md:text-3xl"
+                      className="absolute text-lg sm:text-2xl md:text-3xl animate-bounce"
                       style={{
                         left: `${left}%`,
-                        top: '-30px',
-                        animation: `fall ${duration}s linear forwards`,
-                        animationDelay: `${delay}s`
+                        top: '-50px',
+                        animation: `fall ${duration}s linear forwards, bounce 0.5s ease-in-out infinite`,
+                        animationDelay: `${delay}s, 0s`
                       }}
                     >
                       {emoji}
@@ -2032,6 +2048,10 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                 <style>{`
                   @keyframes fall {
                     to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+                  }
+                  @keyframes bounce {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-20px); }
                   }
                 `}</style>
               </div>

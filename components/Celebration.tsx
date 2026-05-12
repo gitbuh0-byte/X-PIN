@@ -1,4 +1,5 @@
 import React from 'react';
+import { detectPerformanceProfile, getParticleCount } from '../utils/performanceOptimizer.ts';
 
 interface CelebrationProps {
   winnerName?: string;
@@ -7,24 +8,29 @@ interface CelebrationProps {
 }
 
 const Celebration: React.FC<CelebrationProps> = ({ winnerName, amount, isUserWin = false }) => {
+  const perfProfile = detectPerformanceProfile();
+  const particleCount = getParticleCount(28);
+  
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[300] pointer-events-none p-2 sm:p-4">
       {/* falling dots background - copied style from Blitz WinnerAlert */}
-      <div className="absolute inset-0 opacity-80">
-        {[...Array(28)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 rounded-full animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              backgroundColor: ['#00ffff', '#ff00ff', '#ffd700', '#00ff00'][Math.floor(Math.random() * 4)],
-              animation: `fall 2.6s linear infinite`,
-              animationDelay: `${Math.random() * 1.2}s`
-            }}
-          />
-        ))}
-      </div>
+      {!perfProfile.reduceParticles && (
+        <div className="absolute inset-0 opacity-80">
+          {[...Array(particleCount)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 rounded-full animate-pulse"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                backgroundColor: ['#00ffff', '#ff00ff', '#ffd700', '#00ff00'][Math.floor(Math.random() * 4)],
+                animation: `fall 2.6s linear infinite`,
+                animationDelay: `${Math.random() * 1.2}s`
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       <div className={`relative pointer-events-auto max-w-sm w-full p-3 sm:p-4 md:p-6 rounded-lg shadow-[0_0_100px_rgba(0,0,0,0.6)]`}>
         <div className="text-3xl sm:text-4xl md:text-6xl mb-2 sm:mb-3 md:mb-3 text-center">{isUserWin ? '🎉' : '🏆'}</div>

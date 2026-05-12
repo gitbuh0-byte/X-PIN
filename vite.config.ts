@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
         react(),
         VitePWA({
           registerType: 'autoUpdate',
-          includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+          includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'xpin-favicon.svg'],
           manifest: {
             id: '/',
             name: 'X-SPIN Tournament',
@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
             categories: ['games', 'entertainment'],
             icons: [
               {
-                src: 'masked-icon.svg',
+                src: 'xpin-favicon.svg',
                 sizes: 'any',
                 type: 'image/svg+xml'
               },
