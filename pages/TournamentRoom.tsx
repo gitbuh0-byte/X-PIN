@@ -20,6 +20,7 @@ const BET_OPTIONS = [10, 25, 50, 100];
 const TOTAL_PLAYERS = 100;
 const GROUPS_COUNT = 20;
 const PLAYERS_PER_GROUP = 5;
+const FORCE_TOURNAMENT_TEST_WIN = true;
 
 // Round 1 & Round 2: 5 segments - one for each player in the group/QF
 const TOURNAMENT_SEGMENTS_ROUND1_2 = Array.from({ length: 5 }).map((_, idx) => ({
@@ -98,6 +99,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
   const userGroupPlayers = groups.find(group => group.groupNumber === userGroup)?.players ?? [];
   const quarterfinalGroupIndex = Math.max(0, Math.floor(groupWinners.findIndex(player => player.id === user.id) / PLAYERS_PER_GROUP));
   const quarterfinalPlayers = groupWinners.slice(quarterfinalGroupIndex * PLAYERS_PER_GROUP, quarterfinalGroupIndex * PLAYERS_PER_GROUP + PLAYERS_PER_GROUP);
+  const userColorIndex = Math.max(0, COLORS.indexOf(userColor));
 
   // Calculate total pot (100 players * selected entry fee)
   const totalPot = TOTAL_PLAYERS * tournamentBetAmount;
@@ -109,7 +111,9 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
       soundManager.play('bgm');
       
       const assignedGroup = Math.floor(Math.random() * GROUPS_COUNT) + 1;
-      const assignedPositionInGroup = Math.floor(Math.random() * PLAYERS_PER_GROUP);
+      const assignedPositionInGroup = FORCE_TOURNAMENT_TEST_WIN
+        ? Math.floor(Math.random() * TOURNAMENT_SEGMENTS_FINAL.length)
+        : Math.floor(Math.random() * PLAYERS_PER_GROUP);
       const assignedColor = COLORS[assignedPositionInGroup % COLORS.length];
       const assignedRoom = `ROOM-${Math.floor(Math.random() * 1000).toString().padStart(4, '0')}`;
       
@@ -178,7 +182,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
       if (phase === 'FINAL_PREP') {
         // start the final spin
         setPhase('FINAL');
-        const finalT = Math.floor(Math.random() * Math.max(1, groupWinners.length));
+        const finalT = FORCE_TOURNAMENT_TEST_WIN ? userColorIndex : Math.floor(Math.random() * Math.max(1, groupWinners.length));
         setFinalTarget(finalT);
         setFinalSpinning(true);
       }
@@ -223,7 +227,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
   const startGroupSpin = () => {
     // Single simultaneous spin for all groups once every player has placed their bet
     if (groups.length === 0) return;
-    const t = Math.floor(Math.random() * TOURNAMENT_SEGMENTS_ROUND1_2.length);
+    const t = FORCE_TOURNAMENT_TEST_WIN ? userColorIndex : Math.floor(Math.random() * TOURNAMENT_SEGMENTS_ROUND1_2.length);
     setTargetIndex(t);
     setSpinning(true);
   };
@@ -279,7 +283,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
     setPhase('ROUND_2');
     setCountdown(3);
     setCountdownActive(true);
-    const t = Math.floor(Math.random() * TOURNAMENT_SEGMENTS_ROUND1_2.length);
+    const t = FORCE_TOURNAMENT_TEST_WIN ? userColorIndex : Math.floor(Math.random() * TOURNAMENT_SEGMENTS_ROUND1_2.length);
     setTargetIndex(t);
   };
 
@@ -302,19 +306,10 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
       // Select only players whose assigned color matches the winning color
       const playersWithWinningColor = qfGroup.filter(p => p.assignedColor === winningColor);
       if (playersWithWinningColor.length > 0) {
-        // TESTING: Always favor user to win
-        if (FORCE_TESTING_WIN) {
-          const userInQF = playersWithWinningColor.find(p => p.id === user.id);
-          if (userInQF) {
-            quarterfinalists.push(userInQF); // USER FORCED WIN FOR TESTING
-          } else {
-            const winner = playersWithWinningColor[Math.floor(Math.random() * playersWithWinningColor.length)];
-            quarterfinalists.push(winner);
-          }
-        } else {
-          const winner = playersWithWinningColor[Math.floor(Math.random() * playersWithWinningColor.length)];
-          quarterfinalists.push(winner);
-        }
+        const winner = FORCE_TOURNAMENT_TEST_WIN
+          ? (playersWithWinningColor.find(p => p.id === user.id) || playersWithWinningColor[0])
+          : playersWithWinningColor[Math.floor(Math.random() * playersWithWinningColor.length)];
+        quarterfinalists.push(winner);
       }
     }
     
@@ -325,8 +320,8 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
     const userIsWinner = quarterfinalists.some(w => w.id === user.id);
     if (userIsWinner) {
-      // show winners animation and start a 3s countdown before final
-      setWinnerCountdown(3);
+      // show winners animation and start a 5s countdown before final round
+      setWinnerCountdown(5);
     } else {
       // show winners overlay but start a 5s countdown for losers then route to ELIM_LOSE
       setLoserCountdown(5);
@@ -346,40 +341,24 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
     return () => clearTimeout(t);
   }, [loserCountdown]);
 
-  // Drive the winner countdown - when it hits 0, show proceed button
+  // Drive the winner countdown and auto-advance to the next tournament round.
   useEffect(() => {
     if (winnerCountdown === null) return;
     if (winnerCountdown <= 0) {
       setWinnerCountdown(null);
-      setShowWinnerProceed(true);
-      // Start proceed countdown (5 for GROUPS, 3 for ROUND_2)
-      setProceedCountdown(phase === 'GROUPS' ? 5 : 3);
-      return;
-    }
-    const t = setTimeout(() => setWinnerCountdown(c => (c !== null ? c - 1 : null)), 1000);
-    return () => clearTimeout(t);
-  }, [winnerCountdown, phase]);
-
-  // Drive the proceed countdown - auto-advance when it hits 0
-  useEffect(() => {
-    if (proceedCountdown === null) return;
-    if (proceedCountdown <= 0) {
-      setProceedCountdown(null);
       setShowWinnerProceed(false);
       if (phase === 'GROUPS') {
         proceedToRound2();
       } else if (phase === 'ROUND_2') {
         setAnnouncing(false);
-        // PRESERVE original winning colors - do NOT reassign!
         setPhase('FINAL_COLOR');
         setFinalColorCountdown(5);
       }
       return;
     }
-    const t = setTimeout(() => setProceedCountdown(c => (c !== null ? c - 1 : null)), 1000);
+    const t = setTimeout(() => setWinnerCountdown(c => (c !== null ? c - 1 : null)), 1000);
     return () => clearTimeout(t);
-  }, [proceedCountdown, phase]);
-
+  }, [winnerCountdown, phase]);
   // Drive the final color countdown - when it hits 0, move to FINAL with 3s countdown before auto-spin
   useEffect(() => {
     if (finalColorCountdown === null) return;
@@ -388,7 +367,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
       setPhase('FINAL');
       setCountdown(3);
       setCountdownActive(true);
-      const finalT = Math.floor(Math.random() * groupWinners.length);
+      const finalT = FORCE_TOURNAMENT_TEST_WIN ? userColorIndex : Math.floor(Math.random() * groupWinners.length);
       setFinalTarget(finalT);
       return;
     }
@@ -429,7 +408,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
       return;
     }
 
-    const finalT = Math.floor(Math.random() * groupWinners.length);
+    const finalT = FORCE_TOURNAMENT_TEST_WIN ? userColorIndex : Math.floor(Math.random() * groupWinners.length);
     setFinalTarget(finalT);
     setCountdown(3);
     setCountdownActive(true);
@@ -438,26 +417,11 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
   const onFinalSpinEnd = () => {
     setFinalSpinning(false);
-    
-    // Check if the winning color (at top pointer) matches user's assigned color
-    const winningColor = TOURNAMENT_SEGMENTS_FINAL[finalTarget].color;
-    const userWins = userColor === winningColor;
-    
-    // TESTING MODE: Force user to always win finals
-    const FORCE_TESTING_WIN = true;
-    
-    // Determine winner
-    let winner = groupWinners[finalTarget] || groupWinners[0];
-    const userInFinals = groupWinners.find(w => w.id === user.id);
-    
-    // If testing mode is on, user always wins
-    if (FORCE_TESTING_WIN && userInFinals) {
-      winner = userInFinals;
-    } else if (userWins && userInFinals) {
-      // User's assigned color matched the winning segment
-      winner = userInFinals;
-    }
-    
+    const winningColor = TOURNAMENT_SEGMENTS_FINAL[finalTarget]?.color;
+    const winner = (FORCE_TOURNAMENT_TEST_WIN && groupWinners.find(w => w.id === user.id))
+      || groupWinners.find(w => w.assignedColor === winningColor)
+      || groupWinners[finalTarget]
+      || groupWinners[0];
     setGrandWinner(winner);
     if (winner.id === user.id) {
       updateBalance(totalPot);
@@ -630,12 +594,12 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
             
             {/* Main Announcement Text */}
             <div className="text-2xl sm:text-4xl font-arcade font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-green mb-4 tracking-wider drop-shadow-[0_0_30px_rgba(0,255,255,0.6)]">
-              {phase === 'ROUND_2' ? '🏆 ADVANCING TO FINALS' : '🎊 ADVANCING TO ROUND 2 🎊'}
+              {phase === 'ROUND_2' ? 'ADVANCING TO FINAL ROUND' : 'ADVANCING TO ROUND 2'}
             </div>
             
             {/* Finalists Grid - Clear and Visible */}
             <div className="max-w-2xl bg-black/60 border border-neon-pink/50 p-4 sm:p-6 shadow-[0_0_40px_rgba(255,0,128,0.3)]">
-              <div className="text-sm sm:text-base font-arcade text-neon-pink mb-3">{phase === 'ROUND_2' ? 'FINALISTS (4)' : 'TOP 20 WINNERS'}</div>
+              <div className="text-sm sm:text-base font-arcade text-neon-pink mb-3">{phase === 'ROUND_2' ? 'FINAL ROUND PLAYERS (4)' : 'ROUND 1 WINNERS'}</div>
               <div className={`grid ${phase === 'ROUND_2' ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-5'} gap-2`}>
                 {displayedWinners.map((w, idx) => (
                   <div 
@@ -1315,7 +1279,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
         {/* ROUND_2 - Round 2 Spinning */}
         {phase === 'ROUND_2' && (
           <div className="flex-1 flex flex-col lg:flex-row overflow-hidden gap-2 lg:gap-4 p-2 lg:p-4">
-            {/* Left: Quarterfinal Groups Panel - Hidden on mobile */}
+            {/* Left: Round 2 Matches Panel - Hidden on mobile */}
             <div className="hidden lg:flex w-80 bg-black/40 border border-neon-pink/30 rounded overflow-y-auto flex-col flex-shrink-0">
               <div className="sticky top-0 bg-black/80 border-b border-neon-pink/30 p-3">
                 <div className="text-neon-pink font-arcade text-sm">🏆 ROUND 2</div>
@@ -1689,7 +1653,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                   {groupWinners.some(w => w.id === user.id) ? (
                     <div className="bg-neon-gold/15 border-2 border-neon-gold/40 rounded-lg px-4 py-3 text-center">
                       <div className="text-neon-gold font-arcade text-sm mb-1 font-black">🎉 YOU ADVANCED!</div>
-                      <div className="text-xs text-slate-400">Proceed to Final Spin</div>
+                      <div className="text-xs text-slate-400">Final Round starts automatically</div>
                     </div>
                   ) : (
                     <div className="bg-red-950/20 border-2 border-red-700/30 rounded-lg px-4 py-3 text-center">
@@ -1703,7 +1667,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                     <img 
                       src={groupWinners.some(w => w.id === user.id) ? '/winner.png' : '/loser.png'}
                       alt={groupWinners.some(w => w.id === user.id) ? 'Winner' : 'Loser'}
-                      className="w-full h-full object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] bg-transparent"
+                      className="w-28 h-28 sm:w-56 sm:h-56 md:w-64 md:h-64 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] bg-transparent"
                       style={{ backgroundColor: 'transparent' }}
                     />
                   </div>
@@ -1716,11 +1680,11 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                   </div>
                 )}
 
-                {/* Stage 3: Final Spin (Upcoming) - Only show if winner */}
+                {/* Final Round (Upcoming) - Only show if winner */}
                 {groupWinners.some(w => w.id === user.id) && (
                   <div className="bg-gradient-to-br from-slate-900/60 via-black/60 to-slate-900/50 border-2 border-neon-cyan/30 rounded-xl p-6 text-center">
-                    <div className="text-sm font-arcade text-slate-300 mb-2 uppercase tracking-wider font-bold">⚙️ Stage 3: Final Spin</div>
-                    <div className="text-xs text-slate-400">1 Winner from 20 finalists</div>
+                    <div className="text-sm font-arcade text-slate-300 mb-2 uppercase tracking-wider font-bold">⚙️ Final Round</div>
+                    <div className="text-xs text-slate-400">1 winner from the finalists</div>
                   </div>
                 )}
 
@@ -1734,7 +1698,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                 {/* Stage 4: Champion (Upcoming) - Only show if winner */}
                 {groupWinners.some(w => w.id === user.id) && (
                   <div className="bg-gradient-to-br from-slate-900/60 via-black/60 to-slate-900/50 border-2 border-neon-gold/30 rounded-xl p-6 text-center">
-                    <div className="text-sm font-arcade text-neon-gold font-black uppercase tracking-wider">🏆 Stage 4: GRAND CHAMPION</div>
+                    <div className="text-sm font-arcade text-neon-gold font-black uppercase tracking-wider">Grand Champion</div>
                   </div>
                 )}
               </div>
@@ -2102,7 +2066,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                   <div className="w-full">
                     <div className="text-5xl sm:text-6xl md:text-7xl mb-3 sm:mb-4 md:mb-5 animate-bounce drop-shadow-[0_0_40px_rgba(255,215,0,0.8)]">👑</div>
                     <div className="text-3xl sm:text-4xl md:text-5xl font-arcade text-transparent bg-clip-text bg-gradient-to-r from-neon-gold via-neon-pink to-neon-cyan mb-3 sm:mb-4 md:mb-5 animate-pulse drop-shadow-[0_0_30px_rgba(255,215,0,0.6)] font-black tracking-widest">GRAND CHAMPION!</div>
-                    <div className="bg-gradient-to-br from-slate-900/80 via-black/80 to-slate-900/60 border-2 border-neon-gold/50 rounded-xl p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 md:mb-8 shadow-[0_0_40px_rgba(255,215,0,0.3)]">
+                    <div className="bg-vegas-panel/95 border-2 border-neon-gold/50 rounded-sm p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 md:mb-8 shadow-[0_0_40px_rgba(255,215,0,0.3)]">
                       <img src={user.avatar} alt="you" className="w-14 sm:w-16 md:w-20 h-14 sm:h-16 md:h-20 rounded-full mx-auto mb-3 sm:mb-4 md:mb-5 border-4 border-neon-gold shadow-[0_0_20px_rgba(255,215,0,0.5)]" />
                       <div className="font-arcade text-sm sm:text-lg md:text-xl text-neon-cyan mb-2 sm:mb-3 md:mb-4 drop-shadow-[0_0_10px_rgba(0,255,255,0.5)] font-black">
                         {user.username}
@@ -2115,21 +2079,27 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                         ✨ Prize Added to Balance ✨
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <button
                         onClick={playAgainTournament}
                         className="w-full px-5 sm:px-6 py-3 sm:py-4 bg-neon-cyan text-black font-arcade text-xs sm:text-sm font-black hover:bg-neon-cyan/80 shadow-[0_0_20px_rgba(0,255,255,0.35)] transition-all duration-300 rounded-sm uppercase tracking-widest"
                       >
                         Play Again
                       </button>
+                      <button
+                        onClick={exitToLobby}
+                        className="w-full px-5 sm:px-6 py-3 sm:py-4 border-2 border-neon-gold text-neon-gold font-arcade text-xs sm:text-sm font-black hover:bg-neon-gold hover:text-black hover:shadow-[0_0_30px_rgba(255,215,0,0.6)] transition-all duration-300 rounded-sm uppercase tracking-widest"
+                      >
+                        Exit to Lobby
+                      </button>
                     </div>
 
                     {/* Winner Image - Bottom Right of Display Area */}
-                    <div className="absolute bottom-4 right-4 z-[201] pointer-events-none bg-transparent max-w-[240px] max-h-[240px]">
+                    <div className="fixed bottom-2 right-2 sm:bottom-4 sm:right-4 z-[201] pointer-events-none bg-transparent">
                       <img 
                         src="/winner.png"
                         alt="Winner"
-                        className="w-full h-full object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] bg-transparent animate-winner-celebrate"
+                        className="w-28 h-28 sm:w-56 sm:h-56 md:w-64 md:h-64 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] bg-transparent animate-winner-celebrate"
                         style={{ backgroundColor: 'transparent' }}
                       />
                     </div>
@@ -2139,7 +2109,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                   <div className="w-full">
                     <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 md:mb-5">😔</div>
                     <div className="text-2xl sm:text-3xl md:text-4xl font-arcade text-neon-pink mb-3 sm:mb-4 md:mb-5 font-black tracking-wider">Better luck next time!</div>
-                    <div className="bg-gradient-to-br from-slate-800/80 via-black/80 to-slate-900/60 border-2 border-neon-pink/40 rounded-xl p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 md:mb-8 shadow-[0_0_30px_rgba(255,0,128,0.2)]">
+                    <div className="bg-vegas-panel/95 border-2 border-neon-pink/40 rounded-sm p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 md:mb-8 shadow-[0_0_30px_rgba(255,0,128,0.2)]">
                       <div className="text-xs sm:text-sm text-slate-400 mb-2 sm:mb-3 font-arcade tracking-wider uppercase">Grand Champion</div>
                       <img src={grandWinner?.avatar} alt="champion" className="w-14 sm:w-16 md:w-20 h-14 sm:h-16 md:h-20 rounded-full mx-auto mb-2 sm:mb-3 border-4 border-neon-gold" />
                       <div className="font-arcade text-sm sm:text-lg md:text-xl text-neon-gold font-black mb-2 sm:mb-3">{grandWinner?.username}</div>
@@ -2153,11 +2123,11 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                     </button>
 
                     {/* Loser Image - Bottom Right of Display Area */}
-                    <div className="absolute bottom-4 right-4 z-[201] pointer-events-none bg-transparent max-w-[240px] max-h-[240px]">
+                    <div className="fixed bottom-2 right-2 sm:bottom-4 sm:right-4 z-[201] pointer-events-none bg-transparent">
                       <img 
                         src="/loser.png"
                         alt="Loser"
-                        className="w-full h-full object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] bg-transparent"
+                        className="w-28 h-28 sm:w-56 sm:h-56 md:w-64 md:h-64 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] bg-transparent"
                         style={{ backgroundColor: 'transparent' }}
                       />
                     </div>

@@ -11,7 +11,7 @@ interface Player {
 interface Room {
   id: string;
   roomNumber: number;
-  roomLabel: string; // "G1", "G2", etc or "QF1", "Final"
+  roomLabel: string;
   players: Player[];
   status: 'active' | 'upcoming' | 'completed';
   winner?: string;
@@ -83,18 +83,16 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
     };
   });
 
-  // ROUND 2: 4 Quarter Final rooms (QF1 through QF4)
-  // Each QF room gets winners from 5 Round 1 rooms
+  // ROUND 2: 4 rooms. Each room gets winners from 5 Round 1 rooms.
   const round2Rooms: Room[] = Array.from({ length: 4 }).map((_, i) => ({
     id: `r2-room-${i + 1}`,
     roomNumber: i + 1,
-    roomLabel: `QF${i + 1}`,  // QF1, QF2, QF3, QF4
-    players: generatePlayers(`r2-room-${i + 1}`, 5),  // Each QF has 5 finalists from their group
+    roomLabel: `R2-${i + 1}`,
+    players: generatePlayers(`r2-room-${i + 1}`, 5),
     status: 'upcoming' as const
   }));
 
-  // ROUND 3: 1 Final room (Final)
-  // The final has the 4 winners from each QF room
+  // FINAL ROUND: 1 room with the 4 winners from Round 2.
   const round3Rooms: Room[] = Array.from({ length: 1 }).map((_, i) => ({
     id: `final-room-${i + 1}`,
     roomNumber: i + 1,
@@ -182,8 +180,8 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
               <div className="text-[8px] sm:text-[9px] text-neon-cyan/60">4 Rooms</div>
             </div>
             <div className="text-center min-w-0">
-              <div className="text-[10px] sm:text-xs md:text-sm font-arcade text-neon-gold font-bold uppercase tracking-wider">Round 3</div>
-              <div className="text-[8px] sm:text-[9px] text-neon-gold/60">Final • 1 Room</div>
+              <div className="text-[10px] sm:text-xs md:text-sm font-arcade text-neon-gold font-bold uppercase tracking-wider">Final Round</div>
+              <div className="text-[8px] sm:text-[9px] text-neon-gold/60">1 Room</div>
             </div>
           </div>
 
@@ -241,7 +239,7 @@ const TournamentBracketNew: React.FC<TournamentBracketNewProps> = ({
               })}
             </div>
 
-            {/* ROUND 2 - 4 Quarter Finals - Mobile optimized */}
+            {/* ROUND 2 - 4 rooms - Mobile optimized */}
             <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-2 min-w-0">
               {round2Rooms.map((room, idx) => {
                 const isHovered = hoveredRoom === `r2-${idx}`;
