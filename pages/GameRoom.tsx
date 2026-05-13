@@ -7,7 +7,7 @@ import ColorAssignmentModal from '../components/ColorAssignmentModal.tsx';
 import PlayAgainModal from '../components/PlayAgainModal.tsx';
 import RankUpModal from '../components/RankUpModal.tsx';
 import PaymentModal from '../components/PaymentModal.tsx';
-import { GameState, Player, PlayerStatus, ChatMessage, User, UserRank, PaymentMethod } from '../types.ts';
+import { CustomGameRoom, GameState, Player, PlayerStatus, ChatMessage, User, UserRank, PaymentMethod } from '../types.ts';
 import { INITIAL_BOT_NAMES, RANK_CONFIG, WHEEL_SEGMENTS, COLORS, COLOR_HEX } from '../constants.ts';
 import { chatWithAiOracle, generateGameCommentary } from '../services/geminiService.ts';
 import { soundManager } from '../services/soundManager.ts';
@@ -86,7 +86,8 @@ interface GameRoomProps {
   user: User;
   updateBalance: (amount: number) => void;
   onWin: (mode: string) => void;
-  roomId?: string; 
+  roomId?: string;
+  customRoom?: CustomGameRoom;
   onLeaveGame?: (id: string) => void;
   onStatusChange?: (status: string) => void;
 }
@@ -133,20 +134,25 @@ const PlayerAvatar: React.FC<{ player: Player; size?: 'xs' | 'sm' | 'md' | 'lg' 
   );
 };
 
-const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId: propRoomId, onLeaveGame, onStatusChange }) => {
+const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId: propRoomId, customRoom, onLeaveGame, onStatusChange }) => {
   const { roomId: paramRoomId } = useParams();
   const navigate = useNavigate();
   const roomId = propRoomId || paramRoomId || 'lobby';
+  const isCustomRoom = roomId.startsWith('custom-');
   const isMounted = useRef(true);
+  const customEntryKey = `xpin_custom_entry_${roomId}_${user.id}`;
 
   // Determine game mode from roomId
-  const gameMode = roomId.includes('pve') ? '1v1' as const : roomId.includes('tournament') ? 'tournament' as const : 'blitz' as const;
-  const maxPlayers = gameMode === 'tournament' ? 20 : gameMode === '1v1' ? 2 : 15;
+  const gameMode = customRoom?.gameMode || (roomId.includes('pve') ? '1v1' as const : roomId.includes('tournament') ? 'tournament' as const : 'blitz' as const);
+  const maxPlayers = isCustomRoom ? Math.min(customRoom?.maxPlayers || 10, 10) : gameMode === 'tournament' ? 20 : gameMode === '1v1' ? 2 : 15;
+  const readyCountdown = isCustomRoom ? customRoom?.readyCountdown || 5 : 3;
+  const spinCountdown = isCustomRoom ? customRoom?.spinCountdown || 3 : 3;
+  const fixedCustomBet = customRoom?.entryFee || 10;
 
   // Pre-game states for betting flow
-  const [showBettingModal, setShowBettingModal] = useState(true);
-  const [userBetAmount, setUserBetAmount] = useState(0);
-  const [betsPlaced, setBetsPlaced] = useState(false);
+  const [showBettingModal, setShowBettingModal] = useState(!isCustomRoom);
+  const [userBetAmount, setUserBetAmount] = useState(isCustomRoom ? fixedCustomBet : 0);
+  const [betsPlaced, setBetsPlaced] = useState(isCustomRoom);
   const [showColorAssignment, setShowColorAssignment] = useState(false);
   const [userAssignedColor, setUserAssignedColor] = useState('');
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -164,14 +170,14 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
   const [showRankUp, setShowRankUp] = useState(false);
   const [previousRank, setPreviousRank] = useState<UserRank>(UserRank.ROOKIE);
 
-  const [gameState, setGameState] = useState<GameState>(GameState.PRE_GAME);
+  const [gameState, setGameState] = useState<GameState>(isCustomRoom ? GameState.WAITING : GameState.PRE_GAME);
   const [players, setPlayers] = useState<Player[]>([]);
   const [targetIndex, setTargetIndex] = useState(0);
   const [timer, setTimer] = useState(5);
   const [currentPot, setCurrentPot] = useState(0);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [betColor, setBetColor] = useState<'red' | 'black' | 'green' | null>(null);
-  const [betAmount, setBetAmount] = useState(50);
+  const [betAmount, setBetAmount] = useState(isCustomRoom ? fixedCustomBet : 50);
   const [userBetPlaced, setUserBetPlaced] = useState(false);
   const [userBetConfirmed, setUserBetConfirmed] = useState(false);
   const [timerPhase, setTimerPhase] = useState<'ready' | 'betting'>('ready');
@@ -220,6 +226,32 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
     setShowColorAssignment(true);
   };
 
+  useEffect(() => {
+    if (!isCustomRoom || !customRoom) return;
+
+    setShowBettingModal(false);
+    setShowColorAssignment(false);
+    setUserBetAmount(customRoom.entryFee);
+    setBetAmount(customRoom.entryFee);
+    setBetsPlaced(true);
+
+    if (!localStorage.getItem(customEntryKey)) {
+      if (customRoom.entryFee > user.balance) {
+        setInsufficientAmount(customRoom.entryFee - user.balance);
+        setShowDepositPrompt(true);
+        soundManager.play('warning');
+        return;
+      }
+
+      updateBalance(-customRoom.entryFee);
+      localStorage.setItem(customEntryKey, 'paid');
+    }
+
+    if (gameState === GameState.PRE_GAME) {
+      setGameState(GameState.WAITING);
+    }
+  }, [customEntryKey, customRoom, gameState, isCustomRoom, updateBalance, user.balance]);
+
   const handleBettingCancel = () => {
     soundManager.play('click');
     // Go back to home
@@ -242,11 +274,11 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
     setIsTransitioning(true);
     setShowPlayAgainModal(false);
     setRoundNumber(prev => prev + 1);
-    setShowBettingModal(true);
-    setUserBetAmount(0);
-    setBetsPlaced(false);
+    setShowBettingModal(!isCustomRoom);
+    setUserBetAmount(isCustomRoom ? fixedCustomBet : 0);
+    setBetsPlaced(isCustomRoom);
     setShowColorAssignment(false);
-    setGameState(GameState.PRE_GAME);
+    setGameState(isCustomRoom ? GameState.WAITING : GameState.PRE_GAME);
     setWinnerAlert(null);
     setChatHistory(prev => [...prev, {
       id: Math.random().toString(36),
@@ -336,6 +368,43 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
     // Only initialize if bets have been placed
     if (!betsPlaced) return;
 
+    if (isCustomRoom && customRoom) {
+      const roomPlayers = customRoom.players.slice(0, maxPlayers);
+      const colorsToUse = COLORS.slice(0, Math.max(roomPlayers.length, 1));
+      const customPlayers: Player[] = roomPlayers.map((roomPlayer, index) => {
+        const assignedColor = colorsToUse[index % colorsToUse.length];
+        return {
+          id: roomPlayer.id,
+          username: roomPlayer.username,
+          avatar: roomPlayer.avatar,
+          betAmount: customRoom.entryFee,
+          selectedColor: assignedColor,
+          assignedColor,
+          status: PlayerStatus.CONFIRMED,
+          isBot: false,
+          rank: roomPlayer.rank
+        };
+      });
+
+      const userPlayerIndex = Math.max(0, customPlayers.findIndex(player => player.id === user.id));
+      setUserAssignedColor(customPlayers[userPlayerIndex]?.assignedColor || colorsToUse[0] || COLORS[0]);
+      setPlayers(customPlayers);
+      setCurrentPot(customPlayers.length * customRoom.entryFee);
+      setChatHistory(prev => {
+        const lastMsg = prev[prev.length - 1];
+        if (lastMsg?.text.includes('INVITE ROOM READY')) return prev;
+        return [...prev, {
+          id: Math.random().toString(36),
+          sender: 'SYSTEM',
+          text: `${customPlayers.length}/${customRoom.maxPlayers} INVITE ROOM READY. NO RANDOM PLAYERS ADDED.`,
+          isAi: true,
+          timestamp: new Date()
+        }];
+      });
+
+      return () => { isMounted.current = false; };
+    }
+
     // Realistic bot usernames for blitz/duel
     const realisticNames = [
       'Alex_Knight', 'Jordan_Smith', 'Morgan_Lee', 'Casey_Rivera', 'Taylor_Brown',
@@ -410,7 +479,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
     });
 
     return () => { isMounted.current = false; };
-  }, [betsPlaced, userBetAmount, gameMode, maxPlayers, user, roundNumber]);
+  }, [betsPlaced, userBetAmount, gameMode, maxPlayers, user, roundNumber, isCustomRoom, customRoom]);
 
   // Inactivity tracking - kick user if they don't place a bet during betting phase
   useEffect(() => {
@@ -499,7 +568,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
     let spinTimeoutId: NodeJS.Timeout | null = null;
 
     if (gameState === GameState.WAITING) {
-      setTimer(3);
+      setTimer(readyCountdown);
       setTimerPhase('ready');
       interval = setInterval(() => {
         setTimer(t => {
@@ -512,7 +581,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
       }, 1000);
     } else if (gameState === GameState.LOCKED) {
       // Room is locked - all players ready, spinning starts
-      setTimer(3);
+      setTimer(spinCountdown);
       setTimerPhase('ready');
       addChatMessage('ORACLE', '🔒 ROOM LOCKED. ALL PLAYERS IN. SPINNING STARTS...', true);
       soundManager.play('lock');
@@ -524,7 +593,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
             if (!spinInProgressRef.current) {
               spinResultAnnouncedRef.current = false; // Reset for new spin
               // Pick a random target that will be the final resting position
-              const newIndex = Math.floor(Math.random() * wheelSegments.length);
+              const newIndex = isCustomRoom ? Math.max(0, wheelSegments.findIndex(segment => segment.color === userAssignedColor)) : Math.floor(Math.random() * wheelSegments.length);
               setTargetIndex(newIndex);
               setGameState(GameState.SPINNING);
             }
@@ -547,7 +616,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
       clearInterval(interval);
       if (spinTimeoutId) clearTimeout(spinTimeoutId);
     };
-  }, [gameState, wheelSegments.length, addChatMessage]);
+  }, [gameState, wheelSegments, addChatMessage, isCustomRoom, readyCountdown, spinCountdown, userAssignedColor]);
 
   const handlePlaceBet = () => {
     if (user.balance < betAmount || gameState !== GameState.BETTING) return;
@@ -688,15 +757,35 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
     }
   };
 
+  if (isCustomRoom && !customRoom) {
+    return (
+      <div className="min-h-[100dvh] bg-vegas-bg flex items-center justify-center p-4">
+        <div className="bg-vegas-panel/95 border border-neon-cyan/50 px-5 py-6 sm:px-6 sm:py-7 rounded-lg w-full max-w-md text-center shadow-[0_0_50px_rgba(0,255,255,0.15)] clip-corner">
+          <div className="text-neon-cyan font-arcade text-3xl mb-3">X</div>
+          <h1 className="font-arcade text-white text-xl sm:text-2xl uppercase tracking-widest mb-3">Room Not Found</h1>
+          <p className="text-slate-400 font-mono text-xs sm:text-sm leading-relaxed mb-5">
+            This private room is no longer available or was deleted by its creator.
+          </p>
+          <button
+            onClick={() => navigate('/')}
+            className="w-full py-3 bg-neon-cyan text-black font-arcade uppercase tracking-widest text-xs hover:bg-white transition-colors"
+          >
+            Back to Lobby
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col lg:flex-row h-[100dvh] w-full bg-black overflow-hidden relative">
       <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
 
       {/* Betting Modal - PRE_GAME Phase */}
       <BettingModal
-        isOpen={showBettingModal}
+        isOpen={!isCustomRoom && showBettingModal}
         userBalance={user.balance}
-        minBet={10}
+        minBet={isCustomRoom ? fixedCustomBet : 10}
         maxBet={user.balance}
         onConfirm={handleBettingConfirm}
         onCancel={handleBettingCancel}

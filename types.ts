@@ -95,8 +95,8 @@ export interface ChatMessage {
 
 export interface GameSession {
   id: string;
-  type: 'blitz' | '1v1' | 'tournament' | 'grandprix'; // Game mode
-  mode: 'blitz' | '1v1' | 'tournament' | 'grandprix'; // Alternative alias
+  type: 'blitz' | '1v1' | 'tournament' | 'grandprix' | 'custom'; // Game mode
+  mode: 'blitz' | '1v1' | 'tournament' | 'grandprix' | 'custom'; // Alternative alias
   status: string; // e.g., "SPINNING", "WAITING"
   themeColor: string;
   lastUpdate: number;
@@ -105,6 +105,28 @@ export interface GameSession {
   isLocked?: boolean;
   groupNumber?: number; // For Grand Prix: which group (1-10)
   totalPot?: number; // For Grand Prix: total pot from all 100 players
+}
+
+export interface CustomRoomPlayer {
+  id: string;
+  username: string;
+  avatar: string;
+  rank: UserRank;
+  joinedAt: number;
+}
+
+export interface CustomGameRoom {
+  id: string;
+  name: string;
+  creatorId: string;
+  creatorName: string;
+  entryFee: number;
+  maxPlayers: number;
+  gameMode: 'blitz' | '1v1';
+  readyCountdown: number;
+  spinCountdown: number;
+  createdAt: number;
+  players: CustomRoomPlayer[];
 }
 
 export interface GrandPrixGroup {

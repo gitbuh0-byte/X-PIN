@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { HashRouter, Routes, Route, Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { User, Transaction, UserRank, GameSession, AuthMethod } from './types.ts';
+import { User, Transaction, UserRank, GameSession, AuthMethod, CustomGameRoom } from './types.ts';
 import Dashboard from './pages/Dashboard.tsx';
 import GameRoom from './pages/GameRoom.tsx';
 import TournamentRoom from './pages/TournamentRoom.tsx';
@@ -30,6 +30,7 @@ const INITIAL_USER: User = {
 };
 
 const RANK_PROGRESSION = [UserRank.ROOKIE, UserRank.PRO, UserRank.MASTER, UserRank.LEGEND];
+const CUSTOM_ROOMS_STORAGE_KEY = 'xpin_custom_rooms';
 
 const getRankForXp = (wins: number): UserRank => {
   if (wins >= RANK_CONFIG[UserRank.LEGEND].minWins) return UserRank.LEGEND;
@@ -154,6 +155,14 @@ const AppContent: React.FC = () => {
   const [user, setUser] = useState<User>(INITIAL_USER);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [activeSessions, setActiveSessions] = useState<GameSession[]>([]);
+  const [customRooms, setCustomRooms] = useState<CustomGameRoom[]>(() => {
+    try {
+      const saved = localStorage.getItem(CUSTOM_ROOMS_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [payment, setPayment] = useState<{ open: boolean, type: 'DEPOSIT' | 'WITHDRAWAL' }>({ open: false, type: 'DEPOSIT' });
 
   const navigate = useNavigate();
@@ -195,6 +204,10 @@ const AppContent: React.FC = () => {
     setUser(prev => ({ ...prev, balance: prev.balance + amount }));
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem(CUSTOM_ROOMS_STORAGE_KEY, JSON.stringify(customRooms));
+  }, [customRooms]);
+
   const handleAwardWin = useCallback(() => {
     setUser(prev => {
       const rankIndex = RANK_PROGRESSION.indexOf(prev.rank);
@@ -206,19 +219,72 @@ const AppContent: React.FC = () => {
     });
   }, []);
 
+  const ensureUserInCustomRoom = useCallback((roomId: string) => {
+    setCustomRooms(prev => prev.map(room => {
+      if (room.id !== roomId || room.players.some(player => player.id === user.id) || room.players.length >= room.maxPlayers) {
+        return room;
+      }
+
+      return {
+        ...room,
+        players: [
+          ...room.players,
+          {
+            id: user.id,
+            username: user.username,
+            avatar: user.avatar,
+            rank: user.rank,
+            joinedAt: Date.now()
+          }
+        ]
+      };
+    }));
+  }, [user.avatar, user.id, user.rank, user.username]);
+
+  const handleCreateCustomRoom = useCallback((settings: Omit<CustomGameRoom, 'id' | 'creatorId' | 'creatorName' | 'createdAt' | 'players'>) => {
+    const roomId = `custom-${Date.now()}`;
+    const room: CustomGameRoom = {
+      ...settings,
+      id: roomId,
+      creatorId: user.id,
+      creatorName: user.username,
+      createdAt: Date.now(),
+      players: [{
+        id: user.id,
+        username: user.username,
+        avatar: user.avatar,
+        rank: user.rank,
+        joinedAt: Date.now()
+      }]
+    };
+
+    setCustomRooms(prev => [room, ...prev]);
+    return roomId;
+  }, [user.avatar, user.id, user.rank, user.username]);
+
+  const handleDeleteCustomRoom = useCallback((roomId: string) => {
+    setCustomRooms(prev => prev.filter(room => room.id !== roomId || room.creatorId !== user.id));
+    setActiveSessions(prev => prev.filter(session => session.id !== roomId));
+  }, [user.id]);
+
   const handleJoinGame = useCallback((roomId: string) => {
+    if (roomId.startsWith('custom-')) {
+      ensureUserInCustomRoom(roomId);
+    }
+
     setActiveSessions(prev => {
       if (prev.find(s => s.id === roomId)) return prev;
-      let type: 'blitz' | '1v1' | 'tournament' | 'grandprix' = 'blitz';
+      let type: 'blitz' | '1v1' | 'tournament' | 'grandprix' | 'custom' = 'blitz';
       let displayName = 'BLITZ';
       let themeColor = 'neon-cyan';
-      if (roomId.includes('pve')) { type = '1v1'; displayName = '1v1 DUEL'; themeColor = 'neon-green'; }
+      if (roomId.startsWith('custom-')) { type = 'custom'; displayName = 'PRIVATE'; themeColor = 'neon-purple'; }
+      else if (roomId.includes('pve')) { type = '1v1'; displayName = '1v1 DUEL'; themeColor = 'neon-green'; }
       else if (roomId.includes('grandprix')) { type = 'grandprix'; displayName = 'GRAND PRIX'; themeColor = 'neon-pink'; }
       else if (roomId.includes('tournament')) { type = 'tournament'; displayName = 'TOURNAMENT'; themeColor = 'neon-pink'; }
       return [...prev, { id: roomId, type, mode: type, status: 'CONNECTING...', themeColor, lastUpdate: Date.now() }];
     });
     navigate(`/room/${roomId}`);
-  }, [navigate]);
+  }, [ensureUserInCustomRoom, navigate]);
 
   const handleExitGame = useCallback((roomId: string) => {
     setActiveSessions(prev => prev.filter(s => s.id !== roomId));
@@ -256,7 +322,15 @@ const AppContent: React.FC = () => {
   return (
     <Layout user={user} onOpenPayment={(type) => setPayment({ open: true, type })}>
       <Routes>
-        <Route path="/" element={<Home user={user} onJoinGame={handleJoinGame} />} />
+        <Route path="/" element={
+          <Home
+            user={user}
+            customRooms={customRooms}
+            onCreateCustomRoom={handleCreateCustomRoom}
+            onDeleteCustomRoom={handleDeleteCustomRoom}
+            onJoinGame={handleJoinGame}
+          />
+        } />
         <Route path="/dashboard" element={<Dashboard user={user} transactions={transactions} onOpenPayment={(type) => setPayment({open: true, type})} onUpdateProfile={(updates) => setUser(p => ({...p, ...updates}))} onLogout={handleLogout} />} />
         <Route path="/help-centre" element={<HelpCentre />} />
         <Route path="/terms-of-use" element={<TermsOfUse />} />
@@ -268,6 +342,8 @@ const AppContent: React.FC = () => {
             handleAwardWin={handleAwardWin}
             handleExitGame={handleExitGame}
             updateSessionStatus={updateSessionStatus}
+            customRooms={customRooms}
+            ensureUserInCustomRoom={ensureUserInCustomRoom}
           />
         } />
       </Routes>
@@ -295,8 +371,17 @@ const RoomWrapper: React.FC<{
   handleAwardWin: () => void;
   handleExitGame: (id: string) => void;
   updateSessionStatus: (id: string, s: string) => void;
-}> = ({ user, handleUpdateBalance, handleAwardWin, handleExitGame, updateSessionStatus }) => {
+  customRooms: CustomGameRoom[];
+  ensureUserInCustomRoom: (id: string) => void;
+}> = ({ user, handleUpdateBalance, handleAwardWin, handleExitGame, updateSessionStatus, customRooms, ensureUserInCustomRoom }) => {
   const { roomId } = useParams<{ roomId: string }>();
+  const customRoom = roomId?.startsWith('custom-') ? customRooms.find(room => room.id === roomId) : undefined;
+
+  useEffect(() => {
+    if (roomId?.startsWith('custom-')) {
+      ensureUserInCustomRoom(roomId);
+    }
+  }, [ensureUserInCustomRoom, roomId]);
 
   const handleStatusChange = useCallback((status: string) => {
     if (roomId) {
@@ -324,6 +409,7 @@ const RoomWrapper: React.FC<{
       updateBalance={handleUpdateBalance}
       onWin={handleAwardWin}
       roomId={roomId}
+      customRoom={customRoom}
       onLeaveGame={handleExitGame}
       onStatusChange={handleStatusChange}
     />
