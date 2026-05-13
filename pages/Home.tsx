@@ -61,14 +61,14 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({ isOpen, onClose, onCr
                 </button>
               ))}
             </div>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neon-cyan font-arcade text-sm">$</span>
+            <div className="flex items-center bg-black/50 border border-white/10 rounded-sm overflow-hidden focus-within:border-neon-cyan transition-all">
+              <span className="px-3 py-2.5 sm:py-3 text-neon-cyan font-arcade text-sm border-r border-white/10 bg-black/40">$</span>
               <input
                 type="number"
                 min={10}
                 value={entryFee}
                 onChange={(e) => setEntryFee(e.target.value)}
-                className="w-full bg-black/50 border border-white/10 p-2.5 sm:p-3 pl-8 text-white font-mono text-xs sm:text-sm focus:border-neon-cyan focus:outline-none focus:bg-white/5 transition-all rounded-sm"
+                className="w-full bg-transparent p-2.5 sm:p-3 text-white font-mono text-xs sm:text-sm focus:outline-none focus:bg-white/5 transition-all min-w-0"
               />
             </div>
           </div>
