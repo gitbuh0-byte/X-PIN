@@ -176,6 +176,8 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
   const navigate = useNavigate();
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [roomPendingDelete, setRoomPendingDelete] = useState<CustomGameRoom | null>(null);
+  const [roomPendingEntryId, setRoomPendingEntryId] = useState<string | null>(null);
+  const [copiedRoomId, setCopiedRoomId] = useState<string | null>(null);
 
   const canCreateRoom = user.rank === UserRank.MASTER || user.rank === UserRank.LEGEND;
 
@@ -183,11 +185,7 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
     setCreateModalOpen(false);
     const roomId = onCreateCustomRoom(settings);
     soundManager.forceBgmStart();
-    if (onJoinGame) {
-      onJoinGame(roomId);
-    } else {
-      navigate(`/room/${roomId}`);
-    }
+    setRoomPendingEntryId(roomId);
   };
 
   const handleHover = () => {
@@ -204,16 +202,24 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
     }
   };
 
+  const getInviteUrl = (room: CustomGameRoom) => {
+    const invitePayload = encodeURIComponent(JSON.stringify(room));
+    return `${window.location.origin}${window.location.pathname}#/room/${room.id}?invite=${invitePayload}`;
+  };
+
   const handleShareRoom = async (room: CustomGameRoom) => {
     soundManager.play('click');
-    const invitePayload = encodeURIComponent(JSON.stringify(room));
-    const url = `${window.location.origin}${window.location.pathname}#/room/${room.id}?invite=${invitePayload}`;
+    const url = getInviteUrl(room);
     try {
       await navigator.clipboard.writeText(url);
+      setCopiedRoomId(room.id);
+      window.setTimeout(() => setCopiedRoomId(current => current === room.id ? null : current), 2200);
     } catch {
       window.prompt('Copy invite link', url);
     }
   };
+
+  const pendingEntryRoom = roomPendingEntryId ? customRooms.find(room => room.id === roomPendingEntryId) || null : null;
 
   return (
     <div className="p-3 sm:p-4 md:p-6 max-w-7xl mx-auto flex flex-col justify-center min-h-[calc(100dvh-116px)] lg:min-h-[calc(100dvh-80px)] mt-2 sm:mt-6 md:mt-10 w-full">
@@ -368,7 +374,7 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
 
                   <div className="grid grid-cols-2 gap-2 mt-4">
                     <button
-                      onClick={() => handleGameStart(room.id)}
+                      onClick={() => { soundManager.play('click'); setRoomPendingEntryId(room.id); }}
                       disabled={isFull}
                       className="py-2 border border-neon-cyan bg-neon-cyan text-black font-arcade text-[9px] sm:text-[10px] uppercase tracking-widest hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed"
                     >
@@ -376,9 +382,9 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
                     </button>
                     <button
                       onClick={() => handleShareRoom(room)}
-                      className="py-2 border border-neon-purple text-neon-purple font-arcade text-[9px] sm:text-[10px] uppercase tracking-widest hover:bg-neon-purple hover:text-white"
+                      className={`py-2 border font-arcade text-[9px] sm:text-[10px] uppercase tracking-widest transition-all ${copiedRoomId === room.id ? 'border-neon-green bg-neon-green text-black' : 'border-neon-purple text-neon-purple hover:bg-neon-purple hover:text-white'}`}
                     >
-                      Share
+                      {copiedRoomId === room.id ? 'Copied' : 'Share'}
                     </button>
                   </div>
 
@@ -426,6 +432,85 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
                 Delete
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {pendingEntryRoom && (
+        <div className="fixed inset-0 z-[115] flex items-center justify-center bg-black/90 backdrop-blur-md p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-vegas-panel/95 border border-neon-cyan/50 px-4 py-4 sm:px-5 sm:py-5 md:px-6 md:py-6 rounded-lg w-full max-w-lg relative shadow-[0_0_50px_rgba(0,255,255,0.15)] clip-corner max-h-[calc(100dvh-32px)] overflow-y-auto custom-scrollbar">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50" />
+            <div className="text-center mb-4 sm:mb-5">
+              <div className="text-3xl sm:text-4xl font-arcade font-black text-neon-cyan mb-1 text-glow-cyan">$</div>
+              <h2 className="text-base sm:text-lg md:text-xl font-arcade text-white mb-1 tracking-widest uppercase">{pendingEntryRoom.name}</h2>
+              <p className="text-[10px] sm:text-xs font-mono text-neon-cyan opacity-80 uppercase">
+                {pendingEntryRoom.gameMode} • ${pendingEntryRoom.entryFee} • {pendingEntryRoom.players.length}/{pendingEntryRoom.maxPlayers} players
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
+              <div className="bg-black/40 border border-white/10 rounded-sm p-3 text-center">
+                <div className="text-[8px] sm:text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Entry</div>
+                <div className="text-lg sm:text-xl font-arcade text-neon-green">${pendingEntryRoom.entryFee}</div>
+              </div>
+              <div className="bg-black/40 border border-white/10 rounded-sm p-3 text-center">
+                <div className="text-[8px] sm:text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Start In</div>
+                <div className="text-lg sm:text-xl font-arcade text-neon-cyan">{pendingEntryRoom.readyCountdown}s</div>
+              </div>
+              <div className="bg-black/40 border border-white/10 rounded-sm p-3 text-center">
+                <div className="text-[8px] sm:text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Spin In</div>
+                <div className="text-lg sm:text-xl font-arcade text-neon-cyan">{pendingEntryRoom.spinCountdown}s</div>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <div className="text-[10px] sm:text-xs font-arcade text-white/70 uppercase tracking-widest">Joined Players</div>
+                <div className="text-[9px] sm:text-[10px] font-mono text-neon-green">{pendingEntryRoom.players.length}/{pendingEntryRoom.maxPlayers} ready slots</div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {pendingEntryRoom.players.map(player => (
+                  <div key={player.id} className="flex items-center gap-3 bg-black/35 border border-white/10 rounded-sm p-2.5">
+                    <img src={player.avatar} alt={player.username} className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-black bg-black flex-shrink-0" />
+                    <div className="min-w-0">
+                      <div className="font-arcade text-[10px] sm:text-[11px] text-white uppercase truncate">{player.username}</div>
+                      <div className="text-[8px] sm:text-[9px] font-mono text-neon-cyan uppercase">{player.rank}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-neon-purple/10 border border-neon-purple/30 rounded-sm p-3 mb-4">
+              <div className="text-[9px] sm:text-xs font-mono text-slate-400 leading-relaxed">
+                Invite more Master or Legend players before you proceed into the game room.
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+              <button
+                onClick={() => handleShareRoom(pendingEntryRoom)}
+                className={`py-2.5 border font-arcade text-[9px] sm:text-[10px] uppercase tracking-widest transition-all ${copiedRoomId === pendingEntryRoom.id ? 'border-neon-green bg-neon-green text-black' : 'border-neon-purple text-neon-purple hover:bg-neon-purple hover:text-white'}`}
+              >
+                {copiedRoomId === pendingEntryRoom.id ? 'Link Copied' : 'Share Invite'}
+              </button>
+              <button
+                onClick={() => {
+                  soundManager.play('start');
+                  setRoomPendingEntryId(null);
+                  handleGameStart(pendingEntryRoom.id);
+                }}
+                className="py-2.5 border border-neon-cyan bg-neon-cyan text-black font-arcade text-[9px] sm:text-[10px] uppercase tracking-widest hover:bg-white"
+              >
+                Proceed to Gameroom
+              </button>
+            </div>
+            <button
+              onClick={() => { soundManager.play('click'); setRoomPendingEntryId(null); }}
+              className="w-full py-2.5 border border-slate-600 text-slate-300 font-arcade text-[9px] sm:text-[10px] uppercase tracking-widest hover:border-white hover:text-white"
+            >
+              Back
+            </button>
           </div>
         </div>
       )}

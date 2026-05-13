@@ -1059,8 +1059,8 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
 
         {/* Countdown Display - Fixed Overlay (rendered outside wheel container) */}
         {gameState === GameState.BETTING && timer > 0 && (
-          <div className="fixed inset-0 flex flex-col items-center justify-center pointer-events-none z-[9999] px-4" style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'auto', height: 'auto' }}>
-            <div className="text-center">
+          <div className="fixed inset-0 flex flex-col items-center justify-center pointer-events-none z-[9999] px-4">
+            <div className="text-center -translate-y-[2vh] sm:translate-y-[1vh] lg:translate-y-[3vh]">
               <div className="text-[12px] sm:text-[14px] font-arcade text-neon-cyan uppercase tracking-wider mb-2 sm:mb-3 drop-shadow-[0_0_20px_rgba(0,255,255,1)]">⏱️ Spin starts in</div>
               <div className="text-6xl sm:text-8xl md:text-9xl font-arcade font-black text-neon-cyan drop-shadow-[0_0_40px_rgba(0,255,255,1)] animate-pulse">
                 {timer}
