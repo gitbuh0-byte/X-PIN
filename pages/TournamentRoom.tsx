@@ -7,7 +7,6 @@ import RankUpModal from '../components/RankUpModal.tsx';
 import { User, Player, UserRank } from '../types.ts';
 import { COLORS, COLOR_HEX, RANK_CONFIG } from '../constants.ts';
 import { soundManager } from '../services/soundManager.ts';
-import { detectPerformanceProfile } from '../utils/performanceOptimizer.ts';
 
 interface TournamentRoomProps {
   user: User;
@@ -95,15 +94,12 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
   const isColorVisible = phase === 'COLOR_ASSIGN' || ((phase !== 'BROWSE' && phase !== 'BET_PROMPT') && colorRevealed);
   const userColorDisplay = isColorVisible ? userColor : 'Hidden';
   const userColorStyle = isColorVisible ? COLOR_HEX[userColor as keyof typeof COLOR_HEX] : '#4b5563';
-  const perfProfile = detectPerformanceProfile();
   const showTournamentHeader = false;
   const showExitButton = phase === 'GROUPS' || phase === 'ROUND_2' || phase === 'FINAL';
   const userGroupPlayers = groups.find(group => group.groupNumber === userGroup)?.players ?? [];
   const quarterfinalGroupIndex = Math.max(0, Math.floor(groupWinners.findIndex(player => player.id === user.id) / PLAYERS_PER_GROUP));
   const quarterfinalPlayers = groupWinners.slice(quarterfinalGroupIndex * PLAYERS_PER_GROUP, quarterfinalGroupIndex * PLAYERS_PER_GROUP + PLAYERS_PER_GROUP);
   const userColorIndex = Math.max(0, COLORS.indexOf(userColor));
-  const showSpinCountdownOverlay = countdownActive && countdown > 0 && (phase === 'GROUPS' || phase === 'ROUND_2' || phase === 'FINAL');
-  const countdownLabel = phase === 'ROUND_2' ? 'Round 2 starts in' : phase === 'FINAL' ? 'Final spin starts in' : 'Tournament spin starts in';
 
   // Calculate total pot (100 players * selected entry fee)
   const totalPot = TOTAL_PLAYERS * tournamentBetAmount;
@@ -966,10 +962,11 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
             {/* Center: Wheel + Mobile Controls */}
             <div className="lg:hidden flex-1 flex flex-col items-center justify-center px-2 py-2 gap-3">
               {/* Status counters area */}
-              <div className="flex flex-col items-center gap-0.5 flex-shrink-0 min-h-[20px]">
+              <div className="flex flex-col items-center justify-end gap-1 flex-shrink-0 min-h-[48px] pt-4">
                 {countdownActive && countdown > 0 && (
                   <div className="text-center">
                     <div className="text-2xl font-arcade text-neon-pink animate-pulse">{countdown}</div>
+                    <div className="text-[9px] text-slate-400 mt-1">Preparing to spin...</div>
                   </div>
                 )}
                 
@@ -1009,7 +1006,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
             {/* Desktop Layout - Hidden on mobile */}
             <div className="hidden lg:flex flex-1 flex-col items-center justify-center gap-4 sm:gap-6 px-2 sm:px-6">
               {countdownActive && countdown > 0 && (
-                <div className="text-center mb-2 sm:mb-4">
+                <div className="text-center mb-2 sm:mb-4 mt-10 sm:mt-12">
                   <div className="text-4xl sm:text-6xl font-arcade text-neon-pink animate-pulse">{countdown}</div>
                   <div className="text-xs sm:text-sm text-slate-400 mt-2">Preparing to spin...</div>
                 </div>
@@ -1315,10 +1312,11 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
             {/* Center: Wheel + Mobile Controls */}
             <div className="lg:hidden flex-1 flex flex-col items-center justify-center px-2 py-2 gap-3">
               {/* Status counters area */}
-              <div className="flex flex-col items-center gap-0.5 flex-shrink-0 min-h-[20px]">
+              <div className="flex flex-col items-center justify-end gap-1 flex-shrink-0 min-h-[48px] pt-4">
                 {countdownActive && countdown > 0 && (
                   <div className="text-center">
                     <div className="text-2xl font-arcade text-neon-pink animate-pulse">{countdown}</div>
+                    <div className="text-[9px] text-slate-400 mt-1">Preparing Round 2...</div>
                   </div>
                 )}
                 
@@ -1358,7 +1356,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
             {/* Desktop Layout - Hidden on mobile */}
             <div className="hidden lg:flex flex-1 flex-col items-center justify-center gap-4 sm:gap-6 px-2 sm:px-6">
               {countdownActive && countdown > 0 && (
-                <div className="text-center mb-2 sm:mb-4">
+                <div className="text-center mb-2 sm:mb-4 mt-10 sm:mt-12">
                   <div className="text-4xl sm:text-6xl font-arcade text-neon-pink animate-pulse">{countdown}</div>
                   <div className="text-xs sm:text-sm text-slate-400 mt-2">Preparing Round 2...</div>
                 </div>
@@ -1756,6 +1754,13 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
         {/* FINAL - Grand Final Spin */}
         {phase === 'FINAL' && (
           <div className="flex-1 flex flex-col lg:flex-row gap-2 lg:gap-4 p-2 lg:p-4 overflow-hidden w-full h-auto relative">
+            {countdownActive && countdown > 0 && (
+              <div className="absolute top-16 sm:top-20 md:top-24 left-1/2 -translate-x-1/2 z-20 text-center pointer-events-none">
+                <div className="text-3xl sm:text-5xl md:text-6xl font-arcade text-neon-gold animate-pulse">{countdown}</div>
+                <div className="text-[10px] sm:text-xs text-slate-400 mt-1 sm:mt-2">Preparing final spin...</div>
+              </div>
+            )}
+
             {/* Left: Finalists - Hidden on mobile */}
             <div className="hidden lg:flex w-72 bg-black/40 border border-neon-gold/30 rounded overflow-hidden flex-col flex-shrink-0">
               <div className="sticky top-0 bg-black/80 border-b border-neon-gold/30 p-3">
@@ -1999,21 +2004,6 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                 </div>
               </div>
             )}
-          </div>
-        )}
-
-        {showSpinCountdownOverlay && (
-          <div className="fixed inset-0 pointer-events-none z-[90] flex items-center justify-center px-4">
-            <div className={`text-center ${perfProfile.isLowEnd ? 'translate-y-[7vh]' : 'translate-y-[6vh] sm:translate-y-[7vh] lg:translate-y-[8vh]'}`}>
-              <div className={`mx-auto rounded-lg border px-4 py-3 sm:px-6 sm:py-4 ${phase === 'FINAL' ? 'border-neon-gold/70 bg-black/88' : phase === 'ROUND_2' ? 'border-neon-pink/70 bg-black/88' : 'border-neon-cyan/70 bg-black/88'} ${perfProfile.isLowEnd ? '' : 'backdrop-blur-sm shadow-[0_0_24px_rgba(0,255,255,0.16)]'}`}>
-                <div className={`font-arcade uppercase tracking-wider mb-1 sm:mb-2 text-[10px] sm:text-xs ${phase === 'FINAL' ? 'text-neon-gold' : phase === 'ROUND_2' ? 'text-neon-pink' : 'text-neon-cyan'}`}>
-                  {countdownLabel}
-                </div>
-                <div className={`font-arcade font-black leading-none text-5xl sm:text-6xl md:text-7xl ${phase === 'FINAL' ? 'text-neon-gold' : phase === 'ROUND_2' ? 'text-neon-pink' : 'text-neon-cyan'} ${perfProfile.disableAnimations ? '' : 'animate-pulse'}`}>
-                  {countdown}
-                </div>
-              </div>
-            </div>
           </div>
         )}
 
