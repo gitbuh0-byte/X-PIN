@@ -627,25 +627,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
         soundManager.play('win');
         setWinnerAlert({ name: user.username, amount: currentPot, isUserWin: true });
         setLastWinner({ name: user.username, amount: currentPot, isUserWin: true });
-        
-        // Check for rank up (5 wins = 1 rank)
-        const newXp = user.rankXp + 1;
-        if (newXp % 5 === 0) {
-          // Rank up!
-          const rankProgression = [UserRank.ROOKIE, UserRank.PRO, UserRank.MASTER, UserRank.LEGEND];
-          const currentRankIndex = rankProgression.indexOf(user.rank);
-          if (currentRankIndex < rankProgression.length - 1) {
-            const newRank = rankProgression[currentRankIndex + 1];
-            setPreviousRank(user.rank);
-            setShowRankUp(true);
-            // Update user rank
-            Object.assign(user, { rank: newRank, rankXp: newXp });
-          }
-        } else {
-          // Update XP without rank up
-          Object.assign(user, { rankXp: newXp });
-        }
-        
+
         const hype = await generateGameCommentary(user.username, payout, players.length);
         addChatMessage('ORACLE', `🏆 WINNER: ${user.username} TAKES THE POT! ${hype}`, true);
       } else {

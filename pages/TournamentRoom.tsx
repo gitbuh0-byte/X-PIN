@@ -11,6 +11,7 @@ import { soundManager } from '../services/soundManager.ts';
 interface TournamentRoomProps {
   user: User;
   updateBalance: (amount: number) => void;
+  onWin?: () => void;
   onLeaveGame?: (roomId: string) => void;
 }
 
@@ -42,7 +43,7 @@ const TOURNAMENT_SEGMENTS = Array.from({ length: 20 }).map((_, idx) => ({
   value: idx
 }));
 
-const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, onLeaveGame }) => {
+const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, onWin, onLeaveGame }) => {
   const navigate = useNavigate();
   const mounted = useRef(true);
 
@@ -424,25 +425,8 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
     setGrandWinner(winner);
     if (winner.id === user.id) {
       updateBalance(totalPot);
+      onWin?.();
       soundManager.play('win'); // Winner announcement sound (same as group winners)
-      
-      // Check for rank up (5 wins = 1 rank)
-      const newXp = user.rankXp + 1;
-      if (newXp % 5 === 0) {
-        // Rank up!
-        const rankProgression = [UserRank.ROOKIE, UserRank.PRO, UserRank.MASTER, UserRank.LEGEND];
-        const currentRankIndex = rankProgression.indexOf(user.rank);
-        if (currentRankIndex < rankProgression.length - 1) {
-          const newRank = rankProgression[currentRankIndex + 1];
-          setPreviousRank(user.rank);
-          setShowRankUp(true);
-          // Update user rank (this would normally be saved to backend)
-          Object.assign(user, { rank: newRank, rankXp: newXp });
-        }
-      } else {
-        // Update XP without rank up
-        Object.assign(user, { rankXp: newXp });
-      }
     }
     setPhase('FINAL_RESULT');
   };

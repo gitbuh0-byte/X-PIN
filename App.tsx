@@ -29,6 +29,15 @@ const INITIAL_USER: User = {
   bio: 'Ready to pin it!'
 };
 
+const RANK_PROGRESSION = [UserRank.ROOKIE, UserRank.PRO, UserRank.MASTER, UserRank.LEGEND];
+
+const getRankForXp = (wins: number): UserRank => {
+  if (wins >= RANK_CONFIG[UserRank.LEGEND].minWins) return UserRank.LEGEND;
+  if (wins >= RANK_CONFIG[UserRank.MASTER].minWins) return UserRank.MASTER;
+  if (wins >= RANK_CONFIG[UserRank.PRO].minWins) return UserRank.PRO;
+  return UserRank.ROOKIE;
+};
+
 const Layout: React.FC<{ children: React.ReactNode; user: User; onOpenPayment?: (type: 'DEPOSIT' | 'WITHDRAWAL') => void }> = ({ children, user, onOpenPayment }) => {
   const location = useLocation();
   const [isMuted, setIsMuted] = useState(soundManager.isMuted());
@@ -61,8 +70,9 @@ const Layout: React.FC<{ children: React.ReactNode; user: User; onOpenPayment?: 
       {!isRoom && (
         <header className="h-14 sm:h-16 md:h-20 border-b border-neon-purple/50 bg-vegas-panel/90 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between px-2 sm:px-4 md:px-8 shadow-[0_0_20px_rgba(191,0,255,0.2)]">
           <div className="flex items-center gap-2 sm:gap-6 md:gap-10 flex-1 min-w-0">
-            <Link to="/" onClick={() => soundManager.play('click')} className="text-lg sm:text-2xl md:text-3xl font-arcade font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-pink to-neon-cyan hover:scale-105 transition-transform animate-glitch whitespace-nowrap">
-              X <span className="text-neon-gold">PIN</span>
+            <Link to="/" onClick={() => soundManager.play('click')} className="text-lg sm:text-2xl md:text-3xl font-arcade font-black hover:scale-105 transition-transform whitespace-nowrap tracking-wider">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-pink to-neon-purple text-glow-pink">X</span>{' '}
+              <span className="text-white">PIN</span>
             </Link>
             <nav className="hidden sm:flex gap-4 md:gap-8">
               <Link to="/" className={`text-xs md:text-sm font-arcade uppercase tracking-widest ${location.pathname === '/' ? 'text-neon-cyan text-glow-cyan' : 'text-slate-400 hover:text-white'}`}>Lobby</Link>
@@ -145,7 +155,7 @@ const AppContent: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [activeSessions, setActiveSessions] = useState<GameSession[]>([]);
   const [payment, setPayment] = useState<{ open: boolean, type: 'DEPOSIT' | 'WITHDRAWAL' }>({ open: false, type: 'DEPOSIT' });
-  
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -168,11 +178,11 @@ const AppContent: React.FC = () => {
       document.removeEventListener('keypress', handleFirstInteraction);
       document.removeEventListener('touchstart', handleFirstInteraction);
     };
-    
+
     document.addEventListener('click', handleFirstInteraction);
     document.addEventListener('keypress', handleFirstInteraction);
     document.addEventListener('touchstart', handleFirstInteraction);
-    
+
     return () => {
       document.removeEventListener('click', handleFirstInteraction);
       document.removeEventListener('keypress', handleFirstInteraction);
@@ -183,6 +193,17 @@ const AppContent: React.FC = () => {
   const handleUpdateBalance = useCallback((amount: number) => {
     soundManager.forceBgmStart(); // Ensure music plays when user interacts
     setUser(prev => ({ ...prev, balance: prev.balance + amount }));
+  }, []);
+
+  const handleAwardWin = useCallback(() => {
+    setUser(prev => {
+      const rankIndex = RANK_PROGRESSION.indexOf(prev.rank);
+      const normalizedXp = Math.max(prev.rankXp, RANK_CONFIG[prev.rank].minWins);
+      const rankBaseXp = rankIndex >= 0 ? RANK_CONFIG[prev.rank].minWins : 0;
+      const newXp = Math.max(normalizedXp + 1, rankBaseXp + 1);
+      const newRank = getRankForXp(newXp);
+      return { ...prev, rankXp: newXp, rank: newRank };
+    });
   }, []);
 
   const handleJoinGame = useCallback((roomId: string) => {
@@ -241,9 +262,10 @@ const AppContent: React.FC = () => {
         <Route path="/terms-of-use" element={<TermsOfUse />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/room/:roomId" element={
-          <RoomWrapper 
-            user={user} 
-            handleUpdateBalance={handleUpdateBalance} 
+          <RoomWrapper
+            user={user}
+            handleUpdateBalance={handleUpdateBalance}
+            handleAwardWin={handleAwardWin}
             handleExitGame={handleExitGame}
             updateSessionStatus={updateSessionStatus}
           />
@@ -252,16 +274,16 @@ const AppContent: React.FC = () => {
 
       {/* GameDock disabled - active session panels removed */}
 
-      <PaymentModal 
-        isOpen={payment.open} 
-        onClose={() => setPayment(p => ({...p, open: false}))} 
+      <PaymentModal
+        isOpen={payment.open}
+        onClose={() => setPayment(p => ({...p, open: false}))}
         type={payment.type}
         userPhoneNumber={user.phoneNumber}
         onProcess={(method, amt) => {
           const final = payment.type === 'DEPOSIT' ? amt : -amt;
           handleUpdateBalance(final);
           setTransactions(p => [{ id: `tx-${Date.now()}`, type: payment.type, amount: amt, method, status: 'COMPLETED', date: new Date().toLocaleDateString() }, ...p]);
-        }} 
+        }}
       />
     </Layout>
   );
@@ -270,11 +292,12 @@ const AppContent: React.FC = () => {
 const RoomWrapper: React.FC<{
   user: User;
   handleUpdateBalance: (amt: number) => void;
+  handleAwardWin: () => void;
   handleExitGame: (id: string) => void;
   updateSessionStatus: (id: string, s: string) => void;
-}> = ({ user, handleUpdateBalance, handleExitGame, updateSessionStatus }) => {
+}> = ({ user, handleUpdateBalance, handleAwardWin, handleExitGame, updateSessionStatus }) => {
   const { roomId } = useParams<{ roomId: string }>();
-  
+
   const handleStatusChange = useCallback((status: string) => {
     if (roomId) {
       updateSessionStatus(roomId, status);
@@ -283,22 +306,23 @@ const RoomWrapper: React.FC<{
 
   // Check if this is a Grand Prix room (tournament rooms are also Grand Prix)
   const isGrandPrix = !!roomId && (roomId.includes('grandprix') || roomId.includes('tournament'));
-  
+
   if (isGrandPrix) {
     return (
-      <TournamentRoom 
-        user={user} 
-        updateBalance={handleUpdateBalance}
-        onLeaveGame={handleExitGame}
-      />
+        <TournamentRoom
+          user={user}
+          updateBalance={handleUpdateBalance}
+          onWin={handleAwardWin}
+          onLeaveGame={handleExitGame}
+        />
     );
   }
-  
+
   return (
-    <GameRoom 
-      user={user} 
-      updateBalance={handleUpdateBalance} 
-      onWin={() => {}} 
+    <GameRoom
+      user={user}
+      updateBalance={handleUpdateBalance}
+      onWin={handleAwardWin}
       roomId={roomId}
       onLeaveGame={handleExitGame}
       onStatusChange={handleStatusChange}
