@@ -175,6 +175,7 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDeleteCustomRoom, onJoinGame }) => {
   const navigate = useNavigate();
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+  const [roomPendingDelete, setRoomPendingDelete] = useState<CustomGameRoom | null>(null);
 
   const canCreateRoom = user.rank === UserRank.MASTER || user.rank === UserRank.LEGEND;
 
@@ -203,9 +204,10 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
     }
   };
 
-  const handleShareRoom = async (roomId: string) => {
+  const handleShareRoom = async (room: CustomGameRoom) => {
     soundManager.play('click');
-    const url = `${window.location.origin}${window.location.pathname}#/room/${roomId}`;
+    const invitePayload = encodeURIComponent(JSON.stringify(room));
+    const url = `${window.location.origin}${window.location.pathname}#/room/${room.id}?invite=${invitePayload}`;
     try {
       await navigator.clipboard.writeText(url);
     } catch {
@@ -373,7 +375,7 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
                       {hasJoined ? 'Enter' : 'Join'}
                     </button>
                     <button
-                      onClick={() => handleShareRoom(room.id)}
+                      onClick={() => handleShareRoom(room)}
                       className="py-2 border border-neon-purple text-neon-purple font-arcade text-[9px] sm:text-[10px] uppercase tracking-widest hover:bg-neon-purple hover:text-white"
                     >
                       Share
@@ -382,7 +384,7 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
 
                   {isCreator && (
                     <button
-                      onClick={() => { soundManager.play('beep'); onDeleteCustomRoom(room.id); }}
+                      onClick={() => { soundManager.play('beep'); setRoomPendingDelete(room); }}
                       className="mt-2 w-full py-2 border border-red-500/40 text-red-300 font-arcade text-[8px] sm:text-[9px] uppercase tracking-widest hover:bg-red-500 hover:text-white"
                     >
                       Delete Room
@@ -393,6 +395,39 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
             })}
           </div>
         </section>
+      )}
+
+      {roomPendingDelete && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/90 backdrop-blur-md p-3 sm:p-4">
+          <div className="bg-vegas-panel/95 border border-red-500/50 px-4 py-5 sm:px-6 sm:py-6 rounded-lg w-full max-w-sm relative shadow-[0_0_50px_rgba(255,0,80,0.18)] clip-corner">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent opacity-60" />
+            <div className="text-center">
+              <div className="text-red-300 font-arcade text-2xl sm:text-3xl mb-3">!</div>
+              <h2 className="text-white font-arcade text-base sm:text-xl uppercase tracking-widest mb-2">Delete Room?</h2>
+              <p className="text-slate-400 font-mono text-[10px] sm:text-xs leading-relaxed">
+                Are you sure you want to delete <span className="text-neon-cyan">{roomPendingDelete.name}</span>? The invite link will no longer open this room on this account.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-5">
+              <button
+                onClick={() => { soundManager.play('click'); setRoomPendingDelete(null); }}
+                className="py-2.5 border border-slate-600 text-slate-300 font-arcade text-[9px] sm:text-xs uppercase tracking-widest hover:border-white hover:text-white"
+              >
+                Back
+              </button>
+              <button
+                onClick={() => {
+                  soundManager.play('beep');
+                  onDeleteCustomRoom(roomPendingDelete.id);
+                  setRoomPendingDelete(null);
+                }}
+                className="py-2.5 border border-red-500 bg-red-600 text-white font-arcade text-[9px] sm:text-xs uppercase tracking-widest hover:bg-red-500"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="mt-auto border-t border-white/5 bg-black/40 backdrop-blur-md overflow-hidden">

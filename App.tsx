@@ -31,6 +31,7 @@ const INITIAL_USER: User = {
 
 const RANK_PROGRESSION = [UserRank.ROOKIE, UserRank.PRO, UserRank.MASTER, UserRank.LEGEND];
 const CUSTOM_ROOMS_STORAGE_KEY = 'xpin_custom_rooms';
+const DELETED_CUSTOM_ROOMS_STORAGE_KEY = 'xpin_deleted_custom_rooms';
 
 const getRankForXp = (wins: number): UserRank => {
   if (wins >= RANK_CONFIG[UserRank.LEGEND].minWins) return UserRank.LEGEND;
@@ -163,6 +164,14 @@ const AppContent: React.FC = () => {
       return [];
     }
   });
+  const [deletedCustomRoomIds, setDeletedCustomRoomIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(DELETED_CUSTOM_ROOMS_STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [payment, setPayment] = useState<{ open: boolean, type: 'DEPOSIT' | 'WITHDRAWAL' }>({ open: false, type: 'DEPOSIT' });
 
   const navigate = useNavigate();
@@ -208,6 +217,10 @@ const AppContent: React.FC = () => {
     localStorage.setItem(CUSTOM_ROOMS_STORAGE_KEY, JSON.stringify(customRooms));
   }, [customRooms]);
 
+  useEffect(() => {
+    localStorage.setItem(DELETED_CUSTOM_ROOMS_STORAGE_KEY, JSON.stringify(deletedCustomRoomIds));
+  }, [deletedCustomRoomIds]);
+
   const handleAwardWin = useCallback(() => {
     setUser(prev => {
       const rankIndex = RANK_PROGRESSION.indexOf(prev.rank);
@@ -220,6 +233,9 @@ const AppContent: React.FC = () => {
   }, []);
 
   const ensureUserInCustomRoom = useCallback((roomId: string) => {
+    const canJoinPrivateRoom = user.rank === UserRank.MASTER || user.rank === UserRank.LEGEND;
+    if (!canJoinPrivateRoom) return;
+
     setCustomRooms(prev => prev.map(room => {
       if (room.id !== roomId || room.players.some(player => player.id === user.id) || room.players.length >= room.maxPlayers) {
         return room;
@@ -240,6 +256,20 @@ const AppContent: React.FC = () => {
       };
     }));
   }, [user.avatar, user.id, user.rank, user.username]);
+
+  const handleImportCustomRoomInvite = useCallback((inviteRoom: CustomGameRoom) => {
+    const canJoinPrivateRoom = user.rank === UserRank.MASTER || user.rank === UserRank.LEGEND;
+    if (!canJoinPrivateRoom) return;
+
+    setCustomRooms(prev => {
+      if (deletedCustomRoomIds.includes(inviteRoom.id)) return prev;
+      if (prev.some(room => room.id === inviteRoom.id)) return prev;
+      return [{
+        ...inviteRoom,
+        players: inviteRoom.players.slice(0, inviteRoom.maxPlayers)
+      }, ...prev];
+    });
+  }, [deletedCustomRoomIds, user.rank]);
 
   const handleCreateCustomRoom = useCallback((settings: Omit<CustomGameRoom, 'id' | 'creatorId' | 'creatorName' | 'createdAt' | 'players'>) => {
     const roomId = `custom-${Date.now()}`;
@@ -264,6 +294,7 @@ const AppContent: React.FC = () => {
 
   const handleDeleteCustomRoom = useCallback((roomId: string) => {
     setCustomRooms(prev => prev.filter(room => room.id !== roomId || room.creatorId !== user.id));
+    setDeletedCustomRoomIds(prev => prev.includes(roomId) ? prev : [...prev, roomId]);
     setActiveSessions(prev => prev.filter(session => session.id !== roomId));
   }, [user.id]);
 
@@ -344,6 +375,7 @@ const AppContent: React.FC = () => {
             updateSessionStatus={updateSessionStatus}
             customRooms={customRooms}
             ensureUserInCustomRoom={ensureUserInCustomRoom}
+            importCustomRoomInvite={handleImportCustomRoomInvite}
           />
         } />
       </Routes>
@@ -373,15 +405,33 @@ const RoomWrapper: React.FC<{
   updateSessionStatus: (id: string, s: string) => void;
   customRooms: CustomGameRoom[];
   ensureUserInCustomRoom: (id: string) => void;
-}> = ({ user, handleUpdateBalance, handleAwardWin, handleExitGame, updateSessionStatus, customRooms, ensureUserInCustomRoom }) => {
+  importCustomRoomInvite: (room: CustomGameRoom) => void;
+}> = ({ user, handleUpdateBalance, handleAwardWin, handleExitGame, updateSessionStatus, customRooms, ensureUserInCustomRoom, importCustomRoomInvite }) => {
   const { roomId } = useParams<{ roomId: string }>();
+  const location = useLocation();
   const customRoom = roomId?.startsWith('custom-') ? customRooms.find(room => room.id === roomId) : undefined;
 
   useEffect(() => {
     if (roomId?.startsWith('custom-')) {
+      const invite = new URLSearchParams(location.search).get('invite');
+      if (invite) {
+        try {
+          const room = JSON.parse(decodeURIComponent(invite)) as CustomGameRoom;
+          if (room.id === roomId) {
+            importCustomRoomInvite(room);
+          }
+        } catch {
+          console.warn('Invalid private room invite link');
+        }
+      }
+    }
+  }, [importCustomRoomInvite, location.search, roomId]);
+
+  useEffect(() => {
+    if (roomId?.startsWith('custom-') && customRoom) {
       ensureUserInCustomRoom(roomId);
     }
-  }, [ensureUserInCustomRoom, roomId]);
+  }, [customRoom, ensureUserInCustomRoom, roomId]);
 
   const handleStatusChange = useCallback((status: string) => {
     if (roomId) {
