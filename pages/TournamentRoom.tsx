@@ -1006,7 +1006,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
             {/* Desktop Layout - Hidden on mobile */}
             <div className="hidden lg:flex flex-1 flex-col items-center justify-center gap-4 sm:gap-6 px-2 sm:px-6">
               {countdownActive && countdown > 0 && (
-                <div className="text-center mb-2 sm:mb-4 mt-10 sm:mt-12">
+                <div className="text-center mb-2 sm:mb-4 mt-4 sm:mt-6">
                   <div className="text-4xl sm:text-6xl font-arcade text-neon-pink animate-pulse">{countdown}</div>
                   <div className="text-xs sm:text-sm text-slate-400 mt-2">Preparing to spin...</div>
                 </div>
@@ -1356,7 +1356,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
             {/* Desktop Layout - Hidden on mobile */}
             <div className="hidden lg:flex flex-1 flex-col items-center justify-center gap-4 sm:gap-6 px-2 sm:px-6">
               {countdownActive && countdown > 0 && (
-                <div className="text-center mb-2 sm:mb-4 mt-10 sm:mt-12">
+                <div className="text-center mb-2 sm:mb-4 mt-4 sm:mt-6">
                   <div className="text-4xl sm:text-6xl font-arcade text-neon-pink animate-pulse">{countdown}</div>
                   <div className="text-xs sm:text-sm text-slate-400 mt-2">Preparing Round 2...</div>
                 </div>
@@ -1755,7 +1755,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
         {phase === 'FINAL' && (
           <div className="flex-1 flex flex-col lg:flex-row gap-2 lg:gap-4 p-2 lg:p-4 overflow-hidden w-full h-auto relative">
             {countdownActive && countdown > 0 && (
-              <div className="absolute top-16 sm:top-20 md:top-24 left-1/2 -translate-x-1/2 z-20 text-center pointer-events-none">
+              <div className="absolute top-8 sm:top-10 md:top-12 left-1/2 -translate-x-1/2 z-20 text-center pointer-events-none">
                 <div className="text-3xl sm:text-5xl md:text-6xl font-arcade text-neon-gold animate-pulse">{countdown}</div>
                 <div className="text-[10px] sm:text-xs text-slate-400 mt-1 sm:mt-2">Preparing final spin...</div>
               </div>
