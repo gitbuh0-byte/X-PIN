@@ -9,10 +9,11 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
           {/* Brand */}
           <div>
-            <div className="text-lg sm:text-xl font-arcade font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-pink to-neon-cyan mb-3">
-              X <span className="text-neon-gold">PIN</span>
+            <div className="text-lg sm:text-xl font-arcade font-black mb-3 tracking-wider">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-pink to-neon-purple">X</span>{' '}
+              <span className="text-white">PIN</span>
             </div>
-            <p className="text-[10px] sm:text-xs text-slate-400">The ultimate spin wheel gaming experience.</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 leading-relaxed">Ultimate and authentic spin-the-wheel action. Place your wager and stand the chance to win your 1,000 KSh.</p>
           </div>
 
           {/* Quick Links */}

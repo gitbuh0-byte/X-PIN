@@ -32,6 +32,7 @@ const INITIAL_USER: User = {
 const RANK_PROGRESSION = [UserRank.ROOKIE, UserRank.PRO, UserRank.MASTER, UserRank.LEGEND];
 const CUSTOM_ROOMS_STORAGE_KEY = 'xpin_custom_rooms';
 const DELETED_CUSTOM_ROOMS_STORAGE_KEY = 'xpin_deleted_custom_rooms';
+const formatCurrency = (amount: number) => `KSh ${amount.toLocaleString()}`;
 
 const getRankForXp = (wins: number): UserRank => {
   if (wins >= RANK_CONFIG[UserRank.LEGEND].minWins) return UserRank.LEGEND;
@@ -92,7 +93,7 @@ const Layout: React.FC<{ children: React.ReactNode; user: User; onOpenPayment?: 
               {/* subtle pulsing dot */}
               <span className="absolute -right-2 top-1/2 -translate-y-1/2 w-3 h-3 bg-neon-green rounded-full opacity-90 animate-pulse pointer-events-none" />
 
-              <div className="font-arcade text-xs sm:text-sm md:text-lg text-neon-green text-glow-green">${user.balance.toLocaleString()}</div>
+              <div className="font-arcade text-xs sm:text-sm md:text-lg text-neon-green text-glow-green">{formatCurrency(user.balance)}</div>
 
               {/* tooltip on hover */}
               <div className="hidden group-hover:block absolute -bottom-10 right-0 bg-black/90 border border-neon-green/20 text-neon-green text-[10px] px-2 py-1 rounded shadow-[0_0_10px_rgba(0,255,0,0.06)] whitespace-nowrap">

@@ -13,6 +13,8 @@ interface DashboardProps {
   onLogout?: () => void;
 }
 
+const formatCurrency = (amount: number) => `KSh ${amount.toFixed(0)}`;
+
 const data = [
   { name: 'Mon', balance: 400 },
   { name: 'Tue', balance: 300 },
@@ -224,7 +226,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, transactions, onOpenPayment
             className="text-sm sm:text-base md:text-xl font-arcade text-white text-glow-gold break-words cursor-pointer hover:text-neon-gold transition-colors active:scale-95 w-full text-left py-0.5"
             title="Click to add funds"
           >
-            ${user.balance.toFixed(0)}
+            {formatCurrency(user.balance)}
           </button>
           <div className="mt-1.5 sm:mt-2 flex gap-1.5 sm:gap-2 w-full">
             <button onClick={() => onOpenPayment('DEPOSIT')} className="flex-1 bg-neon-gold text-black font-bold py-1 sm:py-1.5 md:py-2 uppercase text-[7px] sm:text-[8px] md:text-xs tracking-wide transition-transform active:scale-95 rounded-sm">Deposit</button>
@@ -305,7 +307,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, transactions, onOpenPayment
               {transactions.slice(0, 5).map((tx) => (
                 <tr key={tx.id} className="hover:bg-white/5 transition-colors group">
                   <td className={`px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 font-bold ${tx.type === 'DEPOSIT' || tx.type === 'WIN' ? 'text-neon-green' : 'text-neon-pink'}`}>{tx.type.substring(0, 3)}</td>
-                  <td className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 text-white whitespace-nowrap">${tx.amount.toFixed(0)}</td>
+                  <td className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 text-white whitespace-nowrap">{formatCurrency(tx.amount)}</td>
                   <td className="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 hidden sm:table-cell">
                     <span className={`px-1 py-0.5 border text-[6px] sm:text-[7px] rounded-sm inline-block ${tx.status === 'COMPLETED' ? 'border-neon-green/50 text-neon-green' : 'border-neon-gold/50 text-neon-gold'}`}>
                       {tx.status.substring(0, 3)}

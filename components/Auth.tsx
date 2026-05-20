@@ -45,6 +45,36 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     initializeAuth();
   }, []);
 
+  const formatKenyanPhoneInput = (value: string) => {
+    const hasCountryCode = value.trim().startsWith('+254') || value.replace(/\D/g, '').startsWith('254');
+    let digits = value.replace(/\D/g, '');
+
+    if (digits.startsWith('254')) digits = digits.slice(3);
+    if (digits.startsWith('0')) digits = digits.slice(1);
+
+    digits = digits.slice(0, 9);
+
+    const localPrefix = hasCountryCode ? '+254 ' : '0';
+    const firstBlock = digits.slice(0, 3);
+    const secondBlock = digits.slice(3, 6);
+    const thirdBlock = digits.slice(6, 9);
+
+    return [localPrefix + firstBlock, secondBlock, thirdBlock].filter(Boolean).join(' ').trim();
+  };
+
+  const normalizeKenyanPhoneNumber = (value: string) => {
+    const digits = value.replace(/\D/g, '');
+
+    if (/^0(1|7)\d{8}$/.test(digits)) {
+      return `+254${digits.slice(1)}`;
+    }
+    if (/^254(1|7)\d{8}$/.test(digits)) {
+      return `+${digits}`;
+    }
+
+    return null;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -58,14 +88,19 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         setError('Please fill all fields and ensure passwords match');
         return;
       }
+      if (!normalizeKenyanPhoneNumber(formData.phoneNumber)) {
+        setError('Enter a valid Kenyan phone number, for example 0712 345 678');
+        return;
+      }
     }
 
     soundManager.play('start');
     setError(null);
+    const normalizedPhoneNumber = isRegister ? normalizeKenyanPhoneNumber(formData.phoneNumber) || undefined : undefined;
     onLogin(
       formData.username || 'Player',
       formData.email,
-      formData.phoneNumber || undefined,
+      normalizedPhoneNumber,
       AuthMethod.EMAIL
     );
   };
@@ -123,11 +158,11 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             X <span className="text-neon-pink text-glow-pink">PIN</span>
           </h1>
           <div className="h-0.5 w-40 sm:w-64 bg-neon-cyan mx-auto mt-2 sm:mt-4 animate-pulse"></div>
-          <p className="mt-2 sm:mt-4 text-neon-cyan font-arcade text-[8px] sm:text-[10px] tracking-[0.4em] sm:tracking-[0.6em] uppercase opacity-70">NEURAL ACCESS PROTOCOL</p>
+          <p className="mt-3 sm:mt-4 text-neon-cyan font-arcade text-[10px] sm:text-xs tracking-[0.22em] sm:tracking-[0.32em] uppercase opacity-85">XPIN XPIN AND WIN</p>
         </div>
 
         <div className="bg-vegas-panel/90 backdrop-blur-xl border-2 sm:border-4 border-neon-cyan/40 retro-card p-4 sm:p-8 md:p-10 lg:p-14 shadow-[0_0_80px_rgba(255,255,255,0.15)] relative">
-          <div className="absolute top-0 right-4 sm:right-10 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-neon-cyan/20 border-x border-b border-neon-cyan/40 text-[7px] sm:text-[8px] font-arcade text-neon-cyan pointer-events-none">ENCRYPTED_LINK_04</div>
+          <div className="absolute top-0 right-4 sm:right-10 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-neon-cyan/20 border-x border-b border-neon-cyan/40 text-[7px] sm:text-[8px] font-arcade text-neon-cyan pointer-events-none">SECURE_LOGIN</div>
           
           <h2 className="text-lg sm:text-2xl font-arcade text-white mb-4 sm:mb-6 text-center tracking-widest uppercase border-b border-neon-cyan/10 pb-4 sm:pb-6">
             {isRegister ? 'IDENTITY_REG' : 'ID_CHECK'}
@@ -143,14 +178,14 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             {isRegister && (
               <>
                 <div className="space-y-1.5 sm:space-y-2">
-                  <label className="text-[7px] sm:text-[9px] text-neon-pink uppercase font-arcade tracking-[0.3em] sm:tracking-[0.4em] block opacity-80">Neural_Name</label>
+                  <label className="text-[7px] sm:text-[9px] text-neon-pink uppercase font-arcade tracking-[0.3em] sm:tracking-[0.4em] block opacity-80">Username</label>
                   <input 
                     type="text" 
                     required
                     value={formData.username}
                     onChange={(e) => setFormData(p => ({...p, username: e.target.value}))}
                     className="w-full bg-black border-2 border-neon-cyan/20 p-2 sm:p-3 text-white font-mono focus:border-neon-cyan focus:outline-none transition-all placeholder-slate-800 text-xs sm:text-sm tracking-widest uppercase" 
-                    placeholder="PLAYER_01" 
+                    placeholder="SPINMASTER" 
                   />
                 </div>
 
@@ -158,11 +193,12 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                   <label className="text-[7px] sm:text-[9px] text-neon-green uppercase font-arcade tracking-[0.3em] sm:tracking-[0.4em] block opacity-80">Phone_Number</label>
                   <input 
                     type="tel" 
+                    inputMode="numeric"
                     required
                     value={formData.phoneNumber}
-                    onChange={(e) => setFormData(p => ({...p, phoneNumber: e.target.value}))}
+                    onChange={(e) => setFormData(p => ({...p, phoneNumber: formatKenyanPhoneInput(e.target.value)}))}
                     className="w-full bg-black border-2 border-neon-green/20 p-2 sm:p-3 text-white font-mono focus:border-neon-green focus:outline-none transition-all placeholder-slate-800 text-xs sm:text-sm tracking-widest" 
-                    placeholder="+1 (555) 000-0000" 
+                    placeholder="0712 345 678" 
                   />
 
                 </div>
@@ -222,7 +258,7 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           <div className="mt-4 sm:mt-6">
             <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
               <div className="flex-1 h-px bg-neon-cyan/20"></div>
-              <span className="text-[6px] sm:text-[8px] text-slate-500 font-arcade uppercase tracking-[0.2em]">Or Connect Via</span>
+              <span className="text-[9px] sm:text-[10px] text-slate-400 font-arcade uppercase tracking-[0.16em]">Or Connect Via</span>
               <div className="flex-1 h-px bg-neon-cyan/20"></div>
             </div>
 
@@ -259,9 +295,9 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             <button 
               type="button"
               onClick={() => { setIsRegister(!isRegister); soundManager.play('click'); }}
-              className="text-[7px] sm:text-[11px] text-slate-500 font-arcade hover:text-white transition-all uppercase tracking-[0.2em] sm:tracking-[0.3em] border-b border-transparent hover:border-white"
+              className="text-[10px] sm:text-xs text-slate-400 font-arcade hover:text-white transition-all uppercase tracking-[0.16em] sm:tracking-[0.22em] border-b border-transparent hover:border-white"
             >
-              {isRegister ? '[ BACK_TO_AUTH ]' : 'new to x pin ?'}
+              {isRegister ? '[ BACK_TO_AUTH ]' : 'NEW TO X PIN ?'}
             </button>
           </div>
         </div>

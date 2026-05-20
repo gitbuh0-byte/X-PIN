@@ -11,6 +11,40 @@ interface CreateRoomModalProps {
   onCreate: (settings: CustomRoomSettings) => void;
 }
 
+const formatCurrency = (amount: number | string) => `KSh ${amount}`;
+
+const WheelBoltIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
+  <svg className={className} viewBox="0 0 96 96" fill="none" aria-hidden="true">
+    <circle cx="48" cy="48" r="26" stroke="currentColor" strokeWidth="6" />
+    <circle cx="48" cy="48" r="8" fill="currentColor" />
+    <path d="M48 22V74M22 48H74M30 30L66 66M66 30L30 66" stroke="currentColor" strokeWidth="4" strokeLinecap="round" opacity="0.75" />
+    <path d="M55 12L39 42H52L41 84L66 47H52L55 12Z" fill="currentColor" />
+  </svg>
+);
+
+const DuelIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
+  <svg className={className} viewBox="0 0 96 96" fill="none" aria-hidden="true">
+    <circle cx="48" cy="48" r="28" stroke="currentColor" strokeWidth="6" opacity="0.85" />
+    <path d="M30 24L44 38L38 44L24 30L30 24Z" fill="currentColor" />
+    <path d="M66 24L72 30L58 44L52 38L66 24Z" fill="currentColor" />
+    <path d="M39 43L47 51L31 67L23 59L39 43Z" fill="currentColor" opacity="0.9" />
+    <path d="M57 43L73 59L65 67L49 51L57 43Z" fill="currentColor" opacity="0.9" />
+    <circle cx="48" cy="48" r="6" fill="currentColor" />
+  </svg>
+);
+
+const TournamentIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
+  <svg className={className} viewBox="0 0 96 96" fill="none" aria-hidden="true">
+    <path d="M31 18H65V28C65 38 58 46 48 48C38 46 31 38 31 28V18Z" stroke="currentColor" strokeWidth="6" />
+    <path d="M31 22H20C20 32 24 38 33 40" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+    <path d="M65 22H76C76 32 72 38 63 40" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+    <path d="M48 48V62" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+    <path d="M36 76H60" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+    <path d="M40 62H56V76H40V62Z" stroke="currentColor" strokeWidth="6" />
+    <circle cx="48" cy="33" r="7" fill="currentColor" />
+  </svg>
+);
+
 const CreateRoomModal: React.FC<CreateRoomModalProps> = ({ isOpen, onClose, onCreate }) => {
   const [name, setName] = useState('Elite Table');
   const [entryFee, setEntryFee] = useState('50');
@@ -32,7 +66,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({ isOpen, onClose, onCr
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50" />
 
         <div className="text-center mb-4 sm:mb-5">
-          <div className="text-3xl sm:text-4xl font-arcade font-black text-neon-cyan mb-1 text-glow-cyan">$</div>
+          <div className="text-3xl sm:text-4xl font-arcade font-black text-neon-cyan mb-1 text-glow-cyan">KSh</div>
           <h2 className="text-base sm:text-lg md:text-xl font-arcade text-white mb-1 tracking-widest uppercase">Host Private Room</h2>
           <p className="text-[10px] sm:text-xs font-mono text-neon-cyan opacity-80">Invite-only - max 10 players</p>
         </div>
@@ -57,12 +91,12 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({ isOpen, onClose, onCr
                   onClick={() => { soundManager.play('click'); setEntryFee(String(amount)); }}
                   className={`py-2 border font-arcade text-[8px] sm:text-[9px] uppercase tracking-widest transition-all rounded-sm ${parsedEntryFee === amount ? 'bg-neon-cyan text-black border-neon-cyan shadow-[0_0_15px_rgba(0,255,255,0.35)]' : 'border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20'}`}
                 >
-                  ${amount}
+                  {formatCurrency(amount)}
                 </button>
               ))}
             </div>
             <div className="flex items-center bg-black/50 border border-white/10 rounded-sm overflow-hidden focus-within:border-neon-cyan transition-all">
-              <span className="px-3 py-2.5 sm:py-3 text-neon-cyan font-arcade text-sm border-r border-white/10 bg-black/40">$</span>
+              <span className="px-3 py-2.5 sm:py-3 text-neon-cyan font-arcade text-xs sm:text-sm border-r border-white/10 bg-black/40">KSh</span>
               <input
                 type="number"
                 min={10}
@@ -230,7 +264,7 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
         </h1>
         <div className="h-1 w-16 md:w-24 bg-gradient-to-r from-neon-cyan via-white to-neon-pink mx-auto mb-4 md:mb-6" />
         <p className="relative z-10 text-slate-400 font-mono text-[10px] md:text-lg tracking-[0.14em] sm:tracking-[0.2em] md:tracking-[0.3em] uppercase opacity-80 px-2">
-          Hyper-Competitive Betting Engine
+          XPIN XPIN AND WIN
         </p>
 
         <div className="mt-6 md:mt-8 inline-flex items-center gap-2 md:gap-3 px-3 py-1 md:px-4 md:py-1.5 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm">
@@ -247,15 +281,16 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
         >
           <div className="bg-[#050508] p-4 md:p-6 flex flex-col h-full relative overflow-hidden">
             <div className="absolute -top-4 -right-4 p-4 opacity-5 group-hover:opacity-100 group-hover:text-neon-cyan transition-all duration-500 transform group-hover:scale-110">
-              <svg className="w-16 h-16 md:w-20 md:h-20" fill="currentColor" viewBox="0 0 20 20"><path d="M13 7H7v6h6V7z" /><path fillRule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clipRule="evenodd" /></svg>
+              <WheelBoltIcon className="w-16 h-16 md:w-20 md:h-20" />
             </div>
-            <div className="text-neon-cyan font-arcade text-xl md:text-2xl mb-1 z-10">BLITZ</div>
+            <div className="text-neon-cyan font-arcade text-[30px] md:text-[34px] mb-1 z-10">QUICK MATCH</div>
             <div className="w-6 h-0.5 bg-neon-cyan mb-3 md:mb-4 group-hover:w-20 transition-all duration-500" />
-            <p className="text-slate-400 font-mono text-[10px] md:text-xs leading-relaxed mb-4 md:mb-6 flex-grow z-10">
-              Standard 15-player lobby. High frequency rounds. Instant payouts.
+            <p className="pr-20 md:pr-24 text-slate-400 font-mono text-xs md:text-sm leading-relaxed mb-4 md:mb-6 flex-grow z-10">
+              Jump into a fast 15-player wheel battle.<br />
+              Lock your color, spin quick, and cash out in KSh.
             </p>
             <button className="w-full py-2.5 md:py-3 border border-neon-cyan text-neon-cyan font-arcade uppercase text-[10px] md:text-sm tracking-widest hover:bg-neon-cyan hover:text-black transition-all z-10">
-              Connect
+              Join Match
             </button>
           </div>
         </div>
@@ -267,12 +302,13 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
         >
           <div className="bg-[#050508] p-4 md:p-6 flex flex-col h-full relative overflow-hidden">
             <div className="absolute -top-4 -right-4 p-4 opacity-5 group-hover:opacity-100 group-hover:text-neon-green transition-all duration-500 transform group-hover:scale-110">
-              <svg className="w-16 h-16 md:w-20 md:h-20" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clipRule="evenodd" /><path fillRule="evenodd" d="M12 10a1 1 0 01-1 1H6a1 1 0 100 2h5a3 3 0 003-3V8a1 1 0 012 0v2.4a1 1 0 11-2 0V10z" clipRule="evenodd" /></svg>
+              <DuelIcon className="w-16 h-16 md:w-20 md:h-20" />
             </div>
-            <div className="text-neon-green font-arcade text-xl md:text-2xl mb-1 z-10">1v1</div>
+            <div className="text-neon-green font-arcade text-[30px] md:text-[34px] mb-1 z-10">1V1 DUEL</div>
             <div className="w-6 h-0.5 bg-neon-green mb-3 md:mb-4 group-hover:w-20 transition-all duration-500" />
-            <p className="text-slate-400 font-mono text-[10px] md:text-xs leading-relaxed mb-4 md:mb-6 flex-grow z-10">
-              1v1 vs random. Both colors split 8 ways on the wheel. Test your luck. Earn XP and climb the Ranks.
+            <p className="pr-20 md:pr-24 text-slate-400 font-mono text-xs md:text-sm leading-relaxed mb-4 md:mb-6 flex-grow z-10">
+              Challenge one rival in a tight head-to-head spin.<br />
+              One wheel, two colors, one winner takes the whole pot.
             </p>
             <button className="w-full py-2.5 md:py-3 border border-neon-green text-neon-green font-arcade uppercase text-[10px] md:text-sm tracking-widest hover:bg-neon-green hover:text-black transition-all z-10">
               Duel
@@ -287,12 +323,13 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
         >
           <div className="bg-[#050508] p-4 md:p-6 flex flex-col h-full relative overflow-hidden">
             <div className="absolute -top-4 -right-4 p-4 opacity-5 group-hover:opacity-100 group-hover:text-neon-pink transition-all duration-500 transform group-hover:scale-110">
-              <svg className="w-16 h-16 md:w-20 md:h-20" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.699-3.181a1 1 0 111.772.954l-2.405 4.505c.686.678 1.157 1.595 1.285 2.618l.895.045a1 1 0 11-.098 1.998l-.895-.045c-.477 2.112-2.316 3.654-4.52 3.73l-.223 3.34A1 1 0 0110 19l.223-3.34c-2.204-.076-4.043-1.618-4.52-3.73l-.895.045a1 1 0 01-.098-1.998l.895-.045c.128-1.023.6-1.94 1.285-2.618L4.577 3.475a1 1 0 111.772-.954L8 5.701V3.5a1 1 0 011-1z" clipRule="evenodd" /></svg>
+              <TournamentIcon className="w-16 h-16 md:w-20 md:h-20" />
             </div>
-            <div className="text-neon-pink font-arcade text-xl md:text-2xl mb-1 z-10">TOURNAMENT</div>
+            <div className="text-neon-pink font-arcade text-[30px] md:text-[34px] mb-1 z-10">TOURNAMENT</div>
             <div className="w-6 h-0.5 bg-neon-pink mb-3 md:mb-4 group-hover:w-20 transition-all duration-500" />
-            <p className="text-slate-400 font-mono text-[10px] md:text-xs leading-relaxed mb-4 md:mb-6 flex-grow z-10">
-              100 players. 20 groups. 5 per group. One grand winner takes all.
+            <p className="pr-20 md:pr-24 text-slate-400 font-mono text-xs md:text-sm leading-relaxed mb-4 md:mb-6 flex-grow z-10">
+              Survive every round in a knockout wheel showdown.<br />
+              Advance through the bracket and chase the grand KSh prize.
             </p>
             <button className="w-full py-2.5 md:py-3 border border-neon-pink text-neon-pink font-arcade uppercase text-[10px] md:text-sm tracking-widest hover:bg-neon-pink hover:text-black transition-all z-10">
               Enter
@@ -358,7 +395,7 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
                     <div className="min-w-0">
                       <div className="font-arcade text-white text-sm sm:text-base truncate uppercase">{room.name}</div>
                       <div className="text-[9px] sm:text-[10px] text-neon-cyan font-mono mt-1 uppercase">
-                        {room.gameMode} - ${room.entryFee} - {room.players.length}/{room.maxPlayers}
+                        {room.gameMode} - {formatCurrency(room.entryFee)} - {room.players.length}/{room.maxPlayers}
                       </div>
                     </div>
                     <div className="text-[8px] sm:text-[9px] font-arcade text-neon-green border border-neon-green/30 px-2 py-1 rounded-sm whitespace-nowrap">
@@ -441,17 +478,17 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
           <div className="bg-vegas-panel/95 border border-neon-cyan/50 px-4 py-4 sm:px-5 sm:py-5 md:px-6 md:py-6 rounded-lg w-full max-w-lg relative shadow-[0_0_50px_rgba(0,255,255,0.15)] clip-corner max-h-[calc(100dvh-32px)] overflow-y-auto custom-scrollbar">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50" />
             <div className="text-center mb-4 sm:mb-5">
-              <div className="text-3xl sm:text-4xl font-arcade font-black text-neon-cyan mb-1 text-glow-cyan">$</div>
+              <div className="text-3xl sm:text-4xl font-arcade font-black text-neon-cyan mb-1 text-glow-cyan">KSh</div>
               <h2 className="text-base sm:text-lg md:text-xl font-arcade text-white mb-1 tracking-widest uppercase">{pendingEntryRoom.name}</h2>
               <p className="text-[10px] sm:text-xs font-mono text-neon-cyan opacity-80 uppercase">
-                {pendingEntryRoom.gameMode} • ${pendingEntryRoom.entryFee} • {pendingEntryRoom.players.length}/{pendingEntryRoom.maxPlayers} players
+                {pendingEntryRoom.gameMode} • {formatCurrency(pendingEntryRoom.entryFee)} • {pendingEntryRoom.players.length}/{pendingEntryRoom.maxPlayers} players
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
               <div className="bg-black/40 border border-white/10 rounded-sm p-3 text-center">
                 <div className="text-[8px] sm:text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Entry</div>
-                <div className="text-lg sm:text-xl font-arcade text-neon-green">${pendingEntryRoom.entryFee}</div>
+                <div className="text-lg sm:text-xl font-arcade text-neon-green">{formatCurrency(pendingEntryRoom.entryFee)}</div>
               </div>
               <div className="bg-black/40 border border-white/10 rounded-sm p-3 text-center">
                 <div className="text-[8px] sm:text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1">Start In</div>
@@ -522,7 +559,7 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
             <div className="absolute whitespace-nowrap animate-marquee flex gap-12 md:gap-16">
               {[1, 2, 3, 4, 5, 6, 7].map(i => (
                 <span key={i} className="text-slate-400 font-mono text-[10px] md:text-xs">
-                  <span className="text-neon-pink">WON</span> PLAYER_{1000 + i} <span className="text-neon-gold">${(Math.random() * 1000).toFixed(0)}</span>
+                  <span className="text-neon-pink">WON</span> PLAYER_{1000 + i} <span className="text-neon-gold">KSh {(Math.random() * 1000).toFixed(0)}</span>
                 </span>
               ))}
             </div>

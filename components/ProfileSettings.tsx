@@ -16,6 +16,19 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
     bio: user.bio || '',
   });
 
+  const formatKenyanPhoneInput = (value: string) => {
+    let digits = value.replace(/\D/g, '');
+    if (digits.startsWith('254')) digits = digits.slice(3);
+    if (digits.startsWith('0')) digits = digits.slice(1);
+    digits = digits.slice(0, 9);
+
+    const firstBlock = digits.slice(0, 3);
+    const secondBlock = digits.slice(3, 6);
+    const thirdBlock = digits.slice(6, 9);
+
+    return ['0' + firstBlock, secondBlock, thirdBlock].filter(Boolean).join(' ').trim();
+  };
+
   const handleSave = () => {
     soundManager.play('click');
     onUpdateProfile({
@@ -105,10 +118,11 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
                 <label className="text-[8px] sm:text-[10px] text-neon-green uppercase font-arcade tracking-[0.2em] block opacity-80">Phone Number (Optional)</label>
                 <input
                   type="tel"
+                  inputMode="numeric"
                   value={formData.phoneNumber}
-                  onChange={(e) => setFormData(p => ({...p, phoneNumber: e.target.value}))}
+                  onChange={(e) => setFormData(p => ({...p, phoneNumber: formatKenyanPhoneInput(e.target.value)}))}
                   className="w-full bg-black border-2 border-neon-green/20 p-2 sm:p-3 text-white font-mono focus:border-neon-green focus:outline-none transition-all placeholder-slate-800 text-xs sm:text-sm"
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="0712 345 678"
                 />
                 <p className="text-[6px] sm:text-[7px] text-neon-green/60 font-arcade">Will be auto-filled for deposits and withdrawals</p>
               </div>
