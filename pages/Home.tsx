@@ -21,10 +21,9 @@ const WheelBoltIcon: React.FC<{ className?: string }> = ({ className = '' }) => 
 
 const DuelIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
   <svg className={className} viewBox="0 0 96 96" fill="none" aria-hidden="true">
-    <rect x="10" y="18" width="76" height="60" rx="18" stroke="currentColor" strokeWidth="6" opacity="0.32" />
-    <path d="M22 62L36 34H44L32 62H22Z" fill="currentColor" />
-    <path d="M52 62L66 34H74L62 62H52Z" fill="currentColor" opacity="0.9" />
-    <path d="M40 34H50V62H40Z" fill="currentColor" />
+    <path d="M26 66H44V74H20V60C20 54 24 50 30 50H38L46 58L52 52L58 58L64 50H70C76 50 80 54 80 60V74H52V66H70V61C70 59 69 58 67 58H62L52 68L42 58H35C33 58 32 59 32 61V66H26Z" fill="currentColor" opacity="0.95" />
+    <path d="M36 42C36 35 41 30 48 30C55 30 60 35 60 42V48H52V42C52 39 50 37 48 37C46 37 44 39 44 42V48H36V42Z" fill="currentColor" />
+    <path d="M18 64H78" stroke="currentColor" strokeWidth="5" strokeLinecap="round" opacity="0.35" />
   </svg>
 );
 
