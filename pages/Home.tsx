@@ -15,21 +15,16 @@ const formatCurrency = (amount: number | string) => `KSh ${amount}`;
 
 const WheelBoltIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
   <svg className={className} viewBox="0 0 96 96" fill="none" aria-hidden="true">
-    <circle cx="48" cy="48" r="26" stroke="currentColor" strokeWidth="6" />
-    <circle cx="48" cy="48" r="8" fill="currentColor" />
-    <path d="M48 22V74M22 48H74M30 30L66 66M66 30L30 66" stroke="currentColor" strokeWidth="4" strokeLinecap="round" opacity="0.75" />
     <path d="M55 12L39 42H52L41 84L66 47H52L55 12Z" fill="currentColor" />
   </svg>
 );
 
 const DuelIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
   <svg className={className} viewBox="0 0 96 96" fill="none" aria-hidden="true">
-    <circle cx="48" cy="48" r="28" stroke="currentColor" strokeWidth="6" opacity="0.85" />
-    <path d="M30 24L44 38L38 44L24 30L30 24Z" fill="currentColor" />
-    <path d="M66 24L72 30L58 44L52 38L66 24Z" fill="currentColor" />
-    <path d="M39 43L47 51L31 67L23 59L39 43Z" fill="currentColor" opacity="0.9" />
-    <path d="M57 43L73 59L65 67L49 51L57 43Z" fill="currentColor" opacity="0.9" />
-    <circle cx="48" cy="48" r="6" fill="currentColor" />
+    <rect x="10" y="18" width="76" height="60" rx="18" stroke="currentColor" strokeWidth="6" opacity="0.32" />
+    <path d="M22 62L36 34H44L32 62H22Z" fill="currentColor" />
+    <path d="M52 62L66 34H74L62 62H52Z" fill="currentColor" opacity="0.9" />
+    <path d="M40 34H50V62H40Z" fill="currentColor" />
   </svg>
 );
 
@@ -279,13 +274,13 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
           onClick={() => handleGameStart('quick-match-' + Date.now())}
           className="group relative bg-white/5 border border-white/10 p-0.5 md:p-1 cursor-pointer hover:border-neon-cyan transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(0,255,255,0.15)] flex flex-col rounded-sm"
         >
-          <div className="bg-[#050508] p-4 md:p-6 flex flex-col h-full relative overflow-hidden">
-            <div className="absolute -top-4 -right-4 p-4 opacity-5 group-hover:opacity-100 group-hover:text-neon-cyan transition-all duration-500 transform group-hover:scale-110">
-              <WheelBoltIcon className="w-16 h-16 md:w-20 md:h-20" />
+          <div className="bg-[#050508] p-4 md:p-5 flex flex-col h-full relative overflow-hidden min-h-[280px]">
+            <div className="absolute top-4 right-4 p-1 opacity-10 group-hover:opacity-30 group-hover:text-neon-cyan transition-all duration-500 transform group-hover:scale-105">
+              <WheelBoltIcon className="w-10 h-10 md:w-12 md:h-12" />
             </div>
-            <div className="text-neon-cyan font-arcade text-[30px] md:text-[34px] mb-1 z-10">QUICK MATCH</div>
-            <div className="w-6 h-0.5 bg-neon-cyan mb-3 md:mb-4 group-hover:w-20 transition-all duration-500" />
-            <p className="pr-20 md:pr-24 text-slate-400 font-mono text-xs md:text-sm leading-relaxed mb-4 md:mb-6 flex-grow z-10">
+            <div className="text-neon-cyan font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-12">QUICK MATCH</div>
+            <div className="w-8 h-0.5 bg-neon-cyan mb-3 md:mb-4 group-hover:w-14 transition-all duration-500" />
+            <p className="pr-12 text-slate-400 font-mono text-[11px] md:text-xs leading-6 md:leading-relaxed mb-4 md:mb-6 flex-grow z-10">
               Jump into a fast 15-player wheel battle.<br />
               Lock your color, spin quick, and cash out in KSh.
             </p>
@@ -300,13 +295,13 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
           onClick={() => handleGameStart('pve-' + Date.now())}
           className="group relative bg-white/5 border border-white/10 p-0.5 md:p-1 cursor-pointer hover:border-neon-green transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(0,255,0,0.15)] flex flex-col rounded-sm"
         >
-          <div className="bg-[#050508] p-4 md:p-6 flex flex-col h-full relative overflow-hidden">
-            <div className="absolute -top-4 -right-4 p-4 opacity-5 group-hover:opacity-100 group-hover:text-neon-green transition-all duration-500 transform group-hover:scale-110">
-              <DuelIcon className="w-16 h-16 md:w-20 md:h-20" />
+          <div className="bg-[#050508] p-4 md:p-5 flex flex-col h-full relative overflow-hidden min-h-[280px]">
+            <div className="absolute top-4 right-4 p-1 opacity-10 group-hover:opacity-30 group-hover:text-neon-green transition-all duration-500 transform group-hover:scale-105">
+              <DuelIcon className="w-10 h-10 md:w-12 md:h-12" />
             </div>
-            <div className="text-neon-green font-arcade text-[30px] md:text-[34px] mb-1 z-10">1V1 DUEL</div>
-            <div className="w-6 h-0.5 bg-neon-green mb-3 md:mb-4 group-hover:w-20 transition-all duration-500" />
-            <p className="pr-20 md:pr-24 text-slate-400 font-mono text-xs md:text-sm leading-relaxed mb-4 md:mb-6 flex-grow z-10">
+            <div className="text-neon-green font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-12">1V1 DUEL</div>
+            <div className="w-8 h-0.5 bg-neon-green mb-3 md:mb-4 group-hover:w-14 transition-all duration-500" />
+            <p className="pr-12 text-slate-400 font-mono text-[11px] md:text-xs leading-6 md:leading-relaxed mb-4 md:mb-6 flex-grow z-10">
               Challenge one rival in a tight head-to-head spin.<br />
               One wheel, two colors, one winner takes the whole pot.
             </p>
@@ -321,13 +316,13 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
           onClick={() => handleGameStart('tournament-' + Date.now())}
           className="group relative bg-white/5 border border-white/10 p-0.5 md:p-1 cursor-pointer hover:border-neon-pink transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(255,0,255,0.15)] flex flex-col rounded-sm"
         >
-          <div className="bg-[#050508] p-4 md:p-6 flex flex-col h-full relative overflow-hidden">
-            <div className="absolute -top-4 -right-4 p-4 opacity-5 group-hover:opacity-100 group-hover:text-neon-pink transition-all duration-500 transform group-hover:scale-110">
-              <TournamentIcon className="w-16 h-16 md:w-20 md:h-20" />
+          <div className="bg-[#050508] p-4 md:p-5 flex flex-col h-full relative overflow-hidden min-h-[280px]">
+            <div className="absolute top-4 right-4 p-1 opacity-10 group-hover:opacity-30 group-hover:text-neon-pink transition-all duration-500 transform group-hover:scale-105">
+              <TournamentIcon className="w-10 h-10 md:w-12 md:h-12" />
             </div>
-            <div className="text-neon-pink font-arcade text-[30px] md:text-[34px] mb-1 z-10">TOURNAMENT</div>
-            <div className="w-6 h-0.5 bg-neon-pink mb-3 md:mb-4 group-hover:w-20 transition-all duration-500" />
-            <p className="pr-20 md:pr-24 text-slate-400 font-mono text-xs md:text-sm leading-relaxed mb-4 md:mb-6 flex-grow z-10">
+            <div className="text-neon-pink font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-12">TOURNAMENT</div>
+            <div className="w-8 h-0.5 bg-neon-pink mb-3 md:mb-4 group-hover:w-14 transition-all duration-500" />
+            <p className="pr-12 text-slate-400 font-mono text-[11px] md:text-xs leading-6 md:leading-relaxed mb-4 md:mb-6 flex-grow z-10">
               Survive every round in a knockout wheel showdown.<br />
               Advance through the bracket and chase the grand KSh prize.
             </p>
@@ -351,19 +346,19 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
               : 'opacity-50 cursor-not-allowed grayscale'
           }`}
         >
-          <div className="bg-[#050508] p-4 md:p-6 flex flex-col h-full relative overflow-hidden">
+          <div className="bg-[#050508] p-4 md:p-5 flex flex-col h-full relative overflow-hidden min-h-[280px]">
             {!canCreateRoom && (
               <div className="absolute inset-0 z-50 bg-black/80 flex flex-col items-center justify-center backdrop-blur-[1px]">
                 <span className="text-xl md:text-2xl mb-1">LOCK</span>
                 <span className="text-[8px] md:text-[10px] font-arcade text-white tracking-widest uppercase">Rank: Master</span>
               </div>
             )}
-            <div className="absolute -top-4 -right-4 p-4 opacity-5 group-hover:opacity-100 group-hover:text-neon-purple transition-all duration-500 transform group-hover:scale-110">
-              <svg className="w-16 h-16 md:w-20 md:h-20" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" /></svg>
+            <div className="absolute top-4 right-4 p-1 opacity-10 group-hover:opacity-30 group-hover:text-neon-purple transition-all duration-500 transform group-hover:scale-105">
+              <svg className="w-10 h-10 md:w-12 md:h-12" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" /></svg>
             </div>
-            <div className="text-neon-purple font-arcade text-xl md:text-2xl mb-1 z-10">PRIVATE</div>
-            <div className="w-6 h-0.5 bg-neon-purple mb-3 md:mb-4 group-hover:w-20 transition-all duration-500" />
-            <p className="text-slate-400 font-mono text-[10px] md:text-xs leading-relaxed mb-4 md:mb-6 flex-grow z-10">
+            <div className="text-neon-purple font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-12">PRIVATE</div>
+            <div className="w-8 h-0.5 bg-neon-purple mb-3 md:mb-4 group-hover:w-14 transition-all duration-500" />
+            <p className="pr-12 text-slate-400 font-mono text-[11px] md:text-xs leading-6 md:leading-relaxed mb-4 md:mb-6 flex-grow z-10">
               Host an invite-only room. Share the link, cap the table, and choose countdown timing.
             </p>
             <button

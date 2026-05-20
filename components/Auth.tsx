@@ -46,7 +46,6 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   }, []);
 
   const formatKenyanPhoneInput = (value: string) => {
-    const hasCountryCode = value.trim().startsWith('+254') || value.replace(/\D/g, '').startsWith('254');
     let digits = value.replace(/\D/g, '');
 
     if (digits.startsWith('254')) digits = digits.slice(3);
@@ -54,22 +53,21 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
     digits = digits.slice(0, 9);
 
-    const localPrefix = hasCountryCode ? '+254 ' : '0';
     const firstBlock = digits.slice(0, 3);
     const secondBlock = digits.slice(3, 6);
     const thirdBlock = digits.slice(6, 9);
 
-    return [localPrefix + firstBlock, secondBlock, thirdBlock].filter(Boolean).join(' ').trim();
+    return [firstBlock, secondBlock, thirdBlock].filter(Boolean).join(' ');
   };
 
   const normalizeKenyanPhoneNumber = (value: string) => {
     const digits = value.replace(/\D/g, '');
 
+    if (/^(1|7)\d{8}$/.test(digits)) {
+      return `+254${digits}`;
+    }
     if (/^0(1|7)\d{8}$/.test(digits)) {
       return `+254${digits.slice(1)}`;
-    }
-    if (/^254(1|7)\d{8}$/.test(digits)) {
-      return `+${digits}`;
     }
 
     return null;
@@ -191,15 +189,18 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
                 <div className="space-y-1.5 sm:space-y-2">
                   <label className="text-[7px] sm:text-[9px] text-neon-green uppercase font-arcade tracking-[0.3em] sm:tracking-[0.4em] block opacity-80">Phone_Number</label>
-                  <input 
-                    type="tel" 
-                    inputMode="numeric"
-                    required
-                    value={formData.phoneNumber}
-                    onChange={(e) => setFormData(p => ({...p, phoneNumber: formatKenyanPhoneInput(e.target.value)}))}
-                    className="w-full bg-black border-2 border-neon-green/20 p-2 sm:p-3 text-white font-mono focus:border-neon-green focus:outline-none transition-all placeholder-slate-800 text-xs sm:text-sm tracking-widest" 
-                    placeholder="0712 345 678" 
-                  />
+                  <div className="flex items-center border-2 border-neon-green/20 bg-black focus-within:border-neon-green transition-all">
+                    <span className="px-3 sm:px-4 py-2 sm:py-3 text-neon-green font-arcade text-xs sm:text-sm border-r border-neon-green/20 bg-neon-green/5">+254</span>
+                    <input 
+                      type="tel" 
+                      inputMode="numeric"
+                      required
+                      value={formData.phoneNumber}
+                      onChange={(e) => setFormData(p => ({...p, phoneNumber: formatKenyanPhoneInput(e.target.value)}))}
+                      className="w-full bg-transparent p-2 sm:p-3 text-white font-mono focus:outline-none transition-all placeholder-slate-700 text-xs sm:text-sm tracking-widest" 
+                      placeholder="712 345 678" 
+                    />
+                  </div>
 
                 </div>
               </>

@@ -11,7 +11,7 @@ interface ProfileSettingsProps {
 export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdateProfile, onClose }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    phoneNumber: user.phoneNumber || '',
+    phoneNumber: user.phoneNumber.replace(/^\+254/, '').trim() || '',
     email: user.email || '',
     bio: user.bio || '',
   });
@@ -26,13 +26,19 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
     const secondBlock = digits.slice(3, 6);
     const thirdBlock = digits.slice(6, 9);
 
-    return ['0' + firstBlock, secondBlock, thirdBlock].filter(Boolean).join(' ').trim();
+    return [firstBlock, secondBlock, thirdBlock].filter(Boolean).join(' ').trim();
+  };
+
+  const normalizeKenyanPhoneNumber = (value: string) => {
+    const digits = value.replace(/\D/g, '');
+    if (/^(1|7)\d{8}$/.test(digits)) return `+254${digits}`;
+    return '';
   };
 
   const handleSave = () => {
     soundManager.play('click');
     onUpdateProfile({
-      phoneNumber: formData.phoneNumber || undefined,
+      phoneNumber: normalizeKenyanPhoneNumber(formData.phoneNumber) || undefined,
       email: formData.email,
       bio: formData.bio || undefined,
     });
@@ -42,7 +48,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
   const handleCancel = () => {
     soundManager.play('click');
     setFormData({
-      phoneNumber: user.phoneNumber || '',
+      phoneNumber: user.phoneNumber.replace(/^\+254/, '').trim() || '',
       email: user.email || '',
       bio: user.bio || '',
     });
@@ -116,14 +122,17 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
 
               <div className="space-y-1.5 sm:space-y-2">
                 <label className="text-[8px] sm:text-[10px] text-neon-green uppercase font-arcade tracking-[0.2em] block opacity-80">Phone Number (Optional)</label>
-                <input
-                  type="tel"
-                  inputMode="numeric"
-                  value={formData.phoneNumber}
-                  onChange={(e) => setFormData(p => ({...p, phoneNumber: formatKenyanPhoneInput(e.target.value)}))}
-                  className="w-full bg-black border-2 border-neon-green/20 p-2 sm:p-3 text-white font-mono focus:border-neon-green focus:outline-none transition-all placeholder-slate-800 text-xs sm:text-sm"
-                  placeholder="0712 345 678"
-                />
+                <div className="flex items-center border-2 border-neon-green/20 bg-black focus-within:border-neon-green transition-all">
+                  <span className="px-3 sm:px-4 py-2 sm:py-3 text-neon-green font-arcade text-xs sm:text-sm border-r border-neon-green/20 bg-neon-green/5">+254</span>
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    value={formData.phoneNumber}
+                    onChange={(e) => setFormData(p => ({...p, phoneNumber: formatKenyanPhoneInput(e.target.value)}))}
+                    className="w-full bg-transparent p-2 sm:p-3 text-white font-mono focus:outline-none transition-all placeholder-slate-800 text-xs sm:text-sm"
+                    placeholder="712 345 678"
+                  />
+                </div>
                 <p className="text-[6px] sm:text-[7px] text-neon-green/60 font-arcade">Will be auto-filled for deposits and withdrawals</p>
               </div>
 
