@@ -19,6 +19,7 @@ const PlayAgainModal: React.FC<PlayAgainModalProps> = ({
   onExit
 }) => {
   if (!isOpen) return null;
+  const formatCurrency = (amount: number) => `KSh ${amount.toLocaleString()}`;
 
   return (
     <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black/95 backdrop-blur-lg p-3 sm:p-4">
@@ -56,7 +57,7 @@ const PlayAgainModal: React.FC<PlayAgainModalProps> = ({
                 POT WON
               </p>
               <p className="text-2xl sm:text-3xl md:text-4xl font-arcade font-black text-neon-green">
-                +${winAmount.toLocaleString()}
+                +{formatCurrency(winAmount)}
               </p>
             </div>
           )}

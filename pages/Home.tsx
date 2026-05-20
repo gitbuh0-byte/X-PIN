@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { soundManager } from '../services/soundManager.ts';
 import { CustomGameRoom, User, UserRank } from '../types.ts';
@@ -209,8 +209,20 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
   const [roomPendingDelete, setRoomPendingDelete] = useState<CustomGameRoom | null>(null);
   const [roomPendingEntryId, setRoomPendingEntryId] = useState<string | null>(null);
   const [copiedRoomId, setCopiedRoomId] = useState<string | null>(null);
+  const [onlineCount, setOnlineCount] = useState(3102);
 
   const canCreateRoom = user.rank === UserRank.MASTER || user.rank === UserRank.LEGEND;
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setOnlineCount((current) => {
+        const delta = Math.floor(Math.random() * 41) - 15;
+        return Math.max(2800, Math.min(4200, current + delta));
+      });
+    }, 15000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
 
   const handleCreateRoom = (settings: CustomRoomSettings) => {
     setCreateModalOpen(false);
@@ -264,9 +276,11 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
           XPIN XPIN AND WIN
         </p>
 
-        <div className="mt-6 md:mt-8 inline-flex items-center gap-2 md:gap-3 px-3 py-1 md:px-4 md:py-1.5 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm">
+        <div className="mt-6 md:mt-8 inline-flex items-center gap-2 md:gap-3">
           <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-neon-green rounded-full animate-pulse shadow-[0_0_5px_lime]" />
-          <span className="font-ui font-bold text-neon-green text-[9px] md:text-xs tracking-wide">3,102 ONLINE NOW</span>
+          <span className="font-ui font-bold text-neon-green text-[9px] md:text-xs tracking-wide">
+            {onlineCount.toLocaleString()} ONLINE NOW
+          </span>
         </div>
       </div>
 
@@ -277,12 +291,12 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
           className="group relative bg-white/5 border border-white/10 p-0.5 md:p-1 cursor-pointer hover:border-neon-cyan transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(0,255,255,0.15)] flex flex-col rounded-sm"
         >
           <div className="bg-[#050508] p-4 md:p-5 flex flex-col h-full relative overflow-hidden min-h-[280px]">
-            <div className="absolute top-4 right-4 p-1 mode-icon mode-icon--cyan transition-all duration-500 transform group-hover:scale-105">
-              <WheelBoltIcon className="w-12 h-12 md:w-14 md:h-14" />
+            <div className="absolute top-3 right-3 md:top-4 md:right-4 p-1 mode-icon mode-icon--cyan transition-all duration-500 transform group-hover:scale-105">
+              <WheelBoltIcon className="w-11 h-11 md:w-12 md:h-12" />
             </div>
-            <div className="text-neon-cyan font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-12">QUICK MATCH</div>
+            <div className="text-neon-cyan font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-16 md:pr-20">QUICK MATCH</div>
             <div className="w-8 h-0.5 bg-neon-cyan mb-3 md:mb-4 group-hover:w-14 transition-all duration-500" />
-            <p className="pr-12 text-slate-400 font-mono text-[11px] md:text-xs leading-6 md:leading-relaxed mb-4 md:mb-6 flex-grow z-10">
+            <p className="pr-10 md:pr-16 text-slate-400 font-mono text-[11px] md:text-xs leading-6 md:leading-relaxed mb-4 md:mb-6 flex-grow z-10">
               Jump into a fast 15-player wheel battle.<br />
               Lock your color, spin quick, and cash out in KSh.
             </p>
@@ -298,12 +312,12 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
           className="group relative bg-white/5 border border-white/10 p-0.5 md:p-1 cursor-pointer hover:border-neon-green transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(0,255,0,0.15)] flex flex-col rounded-sm"
         >
           <div className="bg-[#050508] p-4 md:p-5 flex flex-col h-full relative overflow-hidden min-h-[280px]">
-            <div className="absolute top-4 right-4 p-1 mode-icon mode-icon--green transition-all duration-500 transform group-hover:scale-105">
-              <DuelIcon className="w-12 h-12 md:w-14 md:h-14 object-contain" />
+            <div className="absolute top-3 right-3 md:top-4 md:right-4 p-1 mode-icon mode-icon--green transition-all duration-500 transform group-hover:scale-105">
+              <DuelIcon className="w-11 h-11 md:w-12 md:h-12 object-contain" />
             </div>
-            <div className="text-neon-green font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-12">1V1 DUEL</div>
+            <div className="text-neon-green font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-16 md:pr-20">1V1 DUEL</div>
             <div className="w-8 h-0.5 bg-neon-green mb-3 md:mb-4 group-hover:w-14 transition-all duration-500" />
-            <p className="pr-12 text-slate-400 font-mono text-[11px] md:text-xs leading-6 md:leading-relaxed mb-4 md:mb-6 flex-grow z-10">
+            <p className="pr-10 md:pr-16 text-slate-400 font-mono text-[11px] md:text-xs leading-6 md:leading-relaxed mb-4 md:mb-6 flex-grow z-10">
               Challenge one rival in a tight head-to-head spin.<br />
               One wheel, two colors, one winner takes the whole pot.
             </p>
@@ -319,12 +333,12 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
           className="group relative bg-white/5 border border-white/10 p-0.5 md:p-1 cursor-pointer hover:border-neon-pink transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(255,0,255,0.15)] flex flex-col rounded-sm"
         >
           <div className="bg-[#050508] p-4 md:p-5 flex flex-col h-full relative overflow-hidden min-h-[280px]">
-            <div className="absolute top-4 right-4 p-1 mode-icon mode-icon--pink transition-all duration-500 transform group-hover:scale-105">
-              <TournamentIcon className="w-12 h-12 md:w-14 md:h-14" />
+            <div className="absolute top-3 right-3 md:top-4 md:right-4 p-1 mode-icon mode-icon--pink transition-all duration-500 transform group-hover:scale-105">
+              <TournamentIcon className="w-10 h-10 md:w-11 md:h-11" />
             </div>
-            <div className="text-neon-pink font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-12">TOURNAMENT</div>
+            <div className="text-neon-pink font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-16 md:pr-20">TOURNAMENT</div>
             <div className="w-8 h-0.5 bg-neon-pink mb-3 md:mb-4 group-hover:w-14 transition-all duration-500" />
-            <p className="pr-12 text-slate-400 font-mono text-[11px] md:text-xs leading-6 md:leading-relaxed mb-4 md:mb-6 flex-grow z-10">
+            <p className="pr-10 md:pr-16 text-slate-400 font-mono text-[11px] md:text-xs leading-6 md:leading-relaxed mb-4 md:mb-6 flex-grow z-10">
               Survive every round in a knockout wheel showdown.<br />
               Advance through the bracket and chase the grand KSh prize.
             </p>

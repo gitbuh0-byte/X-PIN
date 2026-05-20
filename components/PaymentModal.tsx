@@ -89,12 +89,12 @@ const PaymentModal = ({ isOpen, onClose, onProcess, type, userPhoneNumber, defau
           <div className="mb-6 sm:mb-8 text-center">
             <label className="block text-neon-green text-[8px] sm:text-xs font-bold uppercase tracking-wider mb-2 sm:mb-3">Amount</label>
             <div className="relative inline-block w-full max-w-xs">
-              <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-neon-green text-lg sm:text-xl">$</span>
+              <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-neon-green text-[10px] sm:text-xs font-arcade">KSh</span>
               <input
                 type="number"
                 value={amount}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmount(e.target.value)}
-                className="w-full bg-black border-2 border-neon-green py-2 sm:py-3 pl-8 sm:pl-10 pr-3 sm:pr-4 text-center text-neon-green font-arcade text-lg sm:text-2xl focus:outline-none focus:shadow-[0_0_20px_rgba(0,255,0,0.4)]"
+                className="w-full bg-black border-2 border-neon-green py-2 sm:py-3 pl-12 sm:pl-14 pr-3 sm:pr-4 text-center text-neon-green font-arcade text-lg sm:text-2xl focus:outline-none focus:shadow-[0_0_20px_rgba(0,255,0,0.4)]"
               />
             </div>
           </div>

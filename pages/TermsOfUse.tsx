@@ -69,7 +69,7 @@ const TermsOfUse: React.FC = () => {
                 <strong className="text-neon-gold">Deposits:</strong> Funds are credited instantly to your account. You are responsible for ensuring you have sufficient funds before placing bets.
               </p>
               <p>
-                <strong className="text-neon-gold">Withdrawals:</strong> Requests are processed within 2-5 business days. Minimum withdrawal is $10. All funds must be verified before withdrawal.
+                <strong className="text-neon-gold">Withdrawals:</strong> Requests are processed within 2-5 business days. Minimum withdrawal is KSh 10. All funds must be verified before withdrawal.
               </p>
             </div>
           </section>

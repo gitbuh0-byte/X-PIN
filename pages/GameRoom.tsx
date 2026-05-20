@@ -12,6 +12,8 @@ import { INITIAL_BOT_NAMES, RANK_CONFIG, WHEEL_SEGMENTS, COLORS, COLOR_HEX } fro
 import { chatWithAiOracle, generateGameCommentary } from '../services/geminiService.ts';
 import { soundManager } from '../services/soundManager.ts';
 
+const formatCurrency = (amount: number) => `KSh ${amount.toLocaleString()}`;
+
 // Winner Alert Component
 const WinnerAlert: React.FC<{ name: string; amount: number; isUserWin: boolean }> = ({ name, amount, isUserWin }) => {
   return (
@@ -48,7 +50,7 @@ const WinnerAlert: React.FC<{ name: string; amount: number; isUserWin: boolean }
             <div className="space-y-1 sm:space-y-2 md:space-y-3">
               <div className="text-xs sm:text-base md:text-lg font-arcade text-black/80 uppercase tracking-wider">POT WON</div>
               <div className="text-2xl sm:text-4xl md:text-5xl font-arcade font-black text-green-700 text-glow-green">
-                +${amount.toLocaleString()}
+                +{formatCurrency(amount)}
               </div>
             </div>
           </div>
@@ -66,7 +68,7 @@ const WinnerAlert: React.FC<{ name: string; amount: number; isUserWin: boolean }
             <div className="space-y-1 sm:space-y-2 md:space-y-3">
               <div className="text-xs sm:text-base md:text-lg font-arcade text-red-200/80 uppercase tracking-wider">BET LOST</div>
               <div className="text-2xl sm:text-4xl md:text-5xl font-arcade font-black text-red-300">
-                -${amount.toLocaleString()}
+                -{formatCurrency(amount)}
               </div>
             </div>
           </div>
@@ -799,16 +801,16 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
             <div className="text-5xl mb-4">💳</div>
             <h3 className="text-2xl font-arcade text-neon-pink mb-2 uppercase tracking-wider">INSUFFICIENT BALANCE</h3>
             <p className="text-slate-300 mb-6 text-sm">
-              You need <span className="text-neon-pink font-bold">${insufficientAmount}</span> more to place this bet.
+              You need <span className="text-neon-pink font-bold">{formatCurrency(insufficientAmount)}</span> more to place this bet.
             </p>
             <div className="bg-slate-800/50 border border-neon-pink/30 rounded p-4 mb-6">
               <div className="text-xs text-slate-400 mb-1">Current Balance</div>
-              <div className="text-2xl font-arcade text-neon-green">${user.balance}</div>
+              <div className="text-2xl font-arcade text-neon-green">{formatCurrency(user.balance)}</div>
             </div>
             <div className="mb-6">
               <label className="block text-xs text-slate-400 mb-2 uppercase font-arcade">Deposit Amount</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neon-pink font-arcade text-lg">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neon-pink font-arcade text-[10px]">KSh</span>
                 <input
                   type="number"
                   defaultValue={insufficientAmount}
@@ -953,7 +955,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
                       </span>
                       {p.betAmount > 0 && (
                         <span className="text-neon-green text-[8px] lg:text-[9px] font-mono font-black">
-                          ${p.betAmount}
+                          {formatCurrency(p.betAmount)}
                         </span>
                       )}
                     </div>
@@ -1021,7 +1023,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
             <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-black/90 border border-neon-gold rounded px-2 sm:px-4 py-1.5 sm:py-3 z-40 max-w-[36vw]">
               <div className="text-[7px] sm:text-[10px] font-arcade text-neon-gold/70 uppercase tracking-widest">TOTAL POT</div>
               <div className="text-sm sm:text-2xl font-arcade font-black text-neon-gold drop-shadow-[0_0_10px_rgba(255,215,0,0.5)]">
-                ${players.filter(p => p.status === PlayerStatus.CONFIRMED).reduce((sum, p) => sum + p.betAmount, 0)}
+                {formatCurrency(players.filter(p => p.status === PlayerStatus.CONFIRMED).reduce((sum, p) => sum + p.betAmount, 0))}
               </div>
             </div>
 
@@ -1148,7 +1150,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
               <div className="flex flex-col gap-2 sm:gap-3">
                 <div className="bg-neon-gold/20 border-2 border-neon-gold rounded-sm p-2 sm:p-3 md:p-4 text-center">
                   <div className="text-[8px] sm:text-[9px] md:text-[11px] font-arcade text-neon-gold uppercase tracking-widest mb-1 sm:mb-2">BET PLACED</div>
-                  <div className="text-xl sm:text-2xl md:text-3xl font-arcade font-black text-neon-gold">${betAmount}</div>
+                  <div className="text-xl sm:text-2xl md:text-3xl font-arcade font-black text-neon-gold">{formatCurrency(betAmount)}</div>
                 </div>
                 <div className="flex gap-1 sm:gap-2 justify-center">
                   <button
@@ -1172,7 +1174,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
               <div className="flex flex-col gap-2 sm:gap-3">
                 <div className="bg-gradient-to-r from-neon-purple to-neon-cyan border-2 border-neon-cyan rounded-sm p-3 sm:p-4 md:p-6 text-center animate-pulse">
                   <div className="text-[8px] sm:text-[9px] md:text-[11px] font-arcade text-white uppercase tracking-widest mb-2 sm:mb-3">🔒 BET LOCKED</div>
-                  <div className="text-2xl sm:text-3xl md:text-4xl font-arcade font-black text-white drop-shadow-[0_0_20px_rgba(0,255,255,0.5)]">${betAmount}</div>
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-arcade font-black text-white drop-shadow-[0_0_20px_rgba(0,255,255,0.5)]">{formatCurrency(betAmount)}</div>
                   <div className="mt-2 sm:mt-3 text-[7px] sm:text-[8px] md:text-[10px] font-arcade text-cyan-300 uppercase tracking-widest">
                     Ready to spin
                   </div>

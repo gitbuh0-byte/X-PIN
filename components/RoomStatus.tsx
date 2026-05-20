@@ -10,6 +10,8 @@ interface RoomStatusProps {
 }
 
 const RoomStatus: React.FC<RoomStatusProps> = ({ gameState, playerCount, maxPlayers, currentPot, timer }) => {
+  const formatCurrency = (amount: number) => `KSh ${amount.toLocaleString()}`;
+
   const getStatusText = () => {
     switch (gameState) {
       case GameState.PRE_GAME:
@@ -76,7 +78,7 @@ const RoomStatus: React.FC<RoomStatusProps> = ({ gameState, playerCount, maxPlay
             Total Pot
           </div>
           <div className="text-lg sm:text-xl md:text-2xl font-arcade font-black text-neon-gold">
-            ${currentPot.toLocaleString()}
+            {formatCurrency(currentPot)}
           </div>
         </div>
       )}

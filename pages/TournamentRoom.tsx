@@ -103,6 +103,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
   // Calculate total pot (100 players * selected entry fee)
   const totalPot = TOTAL_PLAYERS * tournamentBetAmount;
+  const formatCurrency = (amount: number) => `KSh ${amount.toLocaleString()}`;
 
   // Initialize groups and assign user on mount
   useEffect(() => {
@@ -208,7 +209,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
 
   const confirmBet = () => {
     if (user.balance < tournamentBetAmount) {
-      alert('Insufficient balance. Need $' + tournamentBetAmount);
+      alert('Insufficient balance. Need KSh ' + tournamentBetAmount);
       return;
     }
     setPhase('COLOR_ASSIGN');
@@ -464,7 +465,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
           </div>
           <div className="text-right hidden sm:block">
             <div className="text-[10px] sm:text-xs text-slate-400 font-arcade tracking-wider uppercase">Your Balance</div>
-            <div className="text-neon-green font-arcade text-sm sm:text-base md:text-xl font-black drop-shadow-[0_0_10px_rgba(0,255,0,0.5)]">${user.balance.toLocaleString()}</div>
+            <div className="text-neon-green font-arcade text-sm sm:text-base md:text-xl font-black drop-shadow-[0_0_10px_rgba(0,255,0,0.5)]">{formatCurrency(user.balance)}</div>
           </div>
         </div>
       )}
@@ -646,11 +647,11 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 sm:mb-4 md:mb-6 text-left">
                 <div className="bg-black/40 border border-white/10 rounded-sm p-2 sm:p-3 md:p-4">
                   <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">Entry Fee</div>
-                  <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade text-neon-green font-black">${tournamentBetAmount}</div>
+                  <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade text-neon-green font-black">{formatCurrency(tournamentBetAmount)}</div>
                 </div>
                 <div className="bg-black/40 border border-white/10 rounded-sm p-2 sm:p-3 md:p-4">
                   <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">Prize Pool</div>
-                  <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade text-neon-gold font-black">${totalPot.toLocaleString()}</div>
+                  <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade text-neon-gold font-black">{formatCurrency(totalPot)}</div>
                 </div>
               </div>
 
@@ -658,7 +659,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                 <div className="text-slate-400 text-[8px] sm:text-[9px] md:text-xs font-mono leading-relaxed space-y-1.5 text-left">
                   <div className="flex items-center gap-2"><span className="text-neon-green text-base sm:text-lg">✓</span><span>20 groups of 5 players</span></div>
                   <div className="flex items-center gap-2"><span className="text-neon-cyan text-base sm:text-lg">✓</span><span>Win your group → Join Final Round</span></div>
-                  <div className="flex items-center gap-2"><span className="text-neon-gold text-base sm:text-lg">✓</span><span>Grand Champion wins <span className="font-black text-neon-gold">${totalPot.toLocaleString()}</span></span></div>
+                  <div className="flex items-center gap-2"><span className="text-neon-gold text-base sm:text-lg">✓</span><span>Grand Champion wins <span className="font-black text-neon-gold">{formatCurrency(totalPot)}</span></span></div>
                 </div>
               </div>
               <div className="flex gap-2 sm:gap-3 md:gap-4">
@@ -691,13 +692,13 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
               <div className="bg-black/40 border border-white/10 rounded-sm p-2.5 sm:p-3 md:p-4 mb-2.5 sm:mb-3 md:mb-4 text-left">
                 <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">Available Balance</div>
                 <div className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade font-black ${user.balance >= tournamentBetAmount ? 'text-neon-green' : 'text-red-400'}`}>
-                  ${Math.max(0, user.balance - tournamentBetAmount).toLocaleString()}
+                  {formatCurrency(Math.max(0, user.balance - tournamentBetAmount))}
                 </div>
               </div>
 
               <div className="bg-black/40 border border-white/10 rounded-sm p-2.5 sm:p-3 md:p-4 mb-2.5 sm:mb-3 md:mb-4 text-left">
                 <div className="text-slate-500 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1">Bet Amount</div>
-                <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade text-neon-cyan font-black">${tournamentBetAmount}</div>
+                <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade text-neon-cyan font-black">{formatCurrency(tournamentBetAmount)}</div>
               </div>
 
               <div className="mb-3 sm:mb-4 md:mb-5">
@@ -718,7 +719,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                             : 'border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20'
                       }`}
                     >
-                      ${amount}
+                      {formatCurrency(amount)}
                     </button>
                   ))}
                 </div>
@@ -796,7 +797,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                     COLOR LOCKED
                   </div>
                   <div className="text-slate-500 text-[9px] mt-2">
-                    Your <span className="font-bold uppercase" style={{ color: COLOR_HEX[userColor as keyof typeof COLOR_HEX] }}>{userColorDisplay}</span> color is fixed for this tournament. Bet locked: ${tournamentBetAmount}.
+                    Your <span className="font-bold uppercase" style={{ color: COLOR_HEX[userColor as keyof typeof COLOR_HEX] }}>{userColorDisplay}</span> color is fixed for this tournament. Bet locked: {formatCurrency(tournamentBetAmount)}.
                   </div>
                 </div>
               </div>
@@ -911,7 +912,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                           <span className="text-[8px] font-arcade px-1 border-b uppercase opacity-80" style={{ color: rankConfig.color, borderColor: rankConfig.color + '44' }}>
                             {rankConfig.label}
                           </span>
-                          <span className="text-neon-green text-[9px] font-mono font-black">${p.betAmount}</span>
+                          <span className="text-neon-green text-[9px] font-mono font-black">{formatCurrency(p.betAmount)}</span>
                         </div>
                       </div>
                     </div>
@@ -1031,7 +1032,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
               {/* Total Pot */}
               <div className="p-3 border-b border-neon-pink/30">
                 <div className="text-neon-gold font-arcade text-[10px] mb-1">TOTAL POT</div>
-                <div className="text-neon-green font-arcade">${totalPot.toLocaleString()}</div>
+                <div className="text-neon-green font-arcade">{formatCurrency(totalPot)}</div>
               </div>
               {/* User Status */}
               <div className="bg-black/80 border-b border-neon-pink/30 p-3">
@@ -1049,7 +1050,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                   </div>
                   <div>
                     <span className="text-slate-400">Bet:</span>
-                    <div className="font-arcade text-neon-green">${tournamentBetAmount} 🔒</div>
+                    <div className="font-arcade text-neon-green">{formatCurrency(tournamentBetAmount)} 🔒</div>
                   </div>
                 </div>
               </div>
@@ -1174,7 +1175,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                     {/* Total Pot */}
                     <div className="bg-black/60 border border-neon-gold/30 rounded p-3">
                       <div className="text-neon-gold font-arcade text-xs mb-2">TOTAL POT</div>
-                      <div className="text-lg sm:text-xl font-arcade font-black text-neon-green">${totalPot.toLocaleString()}</div>
+                      <div className="text-lg sm:text-xl font-arcade font-black text-neon-green">{formatCurrency(totalPot)}</div>
                     </div>
                     {/* Your Details */}
                     <div className="bg-black/60 border border-neon-pink/30 rounded p-3 space-y-2">
@@ -1190,7 +1191,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                       </div>
                       <div className="pt-2 border-t border-neon-pink/20">
                         <span className="text-slate-400 text-xs">Bet Amount</span>
-                        <div className="font-arcade text-neon-green mt-1">${tournamentBetAmount} 🔒</div>
+                        <div className="font-arcade text-neon-green mt-1">{formatCurrency(tournamentBetAmount)} 🔒</div>
                       </div>
                       <div className="pt-2 border-t border-neon-pink/20">
                         <span className="text-slate-400 text-xs">Your Group</span>
@@ -1377,7 +1378,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
               {/* Total Pot */}
               <div className="p-3 border-b border-neon-pink/30">
                 <div className="text-neon-gold font-arcade text-[10px] mb-1">TOTAL POT</div>
-                <div className="text-neon-green font-arcade">${totalPot.toLocaleString()}</div>
+                <div className="text-neon-green font-arcade">{formatCurrency(totalPot)}</div>
               </div>
               {/* User Status */}
               <div className="bg-black/80 border-b border-neon-pink/30 p-3">
@@ -1526,7 +1527,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                     {/* Total Pot */}
                     <div className="bg-black/60 border border-neon-gold/30 rounded p-3">
                       <div className="text-neon-gold font-arcade text-xs mb-2">TOTAL POT</div>
-                      <div className="text-lg sm:text-xl font-arcade font-black text-neon-green">${totalPot.toLocaleString()}</div>
+                      <div className="text-lg sm:text-xl font-arcade font-black text-neon-green">{formatCurrency(totalPot)}</div>
                     </div>
                     {/* Your Details */}
                     <div className="bg-black/60 border border-neon-cyan/30 rounded p-3 space-y-2">
@@ -1837,7 +1838,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
               {/* Total Pot */}
               <div className="p-2 sm:p-3 border-b border-neon-pink/30">
                 <div className="text-neon-gold font-arcade text-[8px] sm:text-[10px] mb-1">TOTAL POT</div>
-                <div className="text-neon-green font-arcade text-sm sm:text-base">${totalPot.toLocaleString()}</div>
+                <div className="text-neon-green font-arcade text-sm sm:text-base">{formatCurrency(totalPot)}</div>
               </div>
               {/* User Status */}
               <div className="bg-black/80 border-b border-neon-pink/30 p-2 sm:p-3">
@@ -1855,7 +1856,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                   </div>
                   <div>
                     <span className="text-slate-400">Bet:</span>
-                    <div className="font-arcade text-neon-green text-[7px] sm:text-xs">${tournamentBetAmount} 🔒</div>
+                    <div className="font-arcade text-neon-green text-[7px] sm:text-xs">{formatCurrency(tournamentBetAmount)} 🔒</div>
                   </div>
                 </div>
               </div>
@@ -1925,7 +1926,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                     {/* Total Pot */}
                     <div className="bg-black/60 border border-neon-gold/30 rounded p-3">
                       <div className="text-neon-gold font-arcade text-xs mb-2">TOTAL POT</div>
-                      <div className="text-2xl font-arcade text-neon-green font-black">${totalPot.toLocaleString()}</div>
+                      <div className="text-2xl font-arcade text-neon-green font-black">{formatCurrency(totalPot)}</div>
                     </div>
                     {/* Your Details */}
                     <div className="bg-black/60 border border-neon-pink/30 rounded p-3 space-y-2">
@@ -1941,7 +1942,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                       </div>
                       <div className="pt-2 border-t border-neon-pink/20">
                         <span className="text-slate-400 text-xs">Bet Amount</span>
-                        <div className="font-arcade text-neon-green mt-1">${tournamentBetAmount} 🔒</div>
+                        <div className="font-arcade text-neon-green mt-1">{formatCurrency(tournamentBetAmount)} 🔒</div>
                       </div>
                     </div>
                   </div>
@@ -2019,7 +2020,7 @@ const TournamentRoom: React.FC<TournamentRoomProps> = ({ user, updateBalance, on
                   <div className="font-arcade text-sm sm:text-base text-neon-cyan mb-5 truncate">{user.username}</div>
                   <div className="border-y border-white/10 py-4 mb-5">
                     <div className="text-[10px] sm:text-xs text-slate-400 font-arcade uppercase tracking-widest mb-1">Prize Pool</div>
-                    <div className="text-4xl sm:text-5xl font-arcade text-neon-gold font-black tracking-wider">${totalPot.toLocaleString()}</div>
+                    <div className="text-4xl sm:text-5xl font-arcade text-neon-gold font-black tracking-wider">{formatCurrency(totalPot)}</div>
                   </div>
                   <div className="text-[10px] sm:text-xs font-arcade text-neon-green bg-neon-green/10 border border-neon-green/40 rounded-sm px-3 py-3 mb-5">
                     Prize added to balance

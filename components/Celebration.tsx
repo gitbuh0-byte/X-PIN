@@ -10,6 +10,7 @@ interface CelebrationProps {
 const Celebration: React.FC<CelebrationProps> = ({ winnerName, amount, isUserWin = false }) => {
   const perfProfile = detectPerformanceProfile();
   const particleCount = getParticleCount(28);
+  const formatCurrency = (value: number) => `KSh ${value.toLocaleString()}`;
   
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[300] pointer-events-none p-2 sm:p-4">
@@ -45,7 +46,7 @@ const Celebration: React.FC<CelebrationProps> = ({ winnerName, amount, isUserWin
         {amount !== undefined && (
           <div className="text-center">
             <div className="text-[8px] sm:text-[9px] md:text-sm font-arcade uppercase tracking-wider text-slate-300">POT WON</div>
-            <div className={`text-lg sm:text-xl md:text-2xl font-arcade font-black ${isUserWin ? 'text-neon-green text-glow-green' : 'text-neon-gold'}`}>+${amount.toLocaleString()}</div>
+            <div className={`text-lg sm:text-xl md:text-2xl font-arcade font-black ${isUserWin ? 'text-neon-green text-glow-green' : 'text-neon-gold'}`}>+{formatCurrency(amount)}</div>
           </div>
         )}
       </div>

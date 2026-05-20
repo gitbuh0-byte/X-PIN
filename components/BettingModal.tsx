@@ -26,6 +26,7 @@ const BettingModal: React.FC<BettingModalProps> = ({
   const [error, setError] = useState<string>('');
   const availableBalance = balance || userBalance || 0;
   const maxAllowed = maxBet || availableBalance;
+  const formatCurrency = (amount: number) => `KSh ${amount.toLocaleString()}`;
 
   if (!isOpen) return null;
 
@@ -56,7 +57,7 @@ const BettingModal: React.FC<BettingModalProps> = ({
     }
 
     if (amount < minBet) {
-      setError(`Minimum bet is $${minBet}`);
+      setError(`Minimum bet is KSh ${minBet}`);
       soundManager.play('warning');
       return;
     }
@@ -102,7 +103,7 @@ const BettingModal: React.FC<BettingModalProps> = ({
           <div className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade font-black ${
             (userBalance - parseInt(betAmount)) < 0 ? 'text-red-500' : 'text-neon-green'
           }`}>
-            ${(userBalance - parseInt(betAmount)).toLocaleString()}
+            {formatCurrency(userBalance - parseInt(betAmount))}
           </div>
         </div>
 
@@ -112,7 +113,7 @@ const BettingModal: React.FC<BettingModalProps> = ({
             Bet Amount
           </div>
           <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-arcade text-neon-cyan font-black">
-            ${parseInt(betAmount).toLocaleString()}
+            {formatCurrency(parseInt(betAmount))}
           </div>
         </div>
 
@@ -133,7 +134,7 @@ const BettingModal: React.FC<BettingModalProps> = ({
                     : 'border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20'
                 }`}
               >
-                ${amount}
+                {formatCurrency(amount)}
               </button>
             ))}
           </div>
