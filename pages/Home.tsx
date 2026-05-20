@@ -277,7 +277,7 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
           className="group relative bg-white/5 border border-white/10 p-0.5 md:p-1 cursor-pointer hover:border-neon-cyan transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(0,255,255,0.15)] flex flex-col rounded-sm"
         >
           <div className="bg-[#050508] p-4 md:p-5 flex flex-col h-full relative overflow-hidden min-h-[280px]">
-            <div className="absolute top-4 right-4 p-1 opacity-10 group-hover:opacity-30 group-hover:text-neon-cyan transition-all duration-500 transform group-hover:scale-105">
+            <div className="absolute top-4 right-4 p-1 mode-icon mode-icon--cyan transition-all duration-500 transform group-hover:scale-105">
               <WheelBoltIcon className="w-12 h-12 md:w-14 md:h-14" />
             </div>
             <div className="text-neon-cyan font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-12">QUICK MATCH</div>
@@ -298,7 +298,7 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
           className="group relative bg-white/5 border border-white/10 p-0.5 md:p-1 cursor-pointer hover:border-neon-green transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(0,255,0,0.15)] flex flex-col rounded-sm"
         >
           <div className="bg-[#050508] p-4 md:p-5 flex flex-col h-full relative overflow-hidden min-h-[280px]">
-            <div className="absolute top-4 right-4 p-1 opacity-10 group-hover:opacity-30 transition-all duration-500 transform group-hover:scale-105">
+            <div className="absolute top-4 right-4 p-1 mode-icon mode-icon--green transition-all duration-500 transform group-hover:scale-105">
               <DuelIcon className="w-12 h-12 md:w-14 md:h-14 object-contain" />
             </div>
             <div className="text-neon-green font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-12">1V1 DUEL</div>
@@ -319,7 +319,7 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
           className="group relative bg-white/5 border border-white/10 p-0.5 md:p-1 cursor-pointer hover:border-neon-pink transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(255,0,255,0.15)] flex flex-col rounded-sm"
         >
           <div className="bg-[#050508] p-4 md:p-5 flex flex-col h-full relative overflow-hidden min-h-[280px]">
-            <div className="absolute top-4 right-4 p-1 opacity-10 group-hover:opacity-30 group-hover:text-neon-pink transition-all duration-500 transform group-hover:scale-105">
+            <div className="absolute top-4 right-4 p-1 mode-icon mode-icon--pink transition-all duration-500 transform group-hover:scale-105">
               <TournamentIcon className="w-12 h-12 md:w-14 md:h-14" />
             </div>
             <div className="text-neon-pink font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-12">TOURNAMENT</div>
@@ -355,7 +355,7 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
                 <span className="text-[8px] md:text-[10px] font-arcade text-white tracking-widest uppercase">Rank: Master</span>
               </div>
             )}
-            <div className="absolute top-4 right-4 p-1 opacity-10 group-hover:opacity-30 group-hover:text-neon-purple transition-all duration-500 transform group-hover:scale-105">
+            <div className="absolute top-4 right-4 p-1 mode-icon mode-icon--purple transition-all duration-500 transform group-hover:scale-105">
               <svg className="w-12 h-12 md:w-14 md:h-14" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" /></svg>
             </div>
             <div className="text-neon-purple font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-12">PRIVATE</div>
