@@ -12,6 +12,7 @@ interface CreateRoomModalProps {
 }
 
 const formatCurrency = (amount: number | string) => `KSh ${amount}`;
+const ARM_WRESTLING_ICON_URL = 'https://img.icons8.com/?size=100&id=dUtrk7y9UcAJ&format=png&color=000000';
 
 const WheelBoltIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
   <svg className={className} viewBox="0 0 96 96" fill="none" aria-hidden="true">
@@ -20,11 +21,13 @@ const WheelBoltIcon: React.FC<{ className?: string }> = ({ className = '' }) => 
 );
 
 const DuelIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
-  <svg className={className} viewBox="0 0 96 96" fill="none" aria-hidden="true">
-    <path d="M26 66H44V74H20V60C20 54 24 50 30 50H38L46 58L52 52L58 58L64 50H70C76 50 80 54 80 60V74H52V66H70V61C70 59 69 58 67 58H62L52 68L42 58H35C33 58 32 59 32 61V66H26Z" fill="currentColor" opacity="0.95" />
-    <path d="M36 42C36 35 41 30 48 30C55 30 60 35 60 42V48H52V42C52 39 50 37 48 37C46 37 44 39 44 42V48H36V42Z" fill="currentColor" />
-    <path d="M18 64H78" stroke="currentColor" strokeWidth="5" strokeLinecap="round" opacity="0.35" />
-  </svg>
+  <img
+    src={ARM_WRESTLING_ICON_URL}
+    alt=""
+    aria-hidden="true"
+    className={className}
+    style={{ filter: 'brightness(0) saturate(100%) invert(73%) sepia(80%) saturate(2906%) hue-rotate(72deg) brightness(104%) contrast(122%)' }}
+  />
 );
 
 const TournamentIcon: React.FC<{ className?: string }> = ({ className = '' }) => (
@@ -275,7 +278,7 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
         >
           <div className="bg-[#050508] p-4 md:p-5 flex flex-col h-full relative overflow-hidden min-h-[280px]">
             <div className="absolute top-4 right-4 p-1 opacity-10 group-hover:opacity-30 group-hover:text-neon-cyan transition-all duration-500 transform group-hover:scale-105">
-              <WheelBoltIcon className="w-10 h-10 md:w-12 md:h-12" />
+              <WheelBoltIcon className="w-12 h-12 md:w-14 md:h-14" />
             </div>
             <div className="text-neon-cyan font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-12">QUICK MATCH</div>
             <div className="w-8 h-0.5 bg-neon-cyan mb-3 md:mb-4 group-hover:w-14 transition-all duration-500" />
@@ -295,8 +298,8 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
           className="group relative bg-white/5 border border-white/10 p-0.5 md:p-1 cursor-pointer hover:border-neon-green transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(0,255,0,0.15)] flex flex-col rounded-sm"
         >
           <div className="bg-[#050508] p-4 md:p-5 flex flex-col h-full relative overflow-hidden min-h-[280px]">
-            <div className="absolute top-4 right-4 p-1 opacity-10 group-hover:opacity-30 group-hover:text-neon-green transition-all duration-500 transform group-hover:scale-105">
-              <DuelIcon className="w-10 h-10 md:w-12 md:h-12" />
+            <div className="absolute top-4 right-4 p-1 opacity-10 group-hover:opacity-30 transition-all duration-500 transform group-hover:scale-105">
+              <DuelIcon className="w-12 h-12 md:w-14 md:h-14 object-contain" />
             </div>
             <div className="text-neon-green font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-12">1V1 DUEL</div>
             <div className="w-8 h-0.5 bg-neon-green mb-3 md:mb-4 group-hover:w-14 transition-all duration-500" />
@@ -317,7 +320,7 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
         >
           <div className="bg-[#050508] p-4 md:p-5 flex flex-col h-full relative overflow-hidden min-h-[280px]">
             <div className="absolute top-4 right-4 p-1 opacity-10 group-hover:opacity-30 group-hover:text-neon-pink transition-all duration-500 transform group-hover:scale-105">
-              <TournamentIcon className="w-10 h-10 md:w-12 md:h-12" />
+              <TournamentIcon className="w-12 h-12 md:w-14 md:h-14" />
             </div>
             <div className="text-neon-pink font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-12">TOURNAMENT</div>
             <div className="w-8 h-0.5 bg-neon-pink mb-3 md:mb-4 group-hover:w-14 transition-all duration-500" />
@@ -353,7 +356,7 @@ const Home: React.FC<HomeProps> = ({ user, customRooms, onCreateCustomRoom, onDe
               </div>
             )}
             <div className="absolute top-4 right-4 p-1 opacity-10 group-hover:opacity-30 group-hover:text-neon-purple transition-all duration-500 transform group-hover:scale-105">
-              <svg className="w-10 h-10 md:w-12 md:h-12" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" /></svg>
+              <svg className="w-12 h-12 md:w-14 md:h-14" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" /></svg>
             </div>
             <div className="text-neon-purple font-arcade text-[22px] sm:text-[24px] md:text-[26px] mb-1 z-10 pr-12">PRIVATE</div>
             <div className="w-8 h-0.5 bg-neon-purple mb-3 md:mb-4 group-hover:w-14 transition-all duration-500" />
