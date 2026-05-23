@@ -9,6 +9,7 @@ export async function runMigrations() {
     `
     CREATE TABLE IF NOT EXISTS users (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      supabase_user_id UUID UNIQUE,
       email VARCHAR(255) UNIQUE NOT NULL,
       phone_number VARCHAR(20),
       username VARCHAR(100) UNIQUE NOT NULL,
@@ -25,6 +26,8 @@ export async function runMigrations() {
     );
     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
     CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS supabase_user_id UUID;
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_users_supabase_user_id ON users(supabase_user_id);
     `,
 
     // Games table

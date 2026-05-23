@@ -7,6 +7,11 @@ registerSW({
   immediate: true,
 });
 
+if (window.location.pathname === '/auth/callback' && !window.location.hash.startsWith('#/auth/callback')) {
+  const normalizedHashUrl = `${window.location.origin}/#/auth/callback${window.location.search}`;
+  window.location.replace(normalizedHashUrl);
+}
+
 const rootElement = document.getElementById('root');
 
 if (rootElement) {

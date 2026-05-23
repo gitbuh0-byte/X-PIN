@@ -24,10 +24,14 @@ const envSchema = z.object({
   PAYSTACK_PUBLIC_KEY: z.string(),
   AIRTEL_CLIENT_ID: z.string(),
   AIRTEL_CLIENT_SECRET: z.string(),
+  FRONTEND_URLS: z.string().default('http://localhost:5173,http://127.0.0.1:5173,https://x-spin.vercel.app'),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
 });
 
 export const config = envSchema.parse(process.env);
+export const frontendOrigins = config.FRONTEND_URLS.split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
 
 export const isDevelopment = config.NODE_ENV === 'development';
 export const isProduction = config.NODE_ENV === 'production';

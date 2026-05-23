@@ -12,12 +12,14 @@ import PaymentModal from './components/PaymentModal.tsx';
 import GameDock from './components/GameDock.tsx';
 import Footer from './components/Footer.tsx';
 import { Auth } from './components/Auth.tsx';
+import AuthCallback from './pages/AuthCallback.tsx';
 import { soundManager } from './services/soundManager.ts';
 import { RANK_CONFIG } from './constants.ts';
 import { detectPerformanceProfile, disableAnimationsGlobally } from './utils/performanceOptimizer.ts';
+import { getCurrentAuthenticatedUser, logout, subscribeToAuthChanges, syncBackendSession, updateUserProfile } from './services/auth.ts';
 
 const INITIAL_USER: User = {
-  id: 'user-1',
+  id: '',
   username: 'SpinMaster',
   balance: 1000,
   avatar: 'https://api.dicebear.com/7.x/pixel-art/svg?seed=SpinMaster',
@@ -151,9 +153,8 @@ const Layout: React.FC<{ children: React.ReactNode; user: User; onOpenPayment?: 
 };
 
 const AppContent: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('xpin_auth') === 'true';
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthResolved, setIsAuthResolved] = useState(false);
   const [user, setUser] = useState<User>(INITIAL_USER);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [activeSessions, setActiveSessions] = useState<GameSession[]>([]);
@@ -177,6 +178,7 @@ const AppContent: React.FC = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const isHydratingAuthRef = useRef(true);
 
   // Initialize performance optimization on app startup
   useEffect(() => {
@@ -187,6 +189,67 @@ const AppContent: React.FC = () => {
     } else {
       console.log('Performance mode: HIGH-END - Full animations enabled');
     }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const hydrateAuth = async () => {
+      try {
+        const authenticatedUser = await getCurrentAuthenticatedUser();
+
+        if (cancelled) return;
+
+        if (authenticatedUser) {
+          setUser(authenticatedUser);
+          setIsAuthenticated(true);
+          void syncBackendSession();
+        } else {
+          setUser(INITIAL_USER);
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error('Failed to hydrate auth session:', error);
+        if (!cancelled) {
+          setUser(INITIAL_USER);
+          setIsAuthenticated(false);
+        }
+      } finally {
+        if (!cancelled) {
+          isHydratingAuthRef.current = false;
+          setIsAuthResolved(true);
+        }
+      }
+    };
+
+    void hydrateAuth();
+
+    const subscription = subscribeToAuthChanges(async () => {
+      try {
+        const authenticatedUser = await getCurrentAuthenticatedUser();
+        if (cancelled) return;
+
+        if (authenticatedUser) {
+          setUser(authenticatedUser);
+          setIsAuthenticated(true);
+          void syncBackendSession();
+        } else {
+          setUser(INITIAL_USER);
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error('Auth state change handling failed:', error);
+      } finally {
+        if (!cancelled) {
+          setIsAuthResolved(true);
+        }
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Set up autoplay on any user interaction
@@ -211,7 +274,11 @@ const AppContent: React.FC = () => {
 
   const handleUpdateBalance = useCallback((amount: number) => {
     soundManager.forceBgmStart(); // Ensure music plays when user interacts
-    setUser(prev => ({ ...prev, balance: prev.balance + amount }));
+    setUser(prev => {
+      const nextUser = { ...prev, balance: prev.balance + amount };
+      void updateUserProfile(nextUser).catch(error => console.error('Failed to sync balance:', error));
+      return nextUser;
+    });
   }, []);
 
   useEffect(() => {
@@ -229,7 +296,9 @@ const AppContent: React.FC = () => {
       const rankBaseXp = rankIndex >= 0 ? RANK_CONFIG[prev.rank].minWins : 0;
       const newXp = Math.max(normalizedXp + 1, rankBaseXp + 1);
       const newRank = getRankForXp(newXp);
-      return { ...prev, rankXp: newXp, rank: newRank };
+      const nextUser = { ...prev, rankXp: newXp, rank: newRank };
+      void updateUserProfile(nextUser).catch(error => console.error('Failed to sync rank progress:', error));
+      return nextUser;
     });
   }, []);
 
@@ -327,25 +396,36 @@ const AppContent: React.FC = () => {
     setActiveSessions(prev => prev.map(s => s.id === roomId ? { ...s, status, lastUpdate: Date.now() } : s));
   }, []);
 
-  const handleLogin = (username: string, email: string, phoneNumber?: string, authMethod?: AuthMethod) => {
-    setUser(p => ({
-      ...p,
-      username,
-      email,
-      phoneNumber: phoneNumber || '',
-      authMethod: authMethod || AuthMethod.EMAIL
-    }));
-    localStorage.setItem('xpin_auth', 'true');
-    setIsAuthenticated(true);
+  const handleLogin = () => {
     navigate('/');
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('xpin_auth');
-    setIsAuthenticated(false);
-    setUser(INITIAL_USER);
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      setIsAuthenticated(false);
+      setUser(INITIAL_USER);
+      navigate('/');
+    }
   };
+
+  if (location.pathname === '/auth/callback') {
+    return <AuthCallback />;
+  }
+
+  if (!isAuthResolved) {
+    return (
+      <div className="min-h-screen bg-vegas-bg text-white flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="text-3xl sm:text-4xl font-arcade text-neon-cyan mb-3">SYNCING SESSION</div>
+          <div className="text-slate-400 font-ui text-sm sm:text-base">Loading your secure profile...</div>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Auth onLogin={handleLogin} />;
@@ -363,7 +443,24 @@ const AppContent: React.FC = () => {
             onJoinGame={handleJoinGame}
           />
         } />
-        <Route path="/dashboard" element={<Dashboard user={user} transactions={transactions} onOpenPayment={(type) => setPayment({open: true, type})} onUpdateProfile={(updates) => setUser(p => ({...p, ...updates}))} onLogout={handleLogout} />} />
+        <Route
+          path="/dashboard"
+          element={
+            <Dashboard
+              user={user}
+              transactions={transactions}
+              onOpenPayment={(type) => setPayment({open: true, type})}
+              onUpdateProfile={(updates) =>
+                setUser(prev => {
+                  const nextUser = { ...prev, ...updates };
+                  void updateUserProfile(nextUser).catch(error => console.error('Failed to sync profile:', error));
+                  return nextUser;
+                })
+              }
+              onLogout={handleLogout}
+            />
+          }
+        />
         <Route path="/help-centre" element={<HelpCentre />} />
         <Route path="/terms-of-use" element={<TermsOfUse />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />

@@ -54,20 +54,34 @@ authRouter.post('/refresh', async (req: Request, res: Response, next) => {
   }
 });
 
-authRouter.post('/oauth', async (req: Request, res: Response, next) => {
+authRouter.post('/oauth', authenticate, async (req: Request, res: Response, next) => {
   try {
-    const { email, username, authProvider, profile } = req.body;
+    const user = await authService.getUserById(req.user!.user_id);
 
-    const { user, token, refreshToken } = await authService.loginOAuth(
-      email,
-      username,
-      authProvider,
-      profile
-    );
+    if (!user) {
+      throw new AppError('USER_NOT_FOUND', 'Authenticated user not found', 404);
+    }
 
     res.json({
       success: true,
-      data: { user, token, refreshToken },
+      data: { user },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+authRouter.get('/session', authenticate, async (req: Request, res: Response, next) => {
+  try {
+    const user = await authService.getUserById(req.user!.user_id);
+
+    if (!user) {
+      throw new AppError('USER_NOT_FOUND', 'Authenticated user not found', 404);
+    }
+
+    res.json({
+      success: true,
+      data: { user },
     });
   } catch (err) {
     next(err);

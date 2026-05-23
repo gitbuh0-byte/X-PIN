@@ -2,24 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { soundManager } from '../services/soundManager.ts';
 import { AuthMethod } from '../types.ts';
 import { 
-  authenticateWithGoogle, 
-  authenticateWithFacebook, 
-  authenticateWithApple,
-  authenticateWithGoogleFirebase,
+  signInWithEmail,
+  signUpWithEmail,
+  signInWithProvider,
   initializeFirebase,
   initializeGoogleAuth, 
   initializeFacebookAuth,
-  AuthUser 
 } from '../services/auth.ts';
 
 interface AuthProps {
-  onLogin: (username: string, email: string, phoneNumber?: string, authMethod?: AuthMethod) => void;
+  onLogin: () => void;
 }
 
 export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   const [isRegister, setIsRegister] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -27,10 +26,6 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     confirmPassword: '',
     phoneNumber: '',
   });
-
-  const [authMethod, setAuthMethod] = useState<AuthMethod>(AuthMethod.EMAIL);
-  const [useFirebase, setUseFirebase] = useState(true); // Default to Firebase for Google auth
-
   // Initialize OAuth providers on component mount
   useEffect(() => {
     const initializeAuth = async () => {
@@ -94,47 +89,54 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
     soundManager.play('start');
     setError(null);
+    setSuccessMessage(null);
     const normalizedPhoneNumber = isRegister ? normalizeKenyanPhoneNumber(formData.phoneNumber) || undefined : undefined;
-    onLogin(
-      formData.username || 'Player',
-      formData.email,
-      normalizedPhoneNumber,
-      AuthMethod.EMAIL
-    );
+    setIsLoading(true);
+
+    const action = isRegister
+      ? signUpWithEmail({
+          email: formData.email,
+          password: formData.password,
+          username: formData.username || 'Player',
+          phoneNumber: normalizedPhoneNumber,
+        })
+      : signInWithEmail({
+          email: formData.email,
+          password: formData.password,
+        });
+
+    action
+      .then(() => {
+        soundManager.play('win');
+        if (isRegister) {
+          setSuccessMessage('Account created. If email confirmation is enabled, confirm your inbox and then sign in.');
+          setIsRegister(false);
+          setFormData({
+            username: '',
+            email: formData.email,
+            password: '',
+            confirmPassword: '',
+            phoneNumber: '',
+          });
+        } else {
+          onLogin();
+        }
+      })
+      .catch((err) => {
+        soundManager.play('error');
+        setError(err instanceof Error ? err.message : 'Authentication failed');
+      })
+      .finally(() => setIsLoading(false));
   };
 
   const handleSocialAuth = async (method: AuthMethod) => {
     soundManager.play('click');
     setIsLoading(true);
     setError(null);
+    setSuccessMessage(null);
 
     try {
-      let authUser: AuthUser;
-
-      if (method === AuthMethod.GOOGLE) {
-        // Use Firebase for Google auth if configured
-        if (useFirebase && import.meta.env.VITE_FIREBASE_API_KEY) {
-          try {
-            authUser = await authenticateWithGoogleFirebase();
-          } catch (firebaseError) {
-            console.warn('Firebase auth failed, falling back to standard Google auth:', firebaseError);
-            authUser = await authenticateWithGoogle();
-          }
-        } else {
-          authUser = await authenticateWithGoogle();
-        }
-      } else if (method === AuthMethod.FACEBOOK) {
-        authUser = await authenticateWithFacebook();
-      } else if (method === AuthMethod.APPLE) {
-        authUser = await authenticateWithApple();
-      } else {
-        setError('Unsupported authentication method');
-        setIsLoading(false);
-        return;
-      }
-
-      soundManager.play('win');
-      onLogin(authUser.username, authUser.email, authUser.phoneNumber, authUser.authMethod);
+      await signInWithProvider(method);
     } catch (err) {
       soundManager.play('error');
       setError(err instanceof Error ? err.message : 'Authentication failed');
@@ -169,6 +171,12 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           {error && (
             <div className="bg-neon-pink/10 border-2 border-neon-pink rounded p-2 sm:p-3 mb-4 text-neon-pink text-[7px] sm:text-[9px] font-arcade uppercase tracking-wide">
               {error}
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="bg-neon-green/10 border-2 border-neon-green rounded p-2 sm:p-3 mb-4 text-neon-green text-[7px] sm:text-[9px] font-arcade uppercase tracking-wide">
+              {successMessage}
             </div>
           )}
 

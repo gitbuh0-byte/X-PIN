@@ -2,7 +2,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
-import { config } from './config.js';
+import { config, frontendOrigins } from './config.js';
 import { logger } from './utils/logger.js';
 import { connectDatabase, closeDatabase } from './database/db.js';
 import { runMigrations } from './database/migrations.js';
@@ -20,16 +20,40 @@ import userRouter from './routes/users.js';
 import adminRouter from './routes/admin.js';
 
 const app: Application = express();
+
+const isAllowedOrigin = (origin?: string) => {
+  if (!origin) return true;
+  if (frontendOrigins.includes(origin)) return true;
+  return /^https:\/\/.*\.vercel\.app$/.test(origin);
+};
+
 const httpServer = createServer(app);
 const io = new SocketIOServer(httpServer, {
   cors: {
-    origin: config.NODE_ENV === 'production' ? 'https://yourdomain.com' : '*',
+    origin: (origin, callback) => {
+      if (isAllowedOrigin(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error('CORS origin not allowed'));
+    },
     credentials: true,
   },
 });
 
 // Global middleware
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    if (isAllowedOrigin(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error('CORS origin not allowed'));
+  },
+  credentials: true,
+}));
 app.use(express.json());
 app.use(rateLimiter(100, 60000)); // 100 requests per minute
 

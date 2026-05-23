@@ -5,6 +5,7 @@ export type VerificationStatus = 'unverified' | 'verified' | 'rejected';
 
 export interface User {
   id: string;
+  supabase_user_id?: string;
   email: string;
   phone_number?: string;
   username: string;
@@ -169,6 +170,7 @@ export interface JWTPayload {
   user_id: string;
   email: string;
   role: UserRole;
+  supabase_user_id?: string;
   iat: number;
   exp: number;
 }
