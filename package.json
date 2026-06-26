@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@anthropic-ai/claude-code": "^2.1.126",
-    "@google/generative-ai": "^0.21.0",
     "@supabase/supabase-js": "^2.106.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^5.0.6",

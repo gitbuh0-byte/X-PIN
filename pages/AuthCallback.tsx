@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { soundManager } from '../services/soundManager.ts';
-import { exchangeAuthCodeForSession } from '../services/auth.ts';
+import { processAuthRedirect } from '../services/auth.ts';
 
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
@@ -10,7 +10,7 @@ const AuthCallback: React.FC = () => {
   useEffect(() => {
     const complete = async () => {
       try {
-        await exchangeAuthCodeForSession();
+        await processAuthRedirect();
         soundManager.play('win');
         navigate('/', { replace: true });
       } catch (err) {

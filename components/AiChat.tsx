@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { chatWithAiOracle } from '../services/geminiService.ts';
 import { ChatMessage } from '../types.ts';
 
 interface AiChatProps {

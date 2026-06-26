@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import SpinWheel from '../components/SpinWheel.tsx';
-import AiChat from '../components/AiChat.tsx';
 import BettingModal from '../components/BettingModal.tsx';
 import ColorAssignmentModal from '../components/ColorAssignmentModal.tsx';
 import PlayAgainModal from '../components/PlayAgainModal.tsx';
@@ -9,7 +8,6 @@ import RankUpModal from '../components/RankUpModal.tsx';
 import PaymentModal from '../components/PaymentModal.tsx';
 import { CustomGameRoom, GameState, Player, PlayerStatus, ChatMessage, User, UserRank, PaymentMethod } from '../types.ts';
 import { INITIAL_BOT_NAMES, RANK_CONFIG, WHEEL_SEGMENTS, COLORS, COLOR_HEX } from '../constants.ts';
-import { chatWithAiOracle, generateGameCommentary } from '../services/geminiService.ts';
 import { soundManager } from '../services/soundManager.ts';
 
 const formatCurrency = (amount: number) => `KSh ${amount.toLocaleString()}`;
@@ -186,7 +184,6 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
   const [inactivityWarning, setInactivityWarning] = useState(false);
   const [inactivityCountdown, setInactivityCountdown] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [chatOpen, setChatOpen] = useState(false);
   const [kickoutModal, setKickoutModal] = useState(false);
   const [winnerAlert, setWinnerAlert] = useState<{ name: string; amount: number; isUserWin: boolean } | null>(null);
   const bettingStartTimeRef = useRef<number | null>(null);
@@ -699,8 +696,7 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
         setWinnerAlert({ name: user.username, amount: currentPot, isUserWin: true });
         setLastWinner({ name: user.username, amount: currentPot, isUserWin: true });
 
-        const hype = await generateGameCommentary(user.username, payout, players.length);
-        addChatMessage('ORACLE', `🏆 WINNER: ${user.username} TAKES THE POT! ${hype}`, true);
+        addChatMessage('ORACLE', `🏆 WINNER: ${user.username} TAKES THE POT!`, true);
       } else {
         // Another player won
         soundManager.play('lose');
@@ -722,12 +718,6 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
       setShowPlayAgainModal(true);
     }, 3000);
   }, [targetIndex, players, user.id, user.username, roomId, updateBalance, onWin, addChatMessage, wheelSegments, currentPot]);
-
-  const handleSendMessage = async (msg: string) => {
-    addChatMessage('YOU', msg);
-    const reply = await chatWithAiOracle(msg, chatHistory.slice(-5).map(m => m.text));
-    if (isMounted.current) addChatMessage('ORACLE', reply, true);
-  };
 
   const handleExitToLobby = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -1189,33 +1179,6 @@ const GameRoom: React.FC<GameRoomProps> = ({ user, updateBalance, onWin, roomId:
       </div>
       )}
 
-      {/* Chat Panel - Mobile/Tablet: Collapsible Drawer, Desktop: Fixed Side Panel */}
-      {!showBettingModal && !showColorAssignment && (
-        <div className={`fixed lg:relative inset-0 lg:inset-auto z-40 lg:z-auto transition-all duration-300 w-full lg:w-80 lg:h-full ${chatOpen ? 'pointer-events-auto' : 'pointer-events-none lg:pointer-events-auto'}`}>
-          <div className={`absolute inset-0 bg-black/70 lg:hidden transition-opacity duration-300 ${chatOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setChatOpen(false)}></div>
-          <div className={`absolute lg:relative right-0 lg:left-0 top-0 h-full w-[82vw] max-w-80 lg:w-full border-t lg:border-t-0 lg:border-l border-white/5 z-20 bg-black/95 flex flex-col overflow-y-auto custom-scrollbar transition-transform duration-300 lg:translate-x-0 ${chatOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}`}>
-            <button 
-              onClick={() => setChatOpen(false)}
-              className="lg:hidden absolute top-2 right-2 text-slate-400 hover:text-white text-xl z-30"
-            >
-              ✕
-            </button>
-            <div className="mt-10 lg:mt-0 min-h-0 flex-1">
-              <AiChat chatHistory={chatHistory} onSendMessage={handleSendMessage} />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Mobile Chat Toggle Button */}
-      {!showBettingModal && !showColorAssignment && (
-        <button
-          onClick={() => setChatOpen(true)}
-          className="lg:hidden fixed bottom-16 right-2 z-30 w-11 h-11 bg-neon-pink text-black rounded-full font-bold text-xl hover:bg-white transition-colors flex items-center justify-center shadow-lg active:scale-95"
-        >
-          💬
-        </button>
-      )}
 
       {/* Kickout Modal */}
       {kickoutModal && (

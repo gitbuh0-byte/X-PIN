@@ -193,17 +193,29 @@ export const signInWithProvider = async (method: AuthMethod): Promise<void> => {
   if (error) throw error;
 };
 
-export const exchangeAuthCodeForSession = async (): Promise<void> => {
+export const processAuthRedirect = async (): Promise<void> => {
+  if (!isSupabaseConfigured || !supabase) return;
   const client = ensureSupabase();
-  const code = new URLSearchParams(window.location.search).get('code');
+  const url = new URL(window.location.href);
+  const authCode = url.searchParams.get('code');
+  const hasAuthFragment = /access_token=|refresh_token=|provider_token=/.test(window.location.hash);
 
-  if (!code) {
-    throw new Error('Missing auth code in callback URL.');
+  if (!authCode && !hasAuthFragment) {
+    return;
   }
 
-  const { error } = await client.auth.exchangeCodeForSession(code);
-  if (error) throw error;
+  if (authCode) {
+    const { error } = await client.auth.exchangeCodeForSession(authCode);
+    if (error) throw error;
+  }
+
+  if (window.history.replaceState) {
+    const cleanUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`;
+    window.history.replaceState({}, document.title, cleanUrl);
+  }
 };
+
+export const exchangeAuthCodeForSession = processAuthRedirect;
 
 export const ensureUserProfile = async (authUser: AuthUser): Promise<User> => {
   const client = ensureSupabase();

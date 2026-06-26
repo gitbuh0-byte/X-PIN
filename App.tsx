@@ -16,7 +16,7 @@ import AuthCallback from './pages/AuthCallback.tsx';
 import { soundManager } from './services/soundManager.ts';
 import { RANK_CONFIG } from './constants.ts';
 import { detectPerformanceProfile, disableAnimationsGlobally } from './utils/performanceOptimizer.ts';
-import { getCurrentAuthenticatedUser, logout, subscribeToAuthChanges, syncBackendSession, updateUserProfile } from './services/auth.ts';
+import { getCurrentAuthenticatedUser, logout, processAuthRedirect, subscribeToAuthChanges, syncBackendSession, updateUserProfile } from './services/auth.ts';
 
 const INITIAL_USER: User = {
   id: '',
@@ -196,6 +196,7 @@ const AppContent: React.FC = () => {
 
     const hydrateAuth = async () => {
       try {
+        await processAuthRedirect();
         const authenticatedUser = await getCurrentAuthenticatedUser();
 
         if (cancelled) return;
@@ -396,8 +397,19 @@ const AppContent: React.FC = () => {
     setActiveSessions(prev => prev.map(s => s.id === roomId ? { ...s, status, lastUpdate: Date.now() } : s));
   }, []);
 
-  const handleLogin = () => {
-    navigate('/');
+  const handleLogin = async () => {
+    try {
+      const authenticatedUser = await getCurrentAuthenticatedUser();
+      if (authenticatedUser) {
+        setUser(authenticatedUser);
+        setIsAuthenticated(true);
+        await syncBackendSession();
+      }
+    } catch (error) {
+      console.error('Login state hydration failed:', error);
+    } finally {
+      navigate('/');
+    }
   };
 
   const handleLogout = async () => {
