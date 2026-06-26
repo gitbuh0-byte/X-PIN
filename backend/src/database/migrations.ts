@@ -18,6 +18,8 @@ export async function runMigrations() {
       balance DECIMAL(18, 2) NOT NULL DEFAULT 0,
       total_wagered DECIMAL(18, 2) NOT NULL DEFAULT 0,
       total_won DECIMAL(18, 2) NOT NULL DEFAULT 0,
+      total_profit DECIMAL(18, 2) NOT NULL DEFAULT 0,
+      total_loss DECIMAL(18, 2) NOT NULL DEFAULT 0,
       role VARCHAR(50) NOT NULL DEFAULT 'user',
       verification_status VARCHAR(50) NOT NULL DEFAULT 'unverified',
       is_active BOOLEAN NOT NULL DEFAULT true,
@@ -27,6 +29,8 @@ export async function runMigrations() {
     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
     CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
     ALTER TABLE users ADD COLUMN IF NOT EXISTS supabase_user_id UUID;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS total_profit DECIMAL(18,2) NOT NULL DEFAULT 0;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS total_loss DECIMAL(18,2) NOT NULL DEFAULT 0;
     CREATE UNIQUE INDEX IF NOT EXISTS idx_users_supabase_user_id ON users(supabase_user_id);
     `,
 
@@ -141,6 +145,19 @@ export async function runMigrations() {
     );
     CREATE INDEX IF NOT EXISTS idx_rate_limits_key ON rate_limits(key);
     CREATE INDEX IF NOT EXISTS idx_rate_limits_expires ON rate_limits(expires_at);
+    `,
+    // Platform financials tracking (profits & losses aggregated / journal)
+    `
+    CREATE TABLE IF NOT EXISTS platform_financials (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      period DATE NOT NULL DEFAULT CURRENT_DATE,
+      profit DECIMAL(18,2) NOT NULL DEFAULT 0,
+      loss DECIMAL(18,2) NOT NULL DEFAULT 0,
+      source VARCHAR(255),
+      metadata JSONB,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_platform_financials_period ON platform_financials(period);
     `,
   ];
 
