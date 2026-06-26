@@ -5,6 +5,14 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
+    const inlineEnv = {
+      VITE_SUPABASE_URL: env.VITE_SUPABASE_URL || env.SUPABASE_URL || process.env.SUPABASE_URL || '',
+      VITE_SUPABASE_ANON_KEY: env.VITE_SUPABASE_ANON_KEY || env.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '',
+      VITE_GEMINI_API_KEY: env.VITE_GEMINI_API_KEY || env.GEMINI_API_KEY || process.env.GEMINI_API_KEY || '',
+      VITE_BACKEND_URL: env.VITE_BACKEND_URL || env.BACKEND_URL || process.env.BACKEND_URL || '',
+      VITE_BACKEND_WS_URL: env.VITE_BACKEND_WS_URL || env.BACKEND_WS_URL || process.env.BACKEND_WS_URL || '',
+    };
+
     return {
       server: {
         port: 3000,
@@ -52,8 +60,13 @@ export default defineConfig(({ mode }) => {
         })
       ],
       define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+        'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(inlineEnv.VITE_SUPABASE_URL),
+        'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(inlineEnv.VITE_SUPABASE_ANON_KEY),
+        'import.meta.env.VITE_GEMINI_API_KEY': JSON.stringify(inlineEnv.VITE_GEMINI_API_KEY),
+        'import.meta.env.VITE_BACKEND_URL': JSON.stringify(inlineEnv.VITE_BACKEND_URL),
+        'import.meta.env.VITE_BACKEND_WS_URL': JSON.stringify(inlineEnv.VITE_BACKEND_WS_URL),
+        'process.env.API_KEY': JSON.stringify(inlineEnv.VITE_GEMINI_API_KEY),
+        'process.env.GEMINI_API_KEY': JSON.stringify(inlineEnv.VITE_GEMINI_API_KEY),
       },
       resolve: {
         alias: {

@@ -11,7 +11,8 @@ export const generateGameCommentary = async (
   playerCount: number
 ): Promise<string> => {
   try {
-    const ai = new GoogleGenerativeAI(process.env.VITE_GEMINI_API_KEY || "");
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+    const ai = new GoogleGenerativeAI(apiKey);
     const model = ai.getGenerativeModel({
       model: 'gemini-1.5-flash',
       systemInstruction: "You are an elite, high-energy casino commentator for 'X PIN'. Generate a short, hype sentence (max 15 words) congratulating the winner. Use gambling slang and keep it intense."
@@ -35,7 +36,8 @@ export const chatWithAiOracle = async (
   history: string[]
 ): Promise<string> => {
   try {
-    const ai = new GoogleGenerativeAI(process.env.VITE_GEMINI_API_KEY || "");
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+    const ai = new GoogleGenerativeAI(apiKey);
     const model = ai.getGenerativeModel({
       model: 'gemini-1.5-pro',
       systemInstruction: "You are the 'X PIN Oracle'. You live within the digital circuitry of this gambling engine. Give cryptic, mystical, and short advice about luck and fortune. Stay in character, be brief, and never encourage irresponsible behavior."
