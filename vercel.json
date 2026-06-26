@@ -8,6 +8,10 @@
     }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "/assets/.*", "dest": "/assets/$1" },
+    { "src": "/sw.js", "dest": "/sw.js" },
+    { "src": "/workbox-.*\\.js", "dest": "/workbox-$1.js" },
+    { "src": "/manifest.webmanifest", "dest": "/manifest.webmanifest" },
+    { "src": ".*", "dest": "/index.html" }
   ]
 }
