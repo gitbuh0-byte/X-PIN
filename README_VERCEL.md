@@ -14,8 +14,9 @@ Deployment to Vercel
 Steps to deploy frontend on Vercel (quick):
 1. Push repo to GitHub
 2. In Vercel, create a new Project → import the GitHub repo
-3. Set the environment variables listed above in Project Settings
-4. Vercel will run `npm run build` (make sure `package.json` has a `build` script - this repo uses Vite)
+3. If Vercel asks for a multi-service config, use the included `vercel.json` file. It defines both the frontend root and the backend service.
+4. Set the environment variables listed above in Project Settings
+5. Vercel will run `npm run build` for the frontend automatically from `package.json`, and the backend service will use `backend/vercel-build` to compile TypeScript.
 
 Notes:
 - I removed the Firebase env vars from `/.env` because the app now uses Supabase for auth. If you still need Firebase helpers, re-add the values in Vercel env settings.
