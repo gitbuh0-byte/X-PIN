@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-const appOrigin = import.meta.env.VITE_APP_URL || window.location.origin;
+const appOrigin = import.meta.env.VITE_APP_URL || 'https://x-pin-theta.vercel.app';
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
