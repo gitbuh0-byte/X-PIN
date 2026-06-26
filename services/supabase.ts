@@ -20,4 +20,4 @@ export const supabase = isSupabaseConfigured
     })
   : null;
 
-export const getAuthCallbackUrl = () => `${appOrigin}/auth/callback`;
+export const getAuthCallbackUrl = () => `${appOrigin}/#/auth/callback`;
