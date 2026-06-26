@@ -11,13 +11,16 @@ Deployment to Vercel
   - `SUPABASE_SERVICE_ROLE_KEY` (service role - secret)
   - `DATABASE_URL` (if using external DB)
 
-Steps to deploy frontend on Vercel (quick):
+Steps to deploy this project on Vercel:
 1. Push repo to GitHub
 2. In Vercel, create a new Project → import the GitHub repo
-3. If Vercel asks for a multi-service config, use the included `vercel.json` file. It defines both the frontend root and the backend service.
+3. The included `vercel.json` file now supports a single Vercel project with:
+   - frontend static build from `package.json`
+   - backend API routes served from `api/[...path].ts`
 4. Set the environment variables listed above in Project Settings
-5. Vercel will run `npm run build` for the frontend automatically from `package.json`, and the backend service will use `backend/vercel-build` to compile TypeScript.
+5. Redeploy so the frontend bundle picks up the `VITE_` vars
 
 Notes:
+- `VITE_BACKEND_URL` should be set to `/api` if frontend and backend run in the same Vercel project.
 - I removed the Firebase env vars from `/.env` because the app now uses Supabase for auth. If you still need Firebase helpers, re-add the values in Vercel env settings.
 - Keep `SUPABASE_SERVICE_ROLE_KEY` strictly server-side. Do not add it to the frontend Vercel environment.
