@@ -12,7 +12,7 @@ export const supabase = isSupabaseConfigured
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: (url, params) => {
-          if (url.hash.startsWith('#/auth/callback')) return true;
+          if (url.hash.startsWith('#/')) return true;
           if (url.hash.includes('access_token=') || url.hash.includes('refresh_token=') || url.hash.includes('provider_token=')) return true;
           return Boolean(params.access_token || params.error_description || params.error_description);
         },
@@ -20,4 +20,4 @@ export const supabase = isSupabaseConfigured
     })
   : null;
 
-export const getAuthCallbackUrl = () => `${appOrigin}/#/auth/callback`;
+export const getAuthCallbackUrl = () => `${appOrigin}/#/`;
