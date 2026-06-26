@@ -7,8 +7,13 @@ registerSW({
   immediate: true,
 });
 
-if (window.location.pathname === '/auth/callback' && !window.location.hash.startsWith('#/auth/callback')) {
-  const normalizedHashUrl = `${window.location.origin}/#/auth/callback${window.location.search}`;
+const authHash = window.location.hash;
+const authHashMatch = authHash.match(/^#(access_token|refresh_token|provider_token|type)=/);
+if (window.location.pathname === '/auth/callback' && !authHash.startsWith('#/auth/callback')) {
+  const normalizedHashUrl = `${window.location.origin}/#/auth/callback${window.location.search}${authHash}`;
+  window.location.replace(normalizedHashUrl);
+} else if (authHashMatch) {
+  const normalizedHashUrl = `${window.location.origin}/#/auth/callback?${authHash.slice(1)}`;
   window.location.replace(normalizedHashUrl);
 }
 

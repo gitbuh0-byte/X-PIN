@@ -424,7 +424,7 @@ const AppContent: React.FC = () => {
     }
   };
 
-  if (location.pathname === '/auth/callback') {
+  if (location.pathname === '/auth/callback' || location.hash.startsWith('#/auth/callback')) {
     return <AuthCallback />;
   }
 
