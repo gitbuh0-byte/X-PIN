@@ -205,6 +205,16 @@ const AppContent: React.FC = () => {
           setUser(authenticatedUser);
           setIsAuthenticated(true);
           void syncBackendSession();
+          // If we arrived at the root after OAuth redirect, send user to /home
+          try {
+            const hash = window.location.hash || '';
+            const isRootHash = hash === '' || hash === '#/';
+            if (isRootHash && window.location.pathname === '/') {
+              navigate('/home');
+            }
+          } catch (e) {
+            // ignore navigation errors
+          }
         } else {
           setUser(INITIAL_USER);
           setIsAuthenticated(false);
