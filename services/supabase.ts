@@ -11,7 +11,11 @@ export const supabase = isSupabaseConfigured
       auth: {
         persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: true,
+        detectSessionInUrl: (url, params) => {
+          if (url.hash.startsWith('#/auth/callback')) return true;
+          if (url.hash.includes('access_token=') || url.hash.includes('refresh_token=') || url.hash.includes('provider_token=')) return true;
+          return Boolean(params.access_token || params.error_description || params.error_description);
+        },
       },
     })
   : null;
