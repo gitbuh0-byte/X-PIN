@@ -424,7 +424,14 @@ const AppContent: React.FC = () => {
     }
   };
 
-  if (location.pathname === '/auth/callback' || location.hash.startsWith('#/auth/callback')) {
+  const isSupabaseCallback =
+    location.pathname === '/auth/callback' ||
+    location.hash.startsWith('#/auth/callback') ||
+    location.hash.includes('access_token=') ||
+    location.hash.includes('refresh_token=') ||
+    location.hash.includes('provider_token=');
+
+  if (isSupabaseCallback) {
     return <AuthCallback />;
   }
 

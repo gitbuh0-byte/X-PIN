@@ -12,7 +12,7 @@ const AuthCallback: React.FC = () => {
       try {
         await processAuthRedirect();
         soundManager.play('win');
-        navigate('/', { replace: true });
+        window.location.replace(`${window.location.origin}/#/`);
       } catch (err) {
         soundManager.play('error');
         setError(err instanceof Error ? err.message : 'Authentication callback failed.');
