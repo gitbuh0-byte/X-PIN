@@ -180,6 +180,9 @@ const AppContent: React.FC = () => {
   const location = useLocation();
   const isHydratingAuthRef = useRef(true);
 
+  const showDebug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1';
+  const [debugUser, setDebugUser] = useState<User | null | 'loading'>(null);
+
   // Initialize performance optimization on app startup
   useEffect(() => {
     const perfProfile = detectPerformanceProfile();
@@ -282,6 +285,23 @@ const AppContent: React.FC = () => {
       document.removeEventListener('touchstart', handleFirstInteraction);
     };
   }, []);
+
+  useEffect(() => {
+    if (!showDebug) return;
+    let mounted = true;
+    (async () => {
+      setDebugUser('loading');
+      try {
+        const u = await getCurrentAuthenticatedUser();
+        if (!mounted) return;
+        setDebugUser(u);
+      } catch (e) {
+        if (!mounted) return;
+        setDebugUser(null);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [showDebug]);
 
   const handleUpdateBalance = useCallback((amount: number) => {
     soundManager.forceBgmStart(); // Ensure music plays when user interacts
@@ -459,6 +479,15 @@ const AppContent: React.FC = () => {
   }
 
   return (
+    <>
+      {showDebug && (
+        <div className="fixed right-3 bottom-3 z-[9999] bg-black/80 border border-white/10 p-3 text-xs text-white max-w-sm rounded-md font-mono">
+          <div className="font-arcade text-[11px] mb-1">DEBUG</div>
+          <div style={{maxHeight: 220, overflow: 'auto'}}>
+            <pre className="whitespace-pre-wrap text-[11px]">{JSON.stringify({ isAuthResolved, isAuthenticated, hash: window.location.hash, debugUser }, null, 2)}</pre>
+          </div>
+        </div>
+      )}
     <Layout user={user} onOpenPayment={(type) => setPayment({ open: true, type })}>
       <Routes>
         <Route path="/" element={
