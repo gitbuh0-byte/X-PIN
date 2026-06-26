@@ -12,7 +12,7 @@ const AuthCallback: React.FC = () => {
       try {
         await processAuthRedirect();
         soundManager.play('win');
-        setTimeout(() => navigate('/', { replace: true }), 300);
+        setTimeout(() => navigate('/home', { replace: true }), 300);
       } catch (err) {
         soundManager.play('error');
         setError(err instanceof Error ? err.message : 'Authentication callback failed.');
@@ -34,7 +34,7 @@ const AuthCallback: React.FC = () => {
         {error && (
           <button
             type="button"
-            onClick={() => navigate('/', { replace: true })}
+            onClick={() => navigate('/home', { replace: true })}
             className="mt-6 px-6 py-3 bg-neon-cyan text-black font-arcade uppercase tracking-widest text-xs sm:text-sm"
           >
             Back to Login

@@ -408,7 +408,7 @@ const AppContent: React.FC = () => {
     } catch (error) {
       console.error('Login state hydration failed:', error);
     } finally {
-      navigate('/');
+      navigate('/home');
     }
   };
 
@@ -452,6 +452,15 @@ const AppContent: React.FC = () => {
     <Layout user={user} onOpenPayment={(type) => setPayment({ open: true, type })}>
       <Routes>
         <Route path="/" element={
+          <Home
+            user={user}
+            customRooms={customRooms}
+            onCreateCustomRoom={handleCreateCustomRoom}
+            onDeleteCustomRoom={handleDeleteCustomRoom}
+            onJoinGame={handleJoinGame}
+          />
+        } />
+        <Route path="/home" element={
           <Home
             user={user}
             customRooms={customRooms}
