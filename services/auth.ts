@@ -251,13 +251,23 @@ export const processAuthRedirect = async (): Promise<AuthRedirectResult> => {
   }
 
   if (hasAuthFragment && !authCode) {
-    const { data, error } = await client.auth.getSession();
+    const { data, error } = await client.auth.getSessionFromUrl();
     sessionResult = { data, error };
     if (error) {
-      console.error('[auth] getSession after auth fragment failed', error);
+      console.error('[auth] getSessionFromUrl after auth fragment failed', error);
       throw error;
     }
-    console.log('[auth] getSession after auth fragment', data);
+    console.log('[auth] getSessionFromUrl after auth fragment', data);
+
+    if (!data?.session) {
+      const sessionResponse = await client.auth.getSession();
+      sessionResult = { data: sessionResponse, error: sessionResponse.error };
+      if (sessionResponse.error) {
+        console.error('[auth] fallback getSession after auth fragment failed', sessionResponse.error);
+        throw sessionResponse.error;
+      }
+      console.log('[auth] fallback getSession after auth fragment', sessionResponse.data);
+    }
   }
 
   if (window.history.replaceState) {
