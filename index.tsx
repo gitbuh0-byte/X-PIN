@@ -9,7 +9,7 @@ registerSW({
 
 const authHash = window.location.hash;
 const authHashMatch = authHash.match(/^#(access_token|refresh_token|provider_token|type)=/);
-const callbackAuthHashMatch = authHash.match(/^#\/auth\/callback#(access_token|refresh_token|provider_token|type)=/);
+const callbackAuthHashMatch = authHash.match(/^#\/?auth\/callback#(access_token|refresh_token|provider_token|type)=/);
 if (window.location.pathname === '/auth/callback' && !authHash.startsWith('#/auth/callback')) {
   const normalizedHashUrl = authHashMatch
     ? `${window.location.origin}/#/auth/callback?${authHash.slice(1)}`

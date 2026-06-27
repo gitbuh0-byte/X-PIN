@@ -220,12 +220,35 @@ const parseAuthCodeFromHash = (hash: string): string | null => {
   return params.get('code');
 };
 
+const parseAuthFragmentFromHash = (hash: string): string | null => {
+  if (!hash) return null;
+  let cleanedHash = hash.startsWith('#') ? hash.slice(1) : hash;
+
+  if (cleanedHash.startsWith('/auth/callback#')) {
+    cleanedHash = cleanedHash.slice('/auth/callback#'.length);
+  } else if (cleanedHash.startsWith('/auth/callback?')) {
+    cleanedHash = cleanedHash.slice('/auth/callback?'.length);
+  } else if (cleanedHash.startsWith('#/auth/callback#')) {
+    cleanedHash = cleanedHash.slice('#/auth/callback#'.length);
+  } else if (cleanedHash.startsWith('#/auth/callback?')) {
+    cleanedHash = cleanedHash.slice('#/auth/callback?'.length);
+  }
+
+  if (!cleanedHash) return null;
+  if (!cleanedHash.startsWith('access_token=') && !cleanedHash.startsWith('refresh_token=') && !cleanedHash.startsWith('provider_token=') && !cleanedHash.startsWith('type=')) {
+    return null;
+  }
+
+  return `#${cleanedHash}`;
+};
+
 export const processAuthRedirect = async (): Promise<AuthRedirectResult> => {
   if (!isSupabaseConfigured || !supabase) return { authCode: null, hasAuthFragment: false };
   const client = ensureSupabase();
   const url = new URL(window.location.href);
   const authCode = url.searchParams.get('code') || parseAuthCodeFromHash(window.location.hash);
-  const hasAuthFragment = /access_token=|refresh_token=|provider_token=|code=/.test(window.location.hash);
+  const authFragment = parseAuthFragmentFromHash(window.location.hash);
+  const hasAuthFragment = Boolean(authFragment);
   let sessionResult: any;
 
   console.log('[auth] processAuthRedirect start', {
@@ -233,6 +256,7 @@ export const processAuthRedirect = async (): Promise<AuthRedirectResult> => {
     search: url.search,
     hash: window.location.hash,
     authCode,
+    authFragment,
     hasAuthFragment,
   });
 
@@ -251,6 +275,10 @@ export const processAuthRedirect = async (): Promise<AuthRedirectResult> => {
   }
 
   if (hasAuthFragment && !authCode) {
+    const hash = authFragment || window.location.hash;
+    if (hash.startsWith('#')) {
+      window.location.hash = hash;
+    }
     const { data, error } = await client.auth.getSession();
     sessionResult = { data, error };
     if (error) {
