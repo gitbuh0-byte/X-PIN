@@ -235,6 +235,15 @@ const parseAuthFragmentFromHash = (hash: string): string | null => {
   }
 
   if (!cleanedHash) return null;
+
+  // Handle a raw JWT at the start of the callback query string.
+  // Example: #/auth/callback?eyJhbGciOiJFUzI1NiIsImtpZCI6...&expires_at=...
+  const firstParam = cleanedHash.split('&')[0];
+  const jwtPattern = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
+  if (jwtPattern.test(firstParam) && !firstParam.includes('=')) {
+    cleanedHash = `access_token=${firstParam}${cleanedHash.slice(firstParam.length)}`;
+  }
+
   if (!cleanedHash.startsWith('access_token=') && !cleanedHash.startsWith('refresh_token=') && !cleanedHash.startsWith('provider_token=') && !cleanedHash.startsWith('type=')) {
     return null;
   }
