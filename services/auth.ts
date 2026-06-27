@@ -211,6 +211,7 @@ export const processAuthRedirect = async (): Promise<void> => {
 
   if (window.history.replaceState) {
     const cleanUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`;
+    console.log('[auth] cleaning URL after auth, cleanUrl=', cleanUrl);
     window.history.replaceState({}, document.title, cleanUrl);
   }
 };

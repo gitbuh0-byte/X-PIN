@@ -201,6 +201,8 @@ const AppContent: React.FC = () => {
         await processAuthRedirect();
         const authenticatedUser = await getCurrentAuthenticatedUser();
 
+        console.log('[app] after processAuthRedirect, authenticatedUser=', authenticatedUser);
+
         if (cancelled) return;
 
         if (authenticatedUser) {
