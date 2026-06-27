@@ -420,11 +420,10 @@ const AppContent: React.FC = () => {
         setUser(authenticatedUser);
         setIsAuthenticated(true);
         await syncBackendSession();
+        navigate('/home');
       }
     } catch (error) {
       console.error('Login state hydration failed:', error);
-    } finally {
-      navigate('/home');
     }
   };
 

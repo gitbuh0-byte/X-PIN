@@ -193,21 +193,40 @@ export const signInWithProvider = async (method: AuthMethod): Promise<void> => {
   if (error) throw error;
 };
 
+interface AuthRedirectResult {
+  authCode: string | null;
+  hasAuthFragment: boolean;
+  sessionResult?: any;
+}
+
 const parseAuthCodeFromHash = (hash: string): string | null => {
   if (!hash) return null;
   const cleanedHash = hash.startsWith('#') ? hash.slice(1) : hash;
   const queryStart = cleanedHash.indexOf('?');
-  if (queryStart === -1) return null;
-  const params = new URLSearchParams(cleanedHash.slice(queryStart + 1));
+  const fragmentStart = cleanedHash.indexOf('#');
+  let queryString = '';
+
+  if (queryStart >= 0) {
+    queryString = cleanedHash.slice(queryStart + 1);
+  } else if (fragmentStart >= 0) {
+    queryString = cleanedHash.slice(fragmentStart + 1);
+  } else if (cleanedHash.includes('code=')) {
+    queryString = cleanedHash;
+  }
+
+  if (!queryString) return null;
+
+  const params = new URLSearchParams(queryString);
   return params.get('code');
 };
 
-export const processAuthRedirect = async (): Promise<void> => {
-  if (!isSupabaseConfigured || !supabase) return;
+export const processAuthRedirect = async (): Promise<AuthRedirectResult> => {
+  if (!isSupabaseConfigured || !supabase) return { authCode: null, hasAuthFragment: false };
   const client = ensureSupabase();
   const url = new URL(window.location.href);
   const authCode = url.searchParams.get('code') || parseAuthCodeFromHash(window.location.hash);
   const hasAuthFragment = /access_token=|refresh_token=|provider_token=|code=/.test(window.location.hash);
+  let sessionResult: any;
 
   console.log('[auth] processAuthRedirect start', {
     href: window.location.href,
@@ -218,11 +237,12 @@ export const processAuthRedirect = async (): Promise<void> => {
   });
 
   if (!authCode && !hasAuthFragment) {
-    return;
+    return { authCode: null, hasAuthFragment, sessionResult: null };
   }
 
   if (authCode) {
     const { data, error } = await client.auth.exchangeCodeForSession(authCode);
+    sessionResult = { data, error };
     if (error) {
       console.error('[auth] exchangeCodeForSession failed', error);
       throw error;
@@ -232,6 +252,7 @@ export const processAuthRedirect = async (): Promise<void> => {
 
   if (hasAuthFragment && !authCode) {
     const { data, error } = await client.auth.getSession();
+    sessionResult = { data, error };
     if (error) {
       console.error('[auth] getSession after auth fragment failed', error);
       throw error;
@@ -244,6 +265,8 @@ export const processAuthRedirect = async (): Promise<void> => {
     console.log('[auth] cleaning URL after auth, cleanUrl=', cleanUrl);
     window.history.replaceState({}, document.title, cleanUrl);
   }
+
+  return { authCode, hasAuthFragment, sessionResult };
 };
 
 export const exchangeAuthCodeForSession = processAuthRedirect;

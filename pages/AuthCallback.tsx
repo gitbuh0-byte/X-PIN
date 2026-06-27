@@ -6,21 +6,33 @@ import { getCurrentAuthenticatedUser, processAuthRedirect } from '../services/au
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<string | null>(null);
 
   useEffect(() => {
     const complete = async () => {
       try {
-        await processAuthRedirect();
+        const result = await processAuthRedirect();
         const authenticatedUser = await getCurrentAuthenticatedUser();
         if (authenticatedUser) {
           soundManager.play('win');
           navigate('/home', { replace: true });
           return;
         }
-        throw new Error('No authenticated session found after callback. Please try signing in again.');
+        const info = {
+          message: 'No authenticated session found after callback.',
+          location: {
+            href: window.location.href,
+            search: window.location.search,
+            hash: window.location.hash,
+          },
+          result,
+        };
+        throw new Error(JSON.stringify(info, null, 2));
       } catch (err) {
         soundManager.play('error');
-        setError(err instanceof Error ? err.message : 'Authentication callback failed.');
+        const message = err instanceof Error ? err.message : 'Authentication callback failed.';
+        setError(message);
+        setDebugInfo(err instanceof Error ? err.stack || JSON.stringify(err, null, 2) : JSON.stringify(err, null, 2));
       }
     };
 
@@ -37,13 +49,20 @@ const AuthCallback: React.FC = () => {
           {error || 'Completing secure sign-in and loading your profile...'}
         </p>
         {error && (
-          <button
-            type="button"
-            onClick={() => navigate('/home', { replace: true })}
-            className="mt-6 px-6 py-3 bg-neon-cyan text-black font-arcade uppercase tracking-widest text-xs sm:text-sm"
-          >
-            Back to Login
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={() => navigate('/home', { replace: true })}
+              className="mt-6 px-6 py-3 bg-neon-cyan text-black font-arcade uppercase tracking-widest text-xs sm:text-sm"
+            >
+              Back to Login
+            </button>
+            {debugInfo && (
+              <pre className="mt-6 p-4 text-left text-[10px] leading-snug bg-black/70 border border-neon-pink/20 rounded text-neon-pink overflow-x-auto max-h-56">
+                {debugInfo}
+              </pre>
+            )}
+          </>
         )}
       </div>
     </div>
