@@ -440,12 +440,10 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const isSupabaseCallback =
-    location.hash.includes('access_token=') ||
-    location.hash.includes('refresh_token=') ||
-    location.hash.includes('provider_token=');
+  const hashRoute = location.hash.startsWith('#') ? location.hash.slice(1) : location.hash;
+  const isAuthCallbackRoute = location.pathname === '/auth/callback' || hashRoute.startsWith('/auth/callback');
 
-  if (isSupabaseCallback) {
+  if (isAuthCallbackRoute) {
     return <AuthCallback />;
   }
 

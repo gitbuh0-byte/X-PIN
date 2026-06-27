@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { soundManager } from '../services/soundManager.ts';
-import { processAuthRedirect } from '../services/auth.ts';
+import { getCurrentAuthenticatedUser, processAuthRedirect } from '../services/auth.ts';
 
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
@@ -11,8 +11,13 @@ const AuthCallback: React.FC = () => {
     const complete = async () => {
       try {
         await processAuthRedirect();
-        soundManager.play('win');
-        setTimeout(() => navigate('/home', { replace: true }), 300);
+        const authenticatedUser = await getCurrentAuthenticatedUser();
+        if (authenticatedUser) {
+          soundManager.play('win');
+          navigate('/home', { replace: true });
+          return;
+        }
+        throw new Error('No authenticated session found after callback. Please try signing in again.');
       } catch (err) {
         soundManager.play('error');
         setError(err instanceof Error ? err.message : 'Authentication callback failed.');

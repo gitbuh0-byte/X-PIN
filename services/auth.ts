@@ -193,20 +193,50 @@ export const signInWithProvider = async (method: AuthMethod): Promise<void> => {
   if (error) throw error;
 };
 
+const parseAuthCodeFromHash = (hash: string): string | null => {
+  if (!hash) return null;
+  const cleanedHash = hash.startsWith('#') ? hash.slice(1) : hash;
+  const queryStart = cleanedHash.indexOf('?');
+  if (queryStart === -1) return null;
+  const params = new URLSearchParams(cleanedHash.slice(queryStart + 1));
+  return params.get('code');
+};
+
 export const processAuthRedirect = async (): Promise<void> => {
   if (!isSupabaseConfigured || !supabase) return;
   const client = ensureSupabase();
   const url = new URL(window.location.href);
-  const authCode = url.searchParams.get('code');
-  const hasAuthFragment = /access_token=|refresh_token=|provider_token=/.test(window.location.hash);
+  const authCode = url.searchParams.get('code') || parseAuthCodeFromHash(window.location.hash);
+  const hasAuthFragment = /access_token=|refresh_token=|provider_token=|code=/.test(window.location.hash);
+
+  console.log('[auth] processAuthRedirect start', {
+    href: window.location.href,
+    search: url.search,
+    hash: window.location.hash,
+    authCode,
+    hasAuthFragment,
+  });
 
   if (!authCode && !hasAuthFragment) {
     return;
   }
 
   if (authCode) {
-    const { error } = await client.auth.exchangeCodeForSession(authCode);
-    if (error) throw error;
+    const { data, error } = await client.auth.exchangeCodeForSession(authCode);
+    if (error) {
+      console.error('[auth] exchangeCodeForSession failed', error);
+      throw error;
+    }
+    console.log('[auth] exchangeCodeForSession success', data);
+  }
+
+  if (hasAuthFragment && !authCode) {
+    const { data, error } = await client.auth.getSession();
+    if (error) {
+      console.error('[auth] getSession after auth fragment failed', error);
+      throw error;
+    }
+    console.log('[auth] getSession after auth fragment', data);
   }
 
   if (window.history.replaceState) {

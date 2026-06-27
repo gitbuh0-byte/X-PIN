@@ -12,12 +12,14 @@ export const supabase = isSupabaseConfigured
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: (url, params) => {
-          if (url.hash.startsWith('#/')) return true;
-          if (url.hash.includes('access_token=') || url.hash.includes('refresh_token=') || url.hash.includes('provider_token=')) return true;
-          return Boolean(params.access_token || params.error_description || params.error_description);
+          const hash = url.hash || '';
+          const authFragmentPattern = /access_token=|refresh_token=|provider_token=|code=|error_description=/;
+          const hasAuthInHash = authFragmentPattern.test(hash);
+          const hasAuthInSearch = Boolean(params.access_token || params.error_description || params.error);
+          return hasAuthInHash || hasAuthInSearch;
         },
       },
     })
   : null;
 
-export const getAuthCallbackUrl = () => `${appOrigin}/#/`;
+export const getAuthCallbackUrl = () => `${appOrigin}/#/auth/callback`;
